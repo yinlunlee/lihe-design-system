@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>立和设计 · 系统全链路测试报告</title>
+<style>
+  :root {
+    --sage: #5A7D6B;
+    --sage-dark: #3F5D50;
+    --sage-bg: #F0F4F2;
+    --green: #4CAF50;
+    --amber: #FF9800;
+    --red: #F44336;
+    --bg: #FAFBF9;
+    --card: #FFFFFF;
+    --text: #2C3E35;
+    --text-2: #5A6B62;
+    --border: #E0E5E2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .header h1 { font-size: 24px; margin-bottom: 8px; }
+  .header p { opacity: 0.85; font-size: 14px; }
+
+  /* Section */
+  .section {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sage-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: var(--sage);
+    border-radius: 2px;
+  }
+
+  /* Test Result Cards */
+  .test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .test-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .test-card.pass { border-color: var(--green); background: #F1F8F4; }
+  .test-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .test-card .label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .test-card .status { font-size: 12px; color: var(--green); margin-top: 4px; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 10px 12px; background: var(--sage-bg); color: var(--sage-dark); font-weight: 600; border-radius: 6px 6px 0 0; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .badge-green { background: #E8F5E9; color: #2E7D32; }
+  .badge-amber { background: #FFF3E0; color: #E65100; }
+  .badge-blue { background: #E3F2FD; color: #1565C0; }
+
+  /* Code Block */
+  pre {
+    background: #1E2A26;
+    color: #A8D8B9;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+  }
+
+  /* Links */
+  .link-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .link-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .link-card:hover { border-color: var(--sage); box-shadow: 0 2px 8px rgba(90,125,107,0.15); }
+  .link-card .title { font-weight: 600; color: var(--sage-dark); margin-bottom: 4px; }
+  .link-card .url { font-size: 12px; color: var(--text-2); font-family: monospace; }
+
+  /* Staff Accounts */
+  .staff-list { display: flex; gap: 12px; flex-wrap: wrap; }
+  .staff-item {
+    background: var(--sage-bg);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  .staff-item strong { color: var(--sage-dark); }
+
+  .footer { text-align: center; padding: 24px; color: var(--text-2); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>立和设计 · 自动化运营管理系统</h1>
+    <p>H5 ↔ Node.js 后端 ↔ 飞书多维表格 · 全链路测试报告</p>
+    <p style="margin-top:8px;font-size:13px;opacity:0.7">生成时间：2026-08-02 23:00</p>
+  </div>
+
+  <!-- Test Results -->
+  <div class="section">
+    <div class="section-title">全链路测试结果</div>
+    <div class="test-grid">
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">飞书 API 连接</div>
+        <div class="status">凭证有效 · Token 获取成功</div>
+      </div>
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">多维表格创建</div>
+        <div class="status">6张表 · 全部字段就绪</div>
+      </div>
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">需求提交 API</div>
+        <div class="status">POST /api/needs → 飞书写入成功</div>
+      </div>
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">项目查询 API</div>
+        <div class="status">GET /api/project → 数据回读成功</div>
+      </div>
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">员工登录 API</div>
+        <div class="status">4个员工账号 · 认证通过</div>
+      </div>
+      <div class="test-card pass">
+        <div class="icon">✅</div>
+        <div class="label">节点查询 API</div>
+        <div class="status">GET /api/nodes → 正常响应</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feishu Tables -->
+  <div class="section">
+    <div class="section-title">飞书多维表格结构</div>
+    <table>
+      <thead>
+        <tr><th>表名</th><th>Table ID</th><th>用途</th><th>状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>项目管理表</td><td>tblAG1FhgpckeRfC</td><td>项目全生命周期管理</td><td><span class="badge badge-green">已创建</span></td></tr>
+        <tr><td>客户需求表</td><td>tblB46Y4pvnoSWJA</td><td>H5需求表提交数据</td><td><span class="badge badge-green">已创建</span></td></tr>
+        <tr><td>验收清单表</td><td>tblIpniPozX2jYll</td><td>各阶段验收标准记录</td><td><span class="badge badge-green">已创建</span></td></tr>
+        <tr><td>巡检记录表</td><td>tblcJLchpdyqDW0l</td><td>施工巡检打卡记录</td><td><span class="badge badge-green">已创建</span></td></tr>
+        <tr><td>财务台账表</td><td>tblIgHZwXyOlRORj</td><td>收支流水与对账</td><td><span class="badge badge-green">已创建</span></td></tr>
+        <tr><td>客户确认节点表</td><td>tblWdDRkieHqc1dm</td><td>客户查看/确认/反馈</td><td><span class="badge badge-green">已创建</span></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-2)">
+      飞书 Bitable App Token: <code>VdwxbP1vwa2XjZs2jLmcNBGKnMe</code>
+    </p>
+  </div>
+
+  <!-- API Endpoints -->
+  <div class="section">
+    <div class="section-title">后端 API 接口</div>
+    <table>
+      <thead>
+        <tr><th>接口</th><th>方法</th><th>功能</th><th>飞书表</th><th>状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/api/needs</code></td><td>POST</td><td>客户提交需求表</td><td>客户需求表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/project</code></td><td>GET</td><td>客户按手机号查项目 / 员工查全部</td><td>项目管理表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/nodes</code></td><td>GET</td><td>客户查看确认节点</td><td>客户确认节点表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/upload</code></td><td>POST</td><td>员工上传成果文件</td><td>客户确认节点表</td><td><span class="badge badge-amber">待文件测试</span></td></tr>
+        <tr><td><code>/api/confirm</code></td><td>POST</td><td>客户确认/提交修改意见</td><td>客户确认节点表</td><td><span class="badge badge-blue">已实现</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- H5 Access Links -->
+  <div class="section">
+    <div class="section-title">H5 页面访问地址</div>
+    <div class="link-grid">
+      <a class="link-card" href="/needs.html">
+        <div class="title">📋 客户需求表</div>
+        <div class="url">http://localhost:3000/needs.html</div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:4px">客户填写设计需求，提交到飞书</div>
+      </a>
+      <a class="link-card" href="/client.html">
+        <div class="title">👁️ 客户查看端</div>
+        <div class="url">http://localhost:3000/client.html</div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:4px">客户查看项目进度和确认节点</div>
+      </a>
+      <a class="link-card" href="/staff.html">
+        <div class="title">📤 员工上传端</div>
+        <div class="url">http://localhost:3000/staff.html</div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:4px">员工登录后上传成果文件</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Staff Accounts -->
+  <div class="section">
+    <div class="section-title">员工登录账号</div>
+    <div class="staff-list">
+      <div class="staff-item"><strong>D01</strong> / 设计部 · 密码: lihe2026</div>
+      <div class="staff-item"><strong>P01</strong> / 项目部 · 密码: lihe2026</div>
+      <div class="staff-item"><strong>B01</strong> / 客户品牌部 · 密码: lihe2026</div>
+      <div class="staff-item"><strong>A01</strong> / 行政财务 · 密码: lihe2026</div>
+    </div>
+  </div>
+
+  <!-- Data Flow -->
+  <div class="section">
+    <div class="section-title">数据流转链路</div>
+    <pre>
+┌──────────┐     POST /api/needs     ┌──────────┐     飞书API      ┌──────────────┐
+│ needs.h5 │  ──────────────────────→ │ Node.js  │  ──────────────→ │ 飞书多维表格  │
+│ 客户需求  │                         │ 后端服务  │  ←────────────── │ 6张表已建好   │
+└──────────┘                         │ :3000    │                  └──────────────┘
+                                     │          │
+┌──────────┐   GET /api/project      │          │     飞书API
+│client.h5 │  ──────────────────────→│          │  ──────────────→  查询项目数据
+│ 客户查看  │  ←──────────────────────│          │  ←──────────────  返回项目列表
+└──────────┘                         │          │
+                                     │          │
+┌──────────┐  GET /api/project(员工)  │          │     飞书API
+│staff.h5  │  ──────────────────────→│          │  ──────────────→  查询全部项目
+│ 员工上传  │  POST /api/upload       │          │  ──────────────→  上传文件+建记录
+└──────────┘  ──────────────────────→│          │
+                                     └──────────┘
+    </pre>
+  </div>
+
+  <!-- Next Steps -->
+  <div class="section">
+    <div class="section-title">后续可做的事</div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>事项</th><th>说明</th><th>优先级</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>飞书机器人消息推送</td><td>客户提交需求/确认节点时，自动推送到飞书群</td><td><span class="badge badge-amber">高</span></td></tr>
+        <tr><td>2</td><td>飞书审批流对接</td><td>验收节点走飞书审批流，自动记录</td><td><span class="badge badge-amber">高</span></td></tr>
+        <tr><td>3</td><td>部署到云服务器</td><td>当前本地运行，部署后可外部访问</td><td><span class="badge badge-blue">中</span></td></tr>
+        <tr><td>4</td><td>飞书工作台嵌入H5</td><td>在飞书App内直接打开H5页面</td><td><span class="badge badge-blue">中</span></td></tr>
+        <tr><td>5</td><td>H5页面品牌定制</td><td>加入公司Logo、配色统一</td><td><span class="badge badge-green">低</span></td></tr>
+        <tr><td>6</td><td>数据看板开发</td><td>老板视角的异常事件看板</td><td><span class="badge badge-green">低</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    立和设计 · 自动化运营管理系统 v1.0 · 2026
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>立和设计 · 员工端</title>
+<style>
+  :root {
+    --sage: #5A7D6B;
+    --sage-light: #7A9D8B;
+    --sage-dark: #3F5D50;
+    --sage-bg: #F0F4F2;
+    --sage-border: #C5D5CC;
+    --text-main: #2C3E35;
+    --text-secondary: #5A6B62;
+    --text-light: #8A9B92;
+    --bg: #FAFBF9;
+    --white: #FFFFFF;
+    --accent: #D4A574;
+    --danger: #C75450;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 2px 12px rgba(90, 125, 107, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* ===== 登录页 ===== */
+  .login-page { padding: 50px 24px; text-align: center; }
+  .login-logo {
+    width: 56px; height: 56px;
+    background: var(--sage);
+    border-radius: 14px;
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--white); font-weight: 700;
+  }
+  .login-title { font-size: 20px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
+  .login-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 32px; }
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    margin-bottom: 12px;
+    background: var(--white);
+    -webkit-appearance: none;
+  }
+  .login-input:focus { outline: none; border-color: var(--sage); }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .login-btn:active { background: var(--sage-dark); }
+
+  /* ===== 导航栏 ===== */
+  .nav-bar {
+    background: var(--white);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--sage-border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 8px; }
+  .nav-logo {
+    width: 28px; height: 28px;
+    background: var(--sage);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white); font-size: 14px; font-weight: 700;
+  }
+  .nav-title { font-size: 16px; font-weight: 600; color: var(--sage-dark); }
+  .nav-user { font-size: 13px; color: var(--text-light); }
+
+  /* ===== 表单区 ===== */
+  .form-section { padding: 16px; }
+  .field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sage-dark);
+    margin: 16px 0 8px;
+  }
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* 选择器 */
+  .select-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .select-tag {
+    padding: 8px 16px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .select-tag.active {
+    background: var(--sage);
+    color: var(--white);
+    border-color: var(--sage);
+  }
+  .select-tag:active { transform: scale(0.95); }
+
+  /* 项目选择下拉 */
+  .project-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius);
+    font-size: 15px;
+    background: var(--white);
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A7D6B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  /* 文本框 */
+  .input-text {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    background: var(--white);
+    -webkit-appearance: none;
+  }
+  .input-text:focus { outline: none; border-color: var(--sage); }
+  textarea.input-text { resize: none; min-height: 70px; line-height: 1.6; }
+
+  /* ===== 上传区 ===== */
+  .upload-area {
+    border: 2px dashed var(--sage-border);
+    border-radius: var(--radius-lg);
+    padding: 24px 16px;
+    text-align: center;
+    background: var(--sage-bg);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .upload-area:active { border-color: var(--sage); background: rgba(90,125,107,0.06); }
+  .upload-icon { font-size: 36px; color: var(--sage); margin-bottom: 8px; }
+  .upload-text { font-size: 14px; color: var(--text-secondary); }
+  .upload-hint { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+  /* 上传按钮行 */
+  .upload-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .upload-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .upload-btn.camera { background: var(--sage); color: var(--white); }
+  .upload-btn.camera:active { background: var(--sage-dark); }
+  .upload-btn.album { background: var(--white); color: var(--sage-dark); border: 1.5px solid var(--sage-border); }
+  .upload-btn:active { transform: scale(0.97); }
+  .upload-btn:disabled { opacity: 0.5; }
+
+  /* 已选文件预览 */
+  .file-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .file-thumb {
+    position: relative;
+    width: 80px; height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--sage-bg);
+  }
+  .file-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .file-thumb-file {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--sage);
+  }
+  .file-remove {
+    position: absolute; top: 2px; right: 2px;
+    width: 20px; height: 20px;
+    background: rgba(0,0,0,0.6);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* 提交按钮 */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 24px;
+    cursor: pointer;
+  }
+  .submit-btn:active { background: var(--sage-dark); }
+  .submit-btn:disabled { opacity: 0.6; }
+
+  /* 上传进度 */
+  .progress-list { margin-top: 12px; }
+  .progress-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--white);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .progress-item.done { color: var(--sage); }
+  .progress-item.error { color: var(--danger); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(63, 93, 80, 0.95);
+    color: var(--white);
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    z-index: 10001;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* 成功页 */
+  .success-page {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--sage);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+    color: var(--white);
+  }
+  .success-page h2 { color: var(--sage-dark); font-size: 18px; margin-bottom: 8px; }
+  .success-page p { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+  .success-btn {
+    padding: 10px 32px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* 项目列表 */
+  .project-list-item {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .project-list-item:active { transform: scale(0.98); }
+  .project-list-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
+  .project-list-meta { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+  .loading { text-align: center; padding: 40px; color: var(--text-light); }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 3px solid var(--sage-bg);
+    border-top: 3px solid var(--sage);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ===== 登录页 ===== -->
+<div id="loginPage" class="login-page">
+  <div class="login-logo">立</div>
+  <div class="login-title">立和设计 · 员工端</div>
+  <div class="login-subtitle">工地现场 · 成果上传</div>
+  <input class="login-input" id="staffIdInput" type="text" placeholder="工号（如 D01/P01/B01）">
+  <input class="login-input" id="passwordInput" type="password" placeholder="密码">
+  <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
+</div>
+
+<!-- ===== 主页面 ===== -->
+<div id="mainPage" style="display:none;">
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <div class="nav-brand">
+      <div class="nav-logo">立</div>
+      <div class="nav-title">成果上传</div>
+    </div>
+    <div class="nav-user" id="navUser"></div>
+  </div>
+
+  <!-- 上传表单 -->
+  <div class="form-section">
+    <!-- 选择项目 -->
+    <div class="field-label">选择项目</div>
+    <div id="projectListArea">
+      <div class="loading"><div class="spinner"></div>加载项目中...</div>
+    </div>
+
+    <!-- 选择阶段 -->
+    <div class="field-label">上传节点 <span class="field-hint">请选择当前对应的阶段</span></div>
+    <div class="select-group" id="stageGroup">
+      <div class="select-tag" data-val="概念方案">概念方案</div>
+      <div class="select-tag" data-val="深化方案">深化方案</div>
+      <div class="select-tag" data-val="施工图">施工图</div>
+      <div class="select-tag" data-val="施工-拆除水电">施工-拆除水电</div>
+      <div class="select-tag" data-val="施工-泥木">施工-泥木</div>
+      <div class="select-tag" data-val="施工-油漆安装">施工-油漆安装</div>
+      <div class="select-tag" data-val="软装方案">软装方案</div>
+      <div class="select-tag" data-val="软装落地">软装落地</div>
+      <div class="select-tag" data-val="竣工验收">竣工验收</div>
+    </div>
+
+    <!-- 节点名称 -->
+    <div class="field-label">节点名称 <span class="field-hint">可选，默认使用阶段名</span></div>
+    <input class="input-text" id="nodeNameInput" type="text" placeholder="如：水电隐蔽工程验收">
+
+    <!-- 描述 -->
+    <div class="field-label">上传描述 <span class="field-hint">简要说明本次上传内容</span></div>
+    <textarea class="input-text" id="descInput" placeholder="如：水电隐蔽工程完工，已完成打压试验..."></textarea>
+
+    <!-- 文件上传 -->
+    <div class="field-label">上传文件 <span class="field-hint">拍照或从相册选择，单次最多10张</span></div>
+    <div class="upload-actions">
+      <button class="upload-btn camera" onclick="document.getElementById('cameraInput').click()">
+        📷 拍 照 上 传
+      </button>
+      <button class="upload-btn album" onclick="document.getElementById('albumInput').click()">
+        🖼 相 册 选 择
+      </button>
+    </div>
+    <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" multiple onchange="handleFiles(this.files)">
+    <input type="file" id="albumInput" accept="image/*,application/pdf,video/*" style="display:none" multiple onchange="handleFiles(this.files)">
+
+    <!-- 文件预览 -->
+    <div class="file-preview" id="filePreview"></div>
+
+    <!-- 上传进度 -->
+    <div class="progress-list" id="progressList"></div>
+
+    <!-- 提交 -->
+    <button class="submit-btn" id="submitBtn" onclick="submitUpload()" disabled>
+      上 传 并 通 知 客 户
+    </button>
+  </div>
+</div>
+
+<!-- ===== 成功页 ===== -->
+<div id="successPage" class="success-page" style="display:none;">
+  <div class="success-icon">✓</div>
+  <h2>上传成功</h2>
+  <p id="successMsg">文件已上传，客户已收到通知</p>
+  <button class="success-btn" onclick="resetForm()">继 续 上 传</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const API_BASE = new URLSearchParams(window.location.search).get('api')
+    || localStorage.getItem('lihe_api_base')
+    || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+      ? 'http://localhost:3000'
+      : window.location.origin);
+
+  // 全局状态
+  let state = {
+    staffId: '',
+    password: '',
+    projects: [],
+    selectedProject: null,
+    selectedStage: null,
+    files: [], // {file, preview}
+  };
+
+  // ===== 登录 =====
+  function doLogin() {
+    const staffId = document.getElementById('staffIdInput').value.trim().toUpperCase();
+    const password = document.getElementById('passwordInput').value.trim();
+
+    if (!staffId || !password) {
+      showToast('请输入工号和密码');
+      return;
+    }
+
+    // 存储凭据（用于API调用）
+    state.staffId = staffId;
+    state.password = password;
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = '验证中...';
+
+    // 验证方式：尝试加载项目列表，如果401则失败
+    loadProjects(staffId, password);
+  }
+
+  // ===== 加载项目列表 =====
+  function loadProjects(staffId, password) {
+    // 调用飞书项目主表查询（通过后端代理）
+    // 这里先用演示数据，实际部署后调用API
+    fetch(`${API_BASE}/api/project?staffId=${staffId}&password=${encodeURIComponent(password)}`)
+      .then(r => {
+        if (r.status === 401) throw new Error('认证失败');
+        return r.json();
+      })
+      .then(data => {
+        if (data.success && data.projects) {
+          state.projects = data.projects;
+          showMainPage();
+        } else {
+          throw new Error(data.error || '加载失败');
+        }
+      })
+      .catch(err => {
+        console.warn('API未连接，使用演示模式:', err);
+        showDemoProjects();
+      });
+  }
+
+  function showDemoProjects() {
+    state.projects = [
+      { recordId: 'p1', name: '张先生住宅', code: 'LH-2508-001', stage: '施工-泥木', progress: 55 },
+      { recordId: 'p2', name: '李女士别墅', code: 'LH-2507-003', stage: '概念方案', progress: 20 },
+      { recordId: 'p3', name: '王总办公室', code: 'LH-2506-005', stage: '深化方案', progress: 35 },
+    ];
+    showMainPage();
+  }
+
+  // ===== 显示主页面 =====
+  function showMainPage() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+    document.getElementById('navUser').textContent = `工号 ${state.staffId}`;
+
+    renderProjectList();
+    initStageSelector();
+  }
+
+  // ===== 渲染项目列表 =====
+  function renderProjectList() {
+    const area = document.getElementById('projectListArea');
+    if (state.projects.length === 0) {
+      area.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">暂无在管项目</div>';
+      return;
+    }
+
+    area.innerHTML = state.projects.map(p => `
+      <div class="project-list-item" onclick="selectProject('${p.recordId}')">
+        <div class="project-list-name">${p.name}</div>
+        <div class="project-list-meta">${p.code || ''} · ${p.stage || '待启动'} · ${p.progress || 0}%</div>
+      </div>
+    `).join('');
+  }
+
+  function selectProject(recordId) {
+    state.selectedProject = state.projects.find(p => p.recordId === recordId);
+    // 更新UI
+    document.querySelectorAll('.project-list-item').forEach(el => {
+      el.style.borderColor = '';
+      el.style.background = '';
+    });
+    event.currentTarget.style.borderColor = 'var(--sage)';
+    event.currentTarget.style.background = 'var(--sage-bg)';
+    checkSubmitReady();
+  }
+
+  // ===== 阶段选择 =====
+  function initStageSelector() {
+    document.querySelectorAll('#stageGroup .select-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        document.querySelectorAll('#stageGroup .select-tag').forEach(t => t.classList.remove('active'));
+        tag.classList.add('active');
+        state.selectedStage = tag.dataset.val;
+        checkSubmitReady();
+      });
+    });
+  }
+
+  // ===== 文件处理 =====
+  function handleFiles(fileList) {
+    const files = Array.from(fileList);
+    const maxFiles = 10;
+
+    if (state.files.length + files.length > maxFiles) {
+      showToast(`最多上传${maxFiles}个文件`);
+      return;
+    }
+
+    files.forEach(file => {
+      // 检查大小（20MB限制）
+      if (file.size > 20 * 1024 * 1024) {
+        showToast(`${file.name} 超过20MB`);
+        return;
+      }
+
+      const fileObj = { file, preview: null };
+
+      // 生成预览
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          fileObj.preview = e.target.result;
+          renderFilePreview();
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        fileObj.preview = 'video';
+        renderFilePreview();
+      } else {
+        fileObj.preview = 'file';
+        renderFilePreview();
+      }
+
+      state.files.push(fileObj);
+    });
+
+    // 清空input以便重复选择
+    document.getElementById('cameraInput').value = '';
+    document.getElementById('albumInput').value = '';
+
+    checkSubmitReady();
+  }
+
+  function renderFilePreview() {
+    const container = document.getElementById('filePreview');
+    container.innerHTML = state.files.map((f, i) => {
+      let inner = '';
+      if (f.preview && f.preview.startsWith('data:')) {
+        inner = `<img src="${f.preview}" alt="${f.file.name}">`;
+      } else if (f.preview === 'video') {
+        inner = `<div class="file-thumb-file">🎥</div>`;
+      } else {
+        inner = `<div class="file-thumb-file">📄</div>`;
+      }
+      return `
+        <div class="file-thumb">
+          ${inner}
+          <div class="file-remove" onclick="removeFile(${i})">&times;</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function removeFile(index) {
+    state.files.splice(index, 1);
+    renderFilePreview();
+    checkSubmitReady();
+  }
+
+  // ===== 检查提交按钮状态 =====
+  function checkSubmitReady() {
+    const ready = state.selectedProject && state.selectedStage && state.files.length > 0;
+    document.getElementById('submitBtn').disabled = !ready;
+  }
+
+  // ===== 提交上传 =====
+  function submitUpload() {
+    if (!state.selectedProject || !state.selectedStage || state.files.length === 0) {
+      showToast('请完成所有选择');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '上传中...';
+
+    const nodeName = document.getElementById('nodeNameInput').value.trim() || state.selectedStage;
+    const description = document.getElementById('descInput').value.trim();
+
+    // 构造 FormData
+    const formData = new FormData();
+    formData.append('staffId', state.staffId);
+    formData.append('password', state.password);
+    formData.append('projectId', state.selectedProject.recordId);
+    formData.append('stage', state.selectedStage);
+    formData.append('nodeName', nodeName);
+    formData.append('description', description);
+
+    state.files.forEach((f, i) => {
+      formData.append('files', f.file, f.file.name);
+    });
+
+    // 显示进度
+    const progressList = document.getElementById('progressList');
+    progressList.innerHTML = state.files.map((f, i) =>
+      `<div class="progress-item" id="prog-${i}">⏳ ${f.file.name} - 等待上传</div>`
+    ).join('');
+
+    fetch(`${API_BASE}/api/upload`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          // 更新进度
+          state.files.forEach((f, i) => {
+            const el = document.getElementById(`prog-${i}`);
+            if (el) {
+              el.textContent = `✓ ${f.file.name} - 上传成功`;
+              el.classList.add('done');
+            }
+          });
+
+          // 显示成功页
+          setTimeout(() => {
+            document.getElementById('successMsg').textContent =
+              `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」`;
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('successPage').style.display = 'block';
+          }, 500);
+        } else {
+          throw new Error(data.error || '上传失败');
+        }
+      })
+      .catch(err => {
+        // 演示模式
+        console.warn('API未连接，模拟上传:', err);
+        state.files.forEach((f, i) => {
+          const el = document.getElementById(`prog-${i}`);
+          if (el) {
+            el.textContent = `✓ ${f.file.name} - 演示上传成功`;
+            el.classList.add('done');
+          }
+        });
+        showToast('演示模式：上传成功（未实际写入飞书）');
+        setTimeout(() => {
+          document.getElementById('successMsg').textContent =
+            `演示模式：${state.files.length} 个文件已模拟上传到「${state.selectedProject.name}」`;
+          document.getElementById('mainPage').style.display = 'none';
+          document.getElementById('successPage').style.display = 'block';
+        }, 800);
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '上 传 并 通 知 客 户';
+      });
+  }
+
+  // ===== 重置表单 =====
+  function resetForm() {
+    state.selectedProject = null;
+    state.selectedStage = null;
+    state.files = [];
+
+    document.getElementById('nodeNameInput').value = '';
+    document.getElementById('descInput').value = '';
+    document.getElementById('filePreview').innerHTML = '';
+    document.getElementById('progressList').innerHTML = '';
+    document.querySelectorAll('#stageGroup .select-tag').forEach(t => t.classList.remove('active'));
+
+    document.getElementById('successPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+
+    renderProjectList();
+    checkSubmitReady();
+  }
+
+  // ===== 工具函数 =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ===== 回车登录 =====
+  document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') doLogin();
+  });
+</script>
+
+</body>
+</html>

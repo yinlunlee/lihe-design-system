@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>立和设计 · 客户设计需求表</title>
+<style>
+  :root {
+    --sage: #5A7D6B;
+    --sage-light: #7A9D8B;
+    --sage-dark: #3F5D50;
+    --sage-bg: #F0F4F2;
+    --sage-border: #C5D5CC;
+    --text-main: #2C3E35;
+    --text-secondary: #5A6B62;
+    --text-light: #8A9B92;
+    --bg: #FAFBF9;
+    --white: #FFFFFF;
+    --accent: #D4A574;
+    --accent-light: #E8C9A0;
+    --danger: #C75450;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* ===== 顶部封面 ===== */
+  .cover {
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+    color: var(--white);
+    padding: 32px 20px 24px;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .cover h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: 1px; }
+  .cover .subtitle { font-size: 12px; opacity: 0.8; margin-bottom: 6px; }
+  .cover .philosophy { font-size: 11px; opacity: 0.6; font-style: italic; }
+
+  /* ===== 表单主体 ===== */
+  .form-body { padding: 20px 16px 40px; }
+
+  /* 章节标题 */
+  .section-title {
+    background: var(--sage-bg);
+    border-left: 4px solid var(--sage);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 20px 0 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--sage-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-num {
+    background: var(--sage);
+    color: var(--white);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* 字段标签 */
+  .field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sage-dark);
+    margin: 12px 0 6px;
+  }
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* 文本输入 */
+  .input-text {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--white);
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .input-text:focus { outline: none; border-color: var(--sage); }
+  textarea.input-text { resize: none; min-height: 60px; line-height: 1.6; }
+
+  /* 复选框标签组 */
+  .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .tag-item {
+    padding: 6px 14px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tag-item.active {
+    background: var(--sage);
+    color: var(--white);
+    border-color: var(--sage);
+  }
+  .tag-item:active { transform: scale(0.95); }
+
+  /* 复选框组 */
+  .check-group { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 0;
+    user-select: none;
+  }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--sage-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .check-item.checked .check-box {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+  .check-item.checked .check-box::after {
+    content: '✓';
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* 色块选择 */
+  .color-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .color-card {
+    width: calc(25% - 6px);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .color-card.active { border-color: var(--sage); transform: scale(1.05); }
+  .color-block { height: 48px; }
+  .color-name {
+    padding: 4px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--white);
+  }
+
+  /* 提交按钮 */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .submit-btn:active { background: var(--sage-dark); }
+  .submit-btn:disabled { opacity: 0.6; }
+
+  /* 成功页 */
+  .success-page {
+    text-align: center;
+    padding: 60px 20px;
+    display: none;
+  }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--sage);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+    color: var(--white);
+  }
+  .success-page h2 { color: var(--sage-dark); font-size: 18px; margin-bottom: 8px; }
+  .success-page p { color: var(--text-secondary); font-size: 14px; }
+
+  /* 底部 */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-size: 12px;
+  }
+  .footer-divider {
+    width: 40px; height: 2px;
+    background: var(--sage);
+    margin: 0 auto 10px;
+    border-radius: 1px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ===== 封面 ===== -->
+<div class="cover">
+  <h1>立和设计</h1>
+  <div class="subtitle">客户设计需求表 · Client Design Brief</div>
+  <div class="philosophy">「 为时间而设计  ·  Design for Time 」</div>
+</div>
+
+<!-- ===== 表单主体 ===== -->
+<div class="form-body" id="formBody">
+
+  <!-- 01 基本信息 -->
+  <div class="section-title">
+    <span class="section-num">1</span> 基本信息
+  </div>
+
+  <div class="field-label">客户姓名</div>
+  <input class="input-text" id="f_name" type="text" placeholder="请输入姓名">
+
+  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span></div>
+  <input class="input-text" id="f_contact" type="text" placeholder="手机号或微信号">
+
+  <div class="field-label">项目地址</div>
+  <input class="input-text" id="f_address" type="text" placeholder="如：汕头市龙湖区xxx">
+
+  <div class="field-label">空间类型</div>
+  <div class="check-group" id="f_spaceType">
+    <div class="check-item" data-val="住宅"><div class="check-box"></div>住宅</div>
+    <div class="check-item" data-val="公寓"><div class="check-box"></div>公寓</div>
+    <div class="check-item" data-val="别墅"><div class="check-box"></div>别墅</div>
+    <div class="check-item" data-val="商铺"><div class="check-box"></div>商铺</div>
+    <div class="check-item" data-val="办公"><div class="check-box"></div>办公</div>
+    <div class="check-item" data-val="餐饮"><div class="check-box"></div>餐饮</div>
+    <div class="check-item" data-val="其他"><div class="check-box"></div>其他</div>
+  </div>
+
+  <div class="field-label">面积 <span class="field-hint">㎡</span></div>
+  <input class="input-text" id="f_area" type="number" placeholder="如：180">
+
+  <!-- 02 预算 -->
+  <div class="section-title">
+    <span class="section-num">2</span> 预算范围
+  </div>
+
+  <div class="field-label">每平米预算 <span class="field-hint">元/㎡</span></div>
+  <div class="tag-group" id="f_budget">
+    <div class="tag-item" data-val="3000-4000">3000-4000</div>
+    <div class="tag-item" data-val="4000-5000">4000-5000</div>
+    <div class="tag-item" data-val="5000-6000">5000-6000</div>
+    <div class="tag-item" data-val="7000+">7000+</div>
+  </div>
+
+  <div class="field-label">预算弹性 <span class="field-hint">可上下浮动范围</span></div>
+  <input class="input-text" id="f_budgetFlex" type="text" placeholder="如：可浮动10%">
+
+  <!-- 03 色调感觉 -->
+  <div class="section-title">
+    <span class="section-num">3</span> 色调感觉
+  </div>
+
+  <div class="field-label">喜欢的色系 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="f_colorSystem">
+    <div class="tag-item" data-val="暖白">暖白</div>
+    <div class="tag-item" data-val="原木色">原木色</div>
+    <div class="tag-item" data-val="灰色系">灰色系</div>
+    <div class="tag-item" data-val="绿色系">绿色系</div>
+    <div class="tag-item" data-val="蓝色系">蓝色系</div>
+    <div class="tag-item" data-val="大地色">大地色</div>
+    <div class="tag-item" data-val="黑色系">黑色系</div>
+    <div class="tag-item" data-val="跳色点缀">跳色点缀</div>
+    <div class="tag-item" data-val="低饱和">低饱和</div>
+  </div>
+
+  <div class="field-label">请圈选您有感觉的色系</div>
+  <div class="color-grid" id="f_colorPick">
+    <div class="color-card" data-val="暖米" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#F0E6D2;"></div>
+      <div class="color-name">暖米</div>
+    </div>
+    <div class="color-card" data-val="暖沙" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#D4A574;"></div>
+      <div class="color-name">暖沙</div>
+    </div>
+    <div class="color-card" data-val="静绿" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#5A7D6B;"></div>
+      <div class="color-name">静绿</div>
+    </div>
+    <div class="color-card" data-val="雾蓝" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#8B9DAB;"></div>
+      <div class="color-name">雾蓝</div>
+    </div>
+    <div class="color-card" data-val="大地" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#6B5B4F;"></div>
+      <div class="color-name">大地</div>
+    </div>
+    <div class="color-card" data-val="墨黑" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#3A3A3A;"></div>
+      <div class="color-name">墨黑</div>
+    </div>
+    <div class="color-card" data-val="灰调" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#C4C4C4;"></div>
+      <div class="color-name">灰调</div>
+    </div>
+    <div class="color-card" data-val="奶咖" style="border:2px solid transparent;">
+      <div class="color-block" style="background:#E8D5C4;"></div>
+      <div class="color-name">奶咖</div>
+    </div>
+  </div>
+
+  <div class="field-label">喜欢的明暗度 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="f_brightness">
+    <div class="tag-item" data-val="明亮通透">明亮通透</div>
+    <div class="tag-item" data-val="柔和均匀">柔和均匀</div>
+    <div class="tag-item" data-val="层次光影">层次光影</div>
+    <div class="tag-item" data-val="暗调氛围">暗调氛围</div>
+  </div>
+
+  <div class="field-label">不接受的感觉或色调 <span class="field-hint">请描述您不想要的色彩/氛围</span></div>
+  <textarea class="input-text" id="f_reject" rows="3" placeholder="如：不要大面积红色，不喜欢冷冰冰的工业感..."></textarea>
+
+  <!-- 04 功能需求 -->
+  <div class="section-title">
+    <span class="section-num">4</span> 功能需求
+  </div>
+
+  <div class="field-label">常住人口 <span class="field-hint">人数 / 年龄段 / 是否有老人小孩宠物</span></div>
+  <textarea class="input-text" id="f_residents" rows="2" placeholder="如：3人（夫妻+1小孩6岁），有1只猫"></textarea>
+
+  <div class="field-label">核心功能区 <span class="field-hint">请勾选需要的空间</span></div>
+  <div class="check-group" id="f_rooms">
+    <div class="check-item" data-val="客厅"><div class="check-box"></div>客厅</div>
+    <div class="check-item" data-val="餐厅"><div class="check-box"></div>餐厅</div>
+    <div class="check-item" data-val="主卧"><div class="check-box"></div>主卧</div>
+    <div class="check-item" data-val="次卧"><div class="check-box"></div>次卧</div>
+    <div class="check-item" data-val="书房"><div class="check-box"></div>书房</div>
+    <div class="check-item" data-val="厨房"><div class="check-box"></div>厨房</div>
+    <div class="check-item" data-val="卫生间"><div class="check-box"></div>卫生间</div>
+    <div class="check-item" data-val="阳台"><div class="check-box"></div>阳台</div>
+    <div class="check-item" data-val="衣帽间"><div class="check-box"></div>衣帽间</div>
+    <div class="check-item" data-val="储物间"><div class="check-box"></div>储物间</div>
+    <div class="check-item" data-val="玄关"><div class="check-box"></div>玄关</div>
+    <div class="check-item" data-val="茶室"><div class="check-box"></div>茶室</div>
+    <div class="check-item" data-val="影音室"><div class="check-box"></div>影音室</div>
+    <div class="check-item" data-val="健身房"><div class="check-box"></div>健身房</div>
+  </div>
+
+  <div class="field-label">特殊功能需求 <span class="field-hint">如：居家办公/乐器练习/收藏展示等</span></div>
+  <textarea class="input-text" id="f_special" rows="2" placeholder="如有特殊需求请描述"></textarea>
+
+  <div class="field-label">对收纳的需求程度</div>
+  <div class="check-group" id="f_storage">
+    <div class="check-item" data-val="极少收纳"><div class="check-box"></div>极少收纳</div>
+    <div class="check-item" data-val="适中"><div class="check-box"></div>适中</div>
+    <div class="check-item" data-val="大量收纳"><div class="check-box"></div>大量收纳</div>
+    <div class="check-item" data-val="需要隐藏式收纳"><div class="check-box"></div>需要隐藏式收纳</div>
+  </div>
+
+  <!-- 05 其他补充 -->
+  <div class="section-title">
+    <span class="section-num">5</span> 其他补充
+  </div>
+
+  <div class="field-label">对材质的偏好 <span class="field-hint">如：木材/石材/金属/布艺/皮革等</span></div>
+  <textarea class="input-text" id="f_material" rows="2" placeholder="请描述您喜欢的材质"></textarea>
+
+  <div class="field-label">是否有风水方面的考量？</div>
+  <input class="input-text" id="f_fengshui" type="text" placeholder="如有请简要描述">
+
+  <div class="field-label">工期期望 <span class="field-hint">希望什么时候开始 / 入住</span></div>
+  <input class="input-text" id="f_timeline" type="text" placeholder="如：希望9月开工，年底入住">
+
+  <div class="field-label">其他想说的话</div>
+  <textarea class="input-text" id="f_other" rows="3" placeholder="任何想补充的都可以写在这里"></textarea>
+
+  <!-- 提交 -->
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">提 交 需 求</button>
+
+</div>
+
+<!-- ===== 成功页 ===== -->
+<div class="success-page" id="successPage">
+  <div class="success-icon">✓</div>
+  <h2>需求已提交</h2>
+  <p>感谢您的信任，我们会在24小时内与您联系。<br>「 为时间而设计  ·  Design for Time 」</p>
+</div>
+
+<!-- ===== 底部 ===== -->
+<div class="footer">
+  <div class="footer-divider"></div>
+  <p>立和质作  |  广东汕头龙湖区  |  为时间而设计</p>
+  <p style="margin-top:4px; font-size:11px;">本表仅用于前期沟通了解，正式设计需求将在勘测后确认</p>
+</div>
+
+<script>
+  // ===== 交互逻辑 =====
+
+  // 单选标签组
+  document.querySelectorAll('.tag-group').forEach(group => {
+    group.querySelectorAll('.tag-item').forEach(item => {
+      item.addEventListener('click', () => {
+        // 色系和明暗度允许多选，预算单选
+        const groupId = group.id;
+        if (groupId === 'f_budget') {
+          group.querySelectorAll('.tag-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+        } else {
+          item.classList.toggle('active');
+        }
+      });
+    });
+  });
+
+  // 复选框组
+  document.querySelectorAll('.check-group').forEach(group => {
+    // 空间类型和收纳是单选，功能区是多选
+    const groupId = group.id;
+    const isSingle = (groupId === 'f_spaceType' || groupId === 'f_storage');
+    group.querySelectorAll('.check-item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (isSingle) {
+          group.querySelectorAll('.check-item').forEach(i => i.classList.remove('checked'));
+          item.classList.add('checked');
+        } else {
+          item.classList.toggle('checked');
+        }
+      });
+    });
+  });
+
+  // 色块选择（多选）
+  document.querySelectorAll('#f_colorPick .color-card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('active');
+    });
+  });
+
+  // 获取选中的值
+  function getSelectedValues(containerId, isCheckbox = false) {
+    const container = document.getElementById(containerId);
+    const selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
+    const elements = container.querySelectorAll(selector);
+    return Array.from(elements).map(el => el.dataset.val);
+  }
+
+  // 获取单选值
+  function getSingleValue(containerId, isCheckbox = false) {
+    const container = document.getElementById(containerId);
+    const selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
+    const el = container.querySelector(selector);
+    return el ? el.dataset.val : '';
+  }
+
+  // 提交表单
+  function submitForm() {
+    const data = {
+      name: document.getElementById('f_name').value.trim(),
+      contact: document.getElementById('f_contact').value.trim(),
+      address: document.getElementById('f_address').value.trim(),
+      spaceType: getSingleValue('f_spaceType', true),
+      area: document.getElementById('f_area').value.trim(),
+      budget: getSingleValue('f_budget'),
+      budgetFlex: document.getElementById('f_budgetFlex').value.trim(),
+      colorSystem: getSelectedValues('f_colorSystem').join('、'),
+      colorPick: getSelectedValues('f_colorPick').join('、'),
+      brightness: getSelectedValues('f_brightness').join('、'),
+      reject: document.getElementById('f_reject').value.trim(),
+      residents: document.getElementById('f_residents').value.trim(),
+      rooms: getSelectedValues('f_rooms', true).join('、'),
+      special: document.getElementById('f_special').value.trim(),
+      storage: getSingleValue('f_storage', true),
+      material: document.getElementById('f_material').value.trim(),
+      fengshui: document.getElementById('f_fengshui').value.trim(),
+      timeline: document.getElementById('f_timeline').value.trim(),
+      other: document.getElementById('f_other').value.trim(),
+    };
+
+    // 简单校验
+    if (!data.name || !data.contact) {
+      alert('请至少填写客户姓名和联系方式');
+      return;
+    }
+
+    // ===== 提交到后端API → 飞书多维表格 =====
+    const API_BASE = new URLSearchParams(window.location.search).get('api')
+      || localStorage.getItem('lihe_api_base')
+      || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+        ? 'http://localhost:3000'
+        : window.location.origin);
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+
+    fetch(`${API_BASE}/api/needs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+      .then(r => r.json())
+      .then(result => {
+        if (result.success) {
+          showSuccess();
+        } else {
+          throw new Error(result.error || '提交失败');
+        }
+      })
+      .catch(err => {
+        // API未连接时使用演示模式
+        console.warn('API未连接，使用演示模式:', err);
+        localStorage.setItem('lihe_last_submission', JSON.stringify(data));
+        showToast('演示模式：需求已模拟提交（未实际写入飞书）');
+        setTimeout(() => {
+          showSuccess();
+        }, 800);
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '提 交 需 求';
+      });
+  }
+
+  function showSuccess() {
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('successPage').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function showToast(msg) {
+    let t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:rgba(63,93,80,0.95);color:#fff;padding:10px 24px;border-radius:24px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.style.opacity = '1');
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+  }
+</script>
+
+</body>
+</html>

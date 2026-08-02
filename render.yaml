@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: lihe-design
+    runtime: node
+    plan: free
+    buildCommand: echo "No build needed"
+    startCommand: node server.js
+    envVars:
+      - key: FEISHU_APP_ID
+        value: cli_aae7cda72cb8dbc0
+      - key: FEISHU_APP_SECRET
+        value: A1oaS8xoN0EMkDIm8HOmFdcwPgWkd21h
+      - key: FEISHU_APP_TOKEN
+        value: VdwxbP1vwa2XjZs2jLmcNBGKnMe
+      - key: FEISHU_TABLE_PROJECT
+        value: tblAG1FhgpckeRfC
+      - key: FEISHU_TABLE_NEEDS
+        value: tblB46Y4pvnoSWJA
+      - key: FEISHU_TABLE_ACCEPTANCE
+        value: tblIpniPozX2jYll
+      - key: FEISHU_TABLE_INSPECTION
+        value: tblcJLchpdyqDW0l
+      - key: FEISHU_TABLE_FINANCE
+        value: tblIgHZwXyOlRORj
+      - key: FEISHU_TABLE_CONFIRM
+        value: tblWdDRkieHqc1dm
+      - key: STAFF_ACCOUNTS
+        value: '{"D01":"lihe2026","P01":"lihe2026","B01":"lihe2026","A01":"lihe2026"}'
+      - key: NODE_ENV
+        value: production

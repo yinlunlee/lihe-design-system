@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>立和设计 · 我的项目</title>
+<style>
+  :root {
+    --sage: #5A7D6B;
+    --sage-light: #7A9D8B;
+    --sage-dark: #3F5D50;
+    --sage-bg: #F0F4F2;
+    --sage-border: #C5D5CC;
+    --text-main: #2C3E35;
+    --text-secondary: #5A6B62;
+    --text-light: #8A9B92;
+    --bg: #FAFBF9;
+    --white: #FFFFFF;
+    --accent: #D4A574;
+    --success: #5A7D6B;
+    --warning: #D4945A;
+    --danger: #C75450;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 2px 12px rgba(90, 125, 107, 0.08);
+    --shadow-hover: 0 4px 20px rgba(90, 125, 107, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* ===== 登录页 ===== */
+  .login-page { padding: 60px 24px; text-align: center; }
+  .login-logo {
+    width: 56px; height: 56px;
+    background: var(--sage);
+    border-radius: 14px;
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--white); font-weight: 700;
+  }
+  .login-title { font-size: 20px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
+  .login-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 32px; }
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    margin-bottom: 12px;
+    background: var(--white);
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { outline: none; border-color: var(--sage); }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .login-btn:active { background: var(--sage-dark); }
+  .login-btn:disabled { opacity: 0.6; }
+
+  /* ===== 顶部导航 ===== */
+  .nav-bar {
+    background: var(--white);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--sage-border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 8px; }
+  .nav-logo {
+    width: 28px; height: 28px;
+    background: var(--sage);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white); font-size: 14px; font-weight: 700;
+  }
+  .nav-title { font-size: 16px; font-weight: 600; color: var(--sage-dark); }
+  .nav-logout { font-size: 13px; color: var(--text-light); cursor: pointer; }
+
+  /* ===== 项目卡片 ===== */
+  .project-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin: 12px 16px;
+    box-shadow: var(--shadow);
+  }
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .project-name { font-size: 17px; font-weight: 700; color: var(--text-main); }
+  .project-code { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .stage-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .stage-badge.active { background: var(--sage-bg); color: var(--sage-dark); }
+  .stage-badge.done { background: #E8F5E9; color: var(--success); }
+  .stage-badge.pending { background: #FFF3E0; color: var(--warning); }
+  .stage-badge.alert { background: #FFEBEE; color: var(--danger); }
+
+  /* 进度条 */
+  .progress-bar-bg {
+    width: 100%; height: 6px;
+    background: var(--sage-bg);
+    border-radius: 3px;
+    margin: 8px 0 4px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage), var(--sage-light));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+  .progress-text { font-size: 12px; color: var(--text-light); display: flex; justify-content: space-between; }
+
+  .project-meta {
+    display: flex; flex-wrap: wrap; gap: 4px 16px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .project-meta-item { display: flex; align-items: center; gap: 4px; }
+
+  /* ===== 时间线 ===== */
+  .timeline { padding: 8px 16px 24px; }
+  .timeline-phase {
+    font-size: 13px; font-weight: 600;
+    color: var(--sage-dark);
+    margin: 16px 0 8px;
+    padding-left: 8px;
+    border-left: 3px solid var(--sage);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 0 0 16px 24px;
+    margin-left: 8px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--sage-border);
+    border: 2px solid var(--white);
+    z-index: 1;
+  }
+  .timeline-item.done::before { background: var(--sage); }
+  .timeline-item.pending::before { background: var(--accent); }
+  .timeline-item.revise::before { background: var(--danger); }
+  .timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 4px; top: 14px;
+    width: 2px; height: calc(100% - 10px);
+    background: var(--sage-border);
+  }
+
+  .node-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .node-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .node-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
+  .node-status {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .node-status.wait { background: var(--sage-bg); color: var(--sage-dark); }
+  .node-status.confirmed { background: #E8F5E9; color: var(--success); }
+  .node-status.revising { background: #FFEBEE; color: var(--danger); }
+
+  .node-desc { font-size: 13px; color: var(--text-secondary); margin: 4px 0 8px; }
+  .node-time { font-size: 12px; color: var(--text-light); }
+  .node-uploader { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+  /* 附件预览 */
+  .attachment-grid {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 8px 0;
+  }
+  .attachment-thumb {
+    width: calc(33.333% - 4px);
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--sage-bg);
+    position: relative;
+    cursor: pointer;
+  }
+  .attachment-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .attachment-thumb.file {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--sage);
+  }
+  .attachment-more {
+    position: absolute; bottom: 0; right: 0;
+    background: rgba(0,0,0,0.5);
+    color: var(--white);
+    font-size: 14px; font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px 0 0 0;
+  }
+
+  /* 确认按钮 */
+  .node-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-confirm {
+    flex: 1;
+    padding: 10px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-confirm:active { background: var(--sage-dark); }
+  .btn-confirm:disabled { opacity: 0.5; }
+  .btn-revise {
+    flex: 1;
+    padding: 10px;
+    background: var(--white);
+    color: var(--sage-dark);
+    border: 1.5px solid var(--sage-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* 修改意见输入 */
+  .revise-box { display: none; margin-top: 10px; }
+  .revise-box.show { display: block; }
+  .revise-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: 8px;
+    font-size: 14px;
+    resize: none;
+    -webkit-appearance: none;
+  }
+  .revise-textarea:focus { outline: none; border-color: var(--sage); }
+  .revise-submit {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+
+  /* ===== 图片查看器 ===== */
+  .image-viewer {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .image-viewer.show { display: flex; }
+  .image-viewer img { max-width: 95%; max-height: 90vh; border-radius: 4px; }
+  .viewer-close {
+    position: absolute; top: 16px; right: 16px;
+    color: var(--white); font-size: 28px;
+    cursor: pointer; z-index: 10000;
+  }
+
+  /* ===== 空状态 ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(63, 93, 80, 0.95);
+    color: var(--white);
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    z-index: 10001;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ===== 底部 ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-size: 12px;
+  }
+  .footer-divider {
+    width: 40px; height: 2px;
+    background: var(--sage);
+    margin: 0 auto 10px;
+    border-radius: 1px;
+  }
+
+  .loading { text-align: center; padding: 40px; color: var(--text-light); }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 3px solid var(--sage-bg);
+    border-top: 3px solid var(--sage);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ===== 登录页 ===== -->
+<div id="loginPage" class="login-page">
+  <div class="login-logo">立</div>
+  <div class="login-title">立和设计</div>
+  <div class="login-subtitle">我的项目 · 查看进度与确认</div>
+  <input class="login-input" id="phoneInput" type="tel" placeholder="请输入您的手机号" maxlength="11">
+  <button class="login-btn" id="loginBtn" onclick="doLogin()">查 看 我 的 项 目</button>
+  <div style="margin-top:24px; font-size:12px; color:var(--text-light);">
+    手机号需与您在立和登记的联系方式一致
+  </div>
+</div>
+
+<!-- ===== 主页面 ===== -->
+<div id="mainPage" style="display:none;">
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <div class="nav-brand">
+      <div class="nav-logo">立</div>
+      <div class="nav-title">我的项目</div>
+    </div>
+    <div class="nav-logout" onclick="logout()">切换账号</div>
+  </div>
+
+  <!-- 项目列表+时间线 -->
+  <div id="contentArea"></div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    <div class="footer-divider"></div>
+    <p>立和质作  |  为时间而设计  ·  Design for Time</p>
+  </div>
+</div>
+
+<!-- 图片查看器 -->
+<div class="image-viewer" id="imageViewer" onclick="closeViewer()">
+  <span class="viewer-close">&times;</span>
+  <img id="viewerImg" src="">
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===== API 基础地址 =====
+  // 支持 ?api= 参数或 localStorage 配置
+  const API_BASE = new URLSearchParams(window.location.search).get('api')
+    || localStorage.getItem('lihe_api_base')
+    || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+      ? 'http://localhost:3000'
+      : window.location.origin);
+
+  // ===== 登录 =====
+  function doLogin() {
+    const phone = document.getElementById('phoneInput').value.trim();
+    if (!phone || phone.length < 11) {
+      showToast('请输入正确的手机号');
+      return;
+    }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = '查询中...';
+
+    // 查询项目
+    fetch(`${API_BASE}/api/project?phone=${encodeURIComponent(phone)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem('lihe_phone', phone);
+          showMainPage(phone, data.projects);
+        } else {
+          showToast(data.message || '查询失败');
+        }
+      })
+      .catch(err => {
+        // 演示模式：如果API未部署，用模拟数据展示
+        console.warn('API未连接，使用演示模式:', err);
+        showDemoPage(phone);
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '查 看 我 的 项 目';
+      });
+  }
+
+  // ===== 显示主页面 =====
+  function showMainPage(phone, projects) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+
+    const area = document.getElementById('contentArea');
+
+    if (projects.length === 0) {
+      area.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>暂无关联项目</p>
+          <p style="font-size:13px; margin-top:4px;">请联系您的专属顾问为您绑定项目</p>
+        </div>
+      `;
+      return;
+    }
+
+    // 先渲染项目卡片，再加载节点
+    let html = '';
+    projects.forEach((p, i) => {
+      html += renderProjectCard(p);
+    });
+    area.innerHTML = html;
+
+    // 为每个项目加载节点
+    projects.forEach(p => {
+      loadNodes(p);
+    });
+  }
+
+  // ===== 渲染项目卡片 =====
+  function renderProjectCard(p) {
+    const statusBadge = getStatusBadge(p);
+    return `
+      <div class="project-card" id="proj-${p.recordId}">
+        <div class="project-header">
+          <div>
+            <div class="project-name">${p.name}</div>
+            <div class="project-code">${p.code}</div>
+          </div>
+          <div class="stage-badge ${statusBadge.cls}">${p.stage || '待启动'}</div>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${p.progress}%"></div>
+        </div>
+        <div class="progress-text">
+          <span>进度</span>
+          <span>${p.progress}%</span>
+        </div>
+        <div class="project-meta">
+          ${p.spaceType ? `<div class="project-meta-item">🏠 ${p.spaceType}</div>` : ''}
+          ${p.area ? `<div class="project-meta-item">📐 ${p.area}㎡</div>` : ''}
+          ${p.address ? `<div class="project-meta-item">📍 ${p.address}</div>` : ''}
+          ${p.designLead ? `<div class="project-meta-item">✏️ 设计 ${p.designLead}</div>` : ''}
+          ${p.projectLead ? `<div class="project-meta-item">🔨 项目 ${p.projectLead}</div>` : ''}
+        </div>
+      </div>
+      <div class="timeline" id="nodes-${p.recordId}">
+        <div class="loading"><div class="spinner"></div>加载节点...</div>
+      </div>
+    `;
+  }
+
+  function getStatusBadge(p) {
+    if (p.status === '正常') return { cls: 'active' };
+    if (p.status && p.status.includes('停工')) return { cls: 'alert' };
+    return { cls: 'active' };
+  }
+
+  // ===== 加载节点 =====
+  function loadNodes(project) {
+    const container = document.getElementById(`nodes-${project.recordId}`);
+
+    fetch(`${API_BASE}/api/nodes?phone=${encodeURIComponent(localStorage.getItem('lihe_phone'))}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const nodes = data.nodes.filter(n => n.projectId === project.recordId);
+          renderNodes(container, nodes, project);
+        }
+      })
+      .catch(err => {
+        container.innerHTML = '';
+      });
+  }
+
+  // ===== 渲染节点时间线 =====
+  function renderNodes(container, nodes, project) {
+    if (nodes.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">
+          暂无节点记录，等待设计团队上传成果
+        </div>
+      `;
+      return;
+    }
+
+    // 按 phase 分组
+    const phases = { '洽谈': [], '设计': [], '施工': [], '软装': [], '竣工': [] };
+    nodes.forEach(n => {
+      const phase = getPhaseByStage(n.stage);
+      if (phases[phase]) phases[phase].push(n);
+    });
+
+    let html = '';
+    Object.entries(phases).forEach(([phase, phaseNodes]) => {
+      if (phaseNodes.length === 0) return;
+      html += `<div class="timeline-phase">${phase}</div>`;
+      phaseNodes.forEach(node => {
+        html += renderNode(node);
+      });
+    });
+
+    container.innerHTML = html;
+  }
+
+  function getPhaseByStage(stage) {
+    const map = {
+      '需求解析': '洽谈', '概念方案': '设计', '深化方案': '设计', '施工图': '设计',
+      '施工-拆除水电': '施工', '施工-泥木': '施工', '施工-油漆安装': '施工',
+      '软装方案': '软装', '软装落地': '软装', '竣工验收': '竣工',
+    };
+    return map[stage] || '设计';
+  }
+
+  // ===== 渲染单个节点 =====
+  function renderNode(node) {
+    const statusCls = node.status === '已确认' ? 'done' : (node.status === '有修改意见' ? 'revise' : 'pending');
+    const statusBadge = node.status === '已确认' ? 'confirmed' : (node.status === '有修改意见' ? 'revising' : 'wait');
+    const isPending = node.status === '待确认' || !node.status;
+
+    // 附件预览
+    let attachHtml = '';
+    if (node.attachments && node.attachments.length > 0) {
+      attachHtml = '<div class="attachment-grid">';
+      node.attachments.slice(0, 6).forEach((att, i) => {
+        const isImage = att.type && att.type.startsWith('image/');
+        if (isImage && att.url) {
+          attachHtml += `<div class="attachment-thumb" onclick="viewImage('${att.url}')"><img src="${att.url}" alt="${att.name}"></div>`;
+        } else {
+          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${att.url}','${att.name}')">📄</div>`;
+        }
+      });
+      if (node.attachments.length > 6) {
+        attachHtml += `<div class="attachment-thumb file" style="position:relative;">📎<span class="attachment-more">+${node.attachments.length - 6}</span></div>`;
+      }
+      attachHtml += '</div>';
+    }
+
+    // 确认按钮
+    let actionHtml = '';
+    if (isPending) {
+      actionHtml = `
+        <div class="node-actions">
+          <button class="btn-confirm" onclick="confirmNode('${node.recordId}', 'confirm')">确 认 通 过</button>
+          <button class="btn-revise" onclick="toggleReviseBox('${node.recordId}')">提出修改</button>
+        </div>
+        <div class="revise-box" id="revise-${node.recordId}">
+          <textarea class="revise-textarea" id="reviseText-${node.recordId}" placeholder="请描述您希望修改的内容..."></textarea>
+          <button class="revise-submit" onclick="confirmNode('${node.recordId}', 'revise')">提 交 修 改 意 见</button>
+        </div>
+      `;
+    } else if (node.status === '已确认') {
+      actionHtml = `<div style="margin-top:8px; font-size:13px; color:var(--success);">✓ 您已确认此节点</div>`;
+    } else if (node.status === '有修改意见') {
+      actionHtml = `<div style="margin-top:8px; padding:8px 10px; background:#FFF3E0; border-radius:6px; font-size:13px; color:var(--warning);">📝 您的修改意见：${node.clientNotes || '已提交'}</div>`;
+    }
+
+    return `
+      <div class="timeline-item ${statusCls}">
+        <div class="node-card">
+          <div class="node-header">
+            <div class="node-name">${node.nodeName || node.stage}</div>
+            <div class="node-status ${statusBadge}">${node.status || '待确认'}</div>
+          </div>
+          ${node.description ? `<div class="node-desc">${node.description}</div>` : ''}
+          ${attachHtml}
+          <div class="node-time">${formatTime(node.uploadTime)}</div>
+          ${node.uploader ? `<div class="node-uploader">上传人：${node.uploader}</div>` : ''}
+          ${actionHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== 确认/修改 =====
+  function toggleReviseBox(recordId) {
+    const box = document.getElementById(`revise-${recordId}`);
+    box.classList.toggle('show');
+  }
+
+  function confirmNode(recordId, action) {
+    let body = { recordId, action };
+
+    if (action === 'revise') {
+      const notes = document.getElementById(`reviseText-${recordId}`).value.trim();
+      if (!notes) {
+        showToast('请填写修改意见');
+        return;
+      }
+      body.clientNotes = notes;
+    }
+
+    fetch(`${API_BASE}/api/confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showToast(data.message);
+          // 刷新页面
+          setTimeout(() => {
+            const phone = localStorage.getItem('lihe_phone');
+            if (phone) doLogin();
+          }, 1500);
+        } else {
+          showToast(data.error || '操作失败');
+        }
+      })
+      .catch(err => {
+        showToast('网络错误，请稍后重试');
+      });
+  }
+
+  // ===== 图片查看 =====
+  function viewImage(url) {
+    document.getElementById('viewerImg').src = url;
+    document.getElementById('imageViewer').classList.add('show');
+  }
+  function closeViewer() {
+    document.getElementById('imageViewer').classList.remove('show');
+  }
+  function downloadFile(url, name) {
+    if (url) window.open(url, '_blank');
+    else showToast('文件链接已过期，请刷新页面');
+  }
+
+  // ===== 工具函数 =====
+  function formatTime(timestamp) {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function pad(n) { return n < 10 ? '0' + n : n; }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+  function logout() {
+    localStorage.removeItem('lihe_phone');
+    location.reload();
+  }
+
+  // ===== 演示模式（API未部署时） =====
+  function showDemoPage(phone) {
+    const demoProjects = [{
+      recordId: 'demo1',
+      name: '张先生住宅',
+      code: 'LH-2508-001',
+      spaceType: '别墅',
+      area: 320,
+      address: '汕头市龙湖区',
+      stage: '施工-泥木',
+      progress: 55,
+      status: '正常',
+      designLead: 'D-01',
+      projectLead: 'P-01',
+    }];
+
+    const demoNodes = [
+      { recordId: 'n1', projectId: 'demo1', stage: '概念方案', nodeName: '概念方案确认', status: '已确认', uploadTime: Date.now() - 30*86400000, description: '初步概念方案，已与客户确认设计方向', attachments: [], uploader: 'D-01' },
+      { recordId: 'n2', projectId: 'demo1', stage: '深化方案', nodeName: '深化方案确认', status: '已确认', uploadTime: Date.now() - 20*86400000, description: '完整施工图深化方案', attachments: [], uploader: 'D-01' },
+      { recordId: 'n3', projectId: 'demo1', stage: '施工-拆除水电', nodeName: '水电验收', status: '已确认', uploadTime: Date.now() - 10*86400000, description: '水电隐蔽工程完工验收', attachments: [], uploader: 'P-01' },
+      { recordId: 'n4', projectId: 'demo1', stage: '施工-泥木', nodeName: '泥木中间验收', status: '待确认', uploadTime: Date.now() - 2*86400000, description: '泥木工程中间节点，请确认施工质量', attachments: [], uploader: 'P-01' },
+    ];
+
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+
+    const area = document.getElementById('contentArea');
+    area.innerHTML = renderProjectCard(demoProjects[0]);
+    renderNodes(document.getElementById('nodes-demo1'), demoNodes, demoProjects[0]);
+
+    // 演示模式拦截确认操作
+    window._demoMode = true;
+    window.confirmNode = function(recordId, action) {
+      if (action === 'revise') {
+        const box = document.getElementById(`revise-${recordId}`);
+        if (box) box.classList.toggle('show');
+        const submitBtn = box?.querySelector('.revise-submit');
+        if (submitBtn) {
+          submitBtn.onclick = () => {
+            showToast('演示模式：修改意见已模拟提交');
+            setTimeout(() => box.classList.remove('show'), 1500);
+          };
+        }
+        return;
+      }
+      showToast('演示模式：确认操作已模拟');
+      const node = demoNodes.find(n => n.recordId === recordId);
+      if (node) node.status = '已确认';
+      renderNodes(document.getElementById('nodes-demo1'), demoNodes, demoProjects[0]);
+    };
+  }
+
+  // ===== 自动登录 =====
+  window.addEventListener('load', () => {
+    const savedPhone = localStorage.getItem('lihe_phone');
+    if (savedPhone) {
+      document.getElementById('phoneInput').value = savedPhone;
+      doLogin();
+    }
+  });
+</script>
+
+</body>
+</html>

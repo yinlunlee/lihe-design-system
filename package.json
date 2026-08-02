@@ -1,0 +1,12 @@
+{
+  "name": "lihe-design-system",
+  "version": "1.0.0",
+  "description": "立和设计 H5协同系统 - 连接飞书多维表格",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
