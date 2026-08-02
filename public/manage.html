@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>立和设计 · 需求管理后台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif; background: #0f1115; color: #e0e0e0; min-height: 100vh; }
+
+.header { background: linear-gradient(135deg, #1a1d24, #252830); padding: 20px 24px; border-bottom: 1px solid #2a2d35; display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 20px; font-weight: 600; color: #fff; }
+.header .sub { font-size: 13px; color: #888; margin-top: 4px; }
+.badge { background: #1d4ed8; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+
+.login-box { max-width: 400px; margin: 80px auto; background: #1a1d24; border: 1px solid #2a2d35; border-radius: 12px; padding: 32px; }
+.login-box h2 { font-size: 18px; margin-bottom: 20px; text-align: center; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; color: #aaa; margin-bottom: 6px; }
+.field input { width: 100%; padding: 12px 14px; background: #0f1115; border: 1px solid #2a2d35; border-radius: 8px; color: #fff; font-size: 15px; outline: none; }
+.field input:focus { border-color: #3b82f6; }
+.btn { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+.btn:hover { background: #1d4ed8; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; text-align: center; }
+
+.content { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+.stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-card { background: #1a1d24; border: 1px solid #2a2d35; border-radius: 10px; padding: 16px 20px; min-width: 120px; }
+.stat-card .num { font-size: 28px; font-weight: 700; }
+.stat-card .label { font-size: 12px; color: #888; margin-top: 2px; }
+
+.table-wrap { background: #1a1d24; border: 1px solid #2a2d35; border-radius: 12px; overflow: hidden; }
+.table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #2a2d35; }
+.table-header h3 { font-size: 16px; }
+.refresh-btn { background: #2a2d35; color: #ccc; border: 1px solid #3a3d45; padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.refresh-btn:hover { background: #3a3d45; }
+
+table { width: 100%; border-collapse: collapse; }
+th { background: #181b20; padding: 12px 14px; text-align: left; font-size: 12px; color: #888; font-weight: 600; white-space: nowrap; }
+td { padding: 12px 14px; border-top: 1px solid #222530; font-size: 14px; }
+tr:hover td { background: #1d2028; }
+
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.s-pending { background: #312e1f; color: #fbbf24; }
+.s-contacted { background: #1e293b; color: #60a5fa; }
+.s-designing { background: #1e2b1e; color: #4ade80; }
+.s-signed { background: #1f291e; color: #22c55e; }
+.s-paused { background: #2a2a2a; color: #999; }
+.s-lost { background: #2e1e1e; color: #f87171; }
+
+.status-select { background: #0f1115; color: #e0e0e0; border: 1px solid #2a2d35; border-radius: 6px; padding: 6px 10px; font-size: 13px; cursor: pointer; outline: none; }
+.status-select:focus { border-color: #3b82f6; }
+
+.loading { text-align: center; padding: 60px; color: #666; }
+.empty { text-align: center; padding: 40px; color: #666; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1d24; border: 1px solid #3b82f6; color: #60a5fa; padding: 12px 24px; border-radius: 8px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity .3s; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: #22c55e; color: #4ade80; }
+.toast.error { border-color: #ef4444; color: #f87171; }
+
+.sync-tag { display: inline-block; background: #1e2b1e; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>立和设计 · 需求管理后台</h1>
+    <div class="sub">管理客户需求跟进状态 · 签约自动同步项目</div>
+  </div>
+  <span class="badge" id="staffBadge" style="display:none;"></span>
+</div>
+
+<!-- 登录页 -->
+<div class="login-box" id="loginBox">
+  <h2>员工登录</h2>
+  <div class="field">
+    <label>工号</label>
+    <input type="text" id="staffId" placeholder="D01 / P01 / B01 / A01" value="">
+  </div>
+  <div class="field">
+    <label>密码</label>
+    <input type="password" id="password" placeholder="登录密码" value="">
+  </div>
+  <button class="btn" id="loginBtn" onclick="doLogin()">登 录</button>
+  <div class="error-msg" id="loginError"></div>
+</div>
+
+<!-- 管理面板 -->
+<div class="content" id="panel" style="display:none;">
+  <div class="stats" id="statsBar"></div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <h3>客户需求列表</h3>
+      <button class="refresh-btn" onclick="loadNeeds()">刷新</button>
+    </div>
+    <div id="tableBody">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let API_BASE = window.location.origin;
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('api')) API_BASE = urlParams.get('api');
+
+let currentStaffId = '';
+let currentPassword = '';
+let needsCache = [];
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+function doLogin() {
+  const staffId = document.getElementById('staffId').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if (!staffId || !password) {
+    document.getElementById('loginError').textContent = '请输入工号和密码';
+    return;
+  }
+  document.getElementById('loginBtn').disabled = true;
+  document.getElementById('loginBtn').textContent = '验证中...';
+  document.getElementById('loginError').textContent = '';
+
+  fetch(API_BASE + '/api/needs-list?staffId=' + encodeURIComponent(staffId) + '&password=' + encodeURIComponent(password))
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        currentStaffId = staffId;
+        currentPassword = password;
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('panel').style.display = 'block';
+        document.getElementById('staffBadge').style.display = 'inline-block';
+        document.getElementById('staffBadge').textContent = '当前: ' + staffId;
+        renderNeeds(data.items);
+      } else {
+        document.getElementById('loginError').textContent = data.error || '登录失败';
+      }
+    })
+    .catch(err => {
+      document.getElementById('loginError').textContent = '网络错误: ' + err.message;
+    })
+    .finally(() => {
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').textContent = '登 录';
+    });
+}
+
+function loadNeeds() {
+  document.getElementById('tableBody').innerHTML = '<div class="loading">刷新中...</div>';
+  fetch(API_BASE + '/api/needs-list?staffId=' + encodeURIComponent(currentStaffId) + '&password=' + encodeURIComponent(currentPassword))
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        renderNeeds(data.items);
+        showToast('数据已刷新', 'success');
+      } else {
+        document.getElementById('tableBody').innerHTML = '<div class="empty">加载失败: ' + (data.error || '') + '</div>';
+      }
+    })
+    .catch(err => {
+      document.getElementById('tableBody').innerHTML = '<div class="empty">网络错误: ' + err.message + '</div>';
+    });
+}
+
+function renderNeeds(items) {
+  needsCache = items;
+  
+  // Stats
+  const stats = { '待联系': 0, '已联系': 0, '方案设计中': 0, '已签约': 0, '已搁置': 0, '已流失': 0 };
+  items.forEach(i => { stats[i.status] = (stats[i.status] || 0) + 1; });
+  const colors = { '待联系': '#fbbf24', '已联系': '#60a5fa', '方案设计中': '#4ade80', '已签约': '#22c55e', '已搁置': '#999', '已流失': '#f87171' };
+  let statsHtml = '<div class="stat-card"><div class="num" style="color:#fff">' + items.length + '</div><div class="label">总需求</div></div>';
+  for (const s of ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失']) {
+    statsHtml += '<div class="stat-card"><div class="num" style="color:' + colors[s] + '">' + (stats[s] || 0) + '</div><div class="label">' + s + '</div></div>';
+  }
+  document.getElementById('statsBar').innerHTML = statsHtml;
+
+  // Table
+  if (!items.length) {
+    document.getElementById('tableBody').innerHTML = '<div class="empty">暂无需求记录</div>';
+    return;
+  }
+
+  const statusOptions = ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失'];
+  const statusClass = { '待联系': 's-pending', '已联系': 's-contacted', '方案设计中': 's-designing', '已签约': 's-signed', '已搁置': 's-paused', '已流失': 's-lost' };
+
+  let html = '<table><thead><tr>' +
+    '<th>客户姓名</th><th>联系方式</th><th>空间类型</th><th>面积</th><th>预算</th><th>地址</th><th>跟进状态</th>' +
+    '</tr></thead><tbody>';
+
+  items.forEach(item => {
+    html += '<tr>' +
+      '<td>' + (item.name || '-') + '</td>' +
+      '<td>' + (item.contact || '-') + '</td>' +
+      '<td>' + (item.spaceType || '-') + '</td>' +
+      '<td>' + (item.area ? item.area + '㎡' : '-') + '</td>' +
+      '<td>' + (item.budget || '-') + '</td>' +
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (item.address || '-') + '</td>' +
+      '<td>' +
+        '<select class="status-select" onchange="updateStatus(\'' + item.recordId + '\', this.value, this)">' +
+          statusOptions.map(s => '<option value="' + s + '"' + (item.status === s ? ' selected' : '') + '>' + s + '</option>').join('') +
+        '</select>' +
+        (item.status === '已签约' ? '<span class="sync-tag">已同步</span>' : '') +
+      '</td>' +
+    '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function updateStatus(recordId, newStatus, selectEl) {
+  const oldStatus = selectEl.value;
+  selectEl.disabled = true;
+  selectEl.style.opacity = '0.5';
+
+  fetch(API_BASE + '/api/update-status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      staffId: currentStaffId,
+      password: currentPassword,
+      recordId: recordId,
+      status: newStatus,
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      if (newStatus === '已签约' && data.syncResult) {
+        if (data.syncResult.success) {
+          showToast('状态已更新为「已签约」，项目已自动创建！', 'success');
+        } else if (data.syncResult.skipped) {
+          showToast('状态已更新，项目已存在（跳过重复创建）', 'success');
+        } else {
+          showToast('状态已更新，但项目同步失败: ' + (data.syncResult.error || ''), 'error');
+        }
+      } else {
+        showToast('状态已更新为「' + newStatus + '」', 'success');
+      }
+      loadNeeds();
+    } else {
+      showToast('更新失败: ' + (data.error || ''), 'error');
+      selectEl.value = oldStatus;
+    }
+  })
+  .catch(err => {
+    showToast('网络错误: ' + err.message, 'error');
+    selectEl.value = oldStatus;
+  })
+  .finally(() => {
+    selectEl.disabled = false;
+    selectEl.style.opacity = '1';
+  });
+}
+
+// Enter key to login
+document.getElementById('password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('staffId').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('password').focus();
+});
+</script>
+</body>
+</html>

@@ -574,6 +574,89 @@ async function syncNeedToProject(needRecordId) {
   }
 }
 
+// 获取客户需求列表（含跟进状态）
+async function handleNeedsList(req, res) {
+  const parsed = url.parse(req.url, true);
+  const { staffId, password } = parsed.query;
+
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+
+  const result = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records?page_size=100`
+  );
+
+  if (result.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: result.msg });
+  }
+
+  const items = (result.data.items || []).map(item => {
+    const f = item.fields;
+    return {
+      recordId: item.record_id,
+      name: parseFieldValue(f['客户姓名']),
+      contact: parseFieldValue(f['联系方式']),
+      address: parseFieldValue(f['项目地址']),
+      spaceType: parseFieldValue(f['空间类型']),
+      area: parseFieldValue(f['面积']),
+      budget: parseFieldValue(f['预算范围']),
+      timeline: parseFieldValue(f['期望工期']),
+      status: parseFieldValue(f['跟进状态']) || '待联系',
+      createdAt: item.created_time || '',
+    };
+  });
+
+  return sendJSON(res, 200, { success: true, total: items.length, items });
+}
+
+// 更新需求跟进状态
+async function handleUpdateStatus(req, res) {
+  const body = await getBody(req);
+  let data;
+  try { data = JSON.parse(body.toString()); } catch { return sendJSON(res, 400, { success: false, error: 'Invalid JSON' }); }
+
+  const { staffId, password, recordId, status } = data;
+
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+
+  if (!recordId || !status) {
+    return sendJSON(res, 400, { success: false, error: '缺少 recordId 或 status' });
+  }
+
+  const validStatuses = ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失'];
+  if (!validStatuses.includes(status)) {
+    return sendJSON(res, 400, { success: false, error: '无效的状态值' });
+  }
+
+  const updateResult = await feishuRequest('PUT',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/${recordId}`,
+    { fields: { '跟进状态': status } }
+  );
+
+  if (updateResult.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: updateResult.msg });
+  }
+
+  let syncResult = null;
+  if (status === '已签约') {
+    try {
+      syncResult = await syncNeedToProject(recordId);
+    } catch (e) {
+      syncResult = { success: false, error: e.message };
+    }
+  }
+
+  return sendJSON(res, 200, {
+    success: true,
+    recordId,
+    status,
+    syncResult,
+  });
+}
+
 // 手动触发同步所有"已签约"需求
 async function handleSyncSigned(req, res) {
   const parsed = url.parse(req.url, true);
@@ -720,6 +803,12 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/sync-signed' && req.method === 'GET') {
       return await handleSyncSigned(req, res);
     }
+    if (pathname === '/api/needs-list' && req.method === 'GET') {
+      return await handleNeedsList(req, res);
+    }
+    if (pathname === '/api/update-status' && req.method === 'POST') {
+      return await handleUpdateStatus(req, res);
+    }
     if (pathname === '/api/webhook' && (req.method === 'POST' || req.method === 'GET')) {
       return await handleWebhook(req, res);
     }
@@ -742,6 +831,7 @@ server.listen(config.port, () => {
   console.log(`  客户需求表: http://localhost:${config.port}/needs.html`);
   console.log(`  客户查看端: http://localhost:${config.port}/client.html`);
   console.log(`  员工上传端: http://localhost:${config.port}/staff.html`);
+  console.log(`  管理后台: http://localhost:${config.port}/manage.html`);
   console.log(`\n  员工账号:`);
   Object.keys(config.staffAccounts).forEach(id => {
     console.log(`    ${id} / 密码: ${config.staffAccounts[id]}`);

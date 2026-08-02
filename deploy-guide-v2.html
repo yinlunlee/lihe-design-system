@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>部署指南 - 已签约自动同步功能</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+  .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+  h1 { font-size: 28px; margin-bottom: 8px; color: #58a6ff; }
+  .subtitle { color: #8b949e; margin-bottom: 32px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 18px; color: #f0f6fc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .step-num { background: #238636; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+  .code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px 16px; font-family: 'SF Mono', Consolas, monospace; font-size: 13px; color: #7ee787; overflow-x: auto; margin: 12px 0; word-break: break-all; }
+  .btn { display: inline-block; background: #238636; color: #fff; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s; }
+  .btn:hover { background: #2ea043; }
+  .btn-blue { background: #1f6feb; }
+  .btn-blue:hover { background: #388bfd; }
+  .alert { background: #1c2128; border-left: 3px solid #f85149; padding: 12px 16px; border-radius: 4px; margin: 12px 0; color: #f85149; font-size: 13px; }
+  .success { background: #1c2128; border-left: 3px solid #3fb950; padding: 12px 16px; border-radius: 4px; margin: 12px 0; color: #3fb950; font-size: 13px; }
+  ul { margin-left: 20px; margin-top: 8px; }
+  li { margin-bottom: 6px; }
+  .label { color: #8b949e; font-size: 13px; }
+  .value { color: #e6edf3; }
+  .divider { border: 0; border-top: 1px solid #30363d; margin: 24px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>部署指南：已签约自动同步</h1>
+  <p class="subtitle">功能已在本地测试通过，按以下步骤部署到线上</p>
+
+  <div class="success">
+    ✅ <strong>本地测试已通过</strong>：将"淼淼"的跟进状态改为"已签约" → 同步接口自动在项目管理表创建了项目记录，字段映射正确，防重复也OK。
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">1</span> 手动触发 Render 重新部署</h2>
+    <p>代码已推送到 GitHub，但 Render 自动部署可能未开启。手动触发：</p>
+    <ul>
+      <li>打开 <a href="https://dashboard.render.com" target="_blank" style="color:#58a6ff;">Render Dashboard</a></li>
+      <li>点击你的服务 <code>lihe-design</code></li>
+      <li>页面右上角点击 <strong>Manual Deploy</strong> → <strong>Deploy latest commit</strong></li>
+      <li>等待 2-3 分钟，看到状态变为 <strong>Live</strong></li>
+    </ul>
+    <p style="margin-top:12px;">部署完成后，访问以下地址验证：</p>
+    <div class="code-block">https://lihe-design.onrender.com/api/sync-signed?staffId=D01&password=lihe2026</div>
+    <p>如果返回 JSON（而不是 "Not found"），说明部署成功。</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">2</span> 配置飞书事件订阅（实时自动同步）</h2>
+    <p>配置后，当你在多维表格中把跟进状态改为"已签约"时，系统会<strong>自动</strong>在项目管理表创建记录，无需手动触发。</p>
+    <ul>
+      <li>打开 <a href="https://open.feishu.cn/app/cli_aae7cda72cb8dbc0/event" target="_blank" style="color:#58a6ff;">飞书开发者后台 - 事件订阅</a></li>
+      <li>找到<strong>事件配置</strong>区域</li>
+      <li>请求地址填写：<div class="code-block">https://lihe-design.onrender.com/api/webhook</div></li>
+      <li>点击<strong>添加事件</strong>，搜索并订阅：<strong>多维表格记录变更 (bitable.v1.record.changed)</strong></li>
+      <li>保存后飞书会发送验证请求，如果返回成功则配置完成</li>
+    </ul>
+    <div class="alert">
+      ⚠️ 需要先完成第1步（Render部署），飞书验证请求才能通过。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">3</span> 手动同步（备用方案）</h2>
+    <p>如果你不想配置事件订阅，也可以手动触发同步：</p>
+    <ul>
+      <li>在多维表格中把需求记录的"跟进状态"改为"已签约"</li>
+      <li>访问同步接口（需要员工登录）：</li>
+    </ul>
+    <div class="code-block">https://lihe-design.onrender.com/api/sync-signed?staffId=D01&password=lihe2026</div>
+    <p>系统会自动查找所有"已签约"的需求，为还没有项目记录的客户创建项目记录。</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="card">
+    <h2>功能说明</h2>
+    <table style="width:100%; border-collapse:collapse;">
+      <tr><td class="label" style="padding:8px; border-bottom:1px solid #30363d;">触发条件</td><td class="value" style="padding:8px; border-bottom:1px solid #30363d;">客户需求表的"跟进状态"改为"已签约"</td></tr>
+      <tr><td class="label" style="padding:8px; border-bottom:1px solid #30363d;">自动操作</td><td class="value" style="padding:8px; border-bottom:1px solid #30363d;">在项目管理表创建一条新记录</td></tr>
+      <tr><td class="label" style="padding:8px; border-bottom:1px solid #30363d;">字段映射</td><td class="value" style="padding:8px; border-bottom:1px solid #30363d;">客户姓名→项目名称、联系方式、地址、空间类型、面积、预算</td></tr>
+      <tr><td class="label" style="padding:8px; border-bottom:1px solid #30363d;">初始阶段</td><td class="value" style="padding:8px; border-bottom:1px solid #30363d;">设计准备（进度10%）</td></tr>
+      <tr><td class="label" style="padding:8px; border-bottom:1px solid #30363d;">防重复</td><td class="value" style="padding:8px; border-bottom:1px solid #30363d;">按手机号查重，已存在则跳过</td></tr>
+      <tr><td class="label" style="padding:8px;">跟进状态选项</td><td class="value" style="padding:8px;">待联系 → 已联系 → 方案设计中 → 已签约 / 已搁置 / 已流失</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>API 接口一览</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+      <tr style="border-bottom:2px solid #30363d;">
+        <th style="padding:8px; text-align:left;">接口</th>
+        <th style="padding:8px; text-align:left;">方法</th>
+        <th style="padding:8px; text-align:left;">说明</th>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d;">
+        <td style="padding:8px;"><code>/api/needs</code></td><td style="padding:8px;">POST</td><td style="padding:8px;">客户提交需求表</td>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d;">
+        <td style="padding:8px;"><code>/api/project</code></td><td style="padding:8px;">GET</td><td style="padding:8px;">查询项目（手机号/员工）</td>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d;">
+        <td style="padding:8px;"><code>/api/nodes</code></td><td style="padding:8px;">GET</td><td style="padding:8px;">查看确认节点</td>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d;">
+        <td style="padding:8px;"><code>/api/upload</code></td><td style="padding:8px;">POST</td><td style="padding:8px;">员工上传成果</td>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d;">
+        <td style="padding:8px;"><code>/api/confirm</code></td><td style="padding:8px;">POST</td><td style="padding:8px;">客户确认/修改</td>
+      </tr>
+      <tr style="border-bottom:1px solid #30363d; background:#1c2128;">
+        <td style="padding:8px;"><code>/api/sync-signed</code></td><td style="padding:8px;">GET</td><td style="padding:8px;">🆕 手动同步已签约需求</td>
+      </tr>
+      <tr style="background:#1c2128;">
+        <td style="padding:8px;"><code>/api/webhook</code></td><td style="padding:8px;">POST</td><td style="padding:8px;">🆕 飞书事件订阅回调</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="text-align:center; margin-top:32px;">
+    <a href="https://dashboard.render.com" target="_blank" class="btn">前往 Render 部署</a>
+    <a href="https://open.feishu.cn/app/cli_aae7cda72cb8dbc0/event" target="_blank" class="btn btn-blue" style="margin-left:12px;">配置飞书事件订阅</a>
+  </div>
+</div>
+</body>
+</html>
