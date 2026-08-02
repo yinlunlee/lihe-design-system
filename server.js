@@ -497,10 +497,176 @@ async function handleConfirm(req, res) {
   }
 }
 
+// ===== Sync: 已签约需求 → 自动创建项目记录 =====
+
+async function syncNeedToProject(needRecordId) {
+  // 1. 获取需求表记录详情
+  const needResult = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/${needRecordId}`
+  );
+
+  if (needResult.code !== 0 || !needResult.data || !needResult.data.record) {
+    console.error('[sync] Failed to get need record:', needResult.msg);
+    return { success: false, error: '无法获取需求记录' };
+  }
+
+  const f = needResult.data.record.fields;
+  const status = parseFieldValue(f['跟进状态']);
+  const clientPhone = parseFieldValue(f['联系方式']);
+
+  // 2. 确认状态是"已签约"
+  if (status !== '已签约') {
+    return { success: false, error: `状态不是"已签约"(当前: ${status})` };
+  }
+
+  // 3. 检查项目管理表是否已有该客户的项目（按手机号查重）
+  if (clientPhone) {
+    const existResult = await feishuRequest('POST',
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search`,
+      { filter: { conjunction: 'and', conditions: [{ field_name: '客户联系方式', operator: 'is', value: [clientPhone] }] } }
+    );
+
+    if (existResult.code === 0 && existResult.data.items && existResult.data.items.length > 0) {
+      console.log(`[sync] Project already exists for phone ${clientPhone}, skip`);
+      return { success: true, skipped: true, message: '该项目已存在，跳过创建', recordId: existResult.data.items[0].record_id };
+    }
+  }
+
+  // 4. 从需求记录映射到项目记录字段
+  const clientName = parseFieldValue(f['客户姓名']);
+  const projectRecord = {
+    fields: {
+      '项目名称': `${clientName}的装修项目`,
+      '客户姓名': clientName,
+      '客户联系方式': clientPhone,
+      '项目地址': parseFieldValue(f['项目地址']),
+      '空间类型': parseFieldValue(f['空间类型']),
+      '面积': typeof f['面积'] === 'number' ? f['面积'] : (f['面积'] ? parseFloat(parseFieldValue(f['面积'])) : null),
+      '每平米预算': parseFieldValue(f['每平米预算']),
+      '当前阶段': '设计准备',
+      '阶段进度': 10,
+      '停工状态': '正常',
+    }
+  };
+
+  // 移除空值
+  Object.keys(projectRecord.fields).forEach(k => {
+    if (projectRecord.fields[k] === null || projectRecord.fields[k] === '') delete projectRecord.fields[k];
+  });
+
+  // 5. 在项目管理表创建记录
+  const createResult = await feishuRequest('POST',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records`,
+    projectRecord
+  );
+
+  if (createResult.code === 0) {
+    console.log(`[sync] Project created for ${clientName} (${clientPhone}), recordId: ${createResult.data.record.record_id}`);
+    return {
+      success: true,
+      created: true,
+      recordId: createResult.data.record.record_id,
+      message: `已为${clientName}创建项目记录`
+    };
+  } else {
+    console.error('[sync] Failed to create project:', createResult.msg);
+    return { success: false, error: createResult.msg };
+  }
+}
+
+// 手动触发同步所有"已签约"需求
+async function handleSyncSigned(req, res) {
+  const parsed = url.parse(req.url, true);
+  const { staffId, password } = parsed.query;
+
+  // 需要员工权限
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+
+  // 查询所有"已签约"的需求
+  const result = await feishuRequest('POST',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/search`,
+    { filter: { conjunction: 'and', conditions: [{ field_name: '跟进状态', operator: 'is', value: ['已签约'] }] } }
+  );
+
+  if (result.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: result.msg });
+  }
+
+  const needs = result.data.items || [];
+  const results = [];
+
+  for (const item of needs) {
+    const r = await syncNeedToProject(item.record_id);
+    results.push({
+      recordId: item.record_id,
+      clientName: parseFieldValue(item.fields['客户姓名']),
+      ...r,
+    });
+  }
+
+  const created = results.filter(r => r.created).length;
+  const skipped = results.filter(r => r.skipped).length;
+
+  sendJSON(res, 200, {
+    success: true,
+    total: needs.length,
+    created,
+    skipped,
+    results,
+  });
+}
+
+// 飞书事件订阅 Webhook
+async function handleWebhook(req, res) {
+  const body = await getBody(req);
+  let data;
+  try { data = JSON.parse(body.toString()); } catch { return sendJSON(res, 400, { error: 'Invalid JSON' }); }
+
+  // 1. URL验证请求（飞书添加事件订阅时发送）
+  if (data.type === 'url_verification' && data.challenge) {
+    console.log('[webhook] URL verification challenge');
+    return sendJSON(res, 200, { challenge: data.challenge });
+  }
+
+  // 2. 事件通知
+  if (data.header && data.header.event_type) {
+    const eventType = data.header.event_type;
+    console.log(`[webhook] Event received: ${eventType}`);
+
+    // 处理多维表格记录变更事件
+    if (eventType === 'bitable.v1.record.changed' && data.event) {
+      const evt = data.event;
+      const appToken = evt.app_token || evt.app_id;
+      const tableId = evt.table_id;
+      const recordId = evt.record_id;
+      const changeType = evt.change_type || evt.action;
+
+      console.log(`[webhook] Bitable change: table=${tableId}, record=${recordId}, type=${changeType}`);
+
+      // 只处理客户需求表的记录更新
+      if (tableId === config.tables.needs && recordId) {
+        try {
+          const syncResult = await syncNeedToProject(recordId);
+          console.log('[webhook] Sync result:', JSON.stringify(syncResult));
+        } catch (e) {
+          console.error('[webhook] Sync error:', e.message);
+        }
+      }
+    }
+
+    return sendJSON(res, 200, { code: 0 });
+  }
+
+  // 3. 未知请求
+  sendJSON(res, 200, { code: 0 });
+}
+
 // ===== Static file server =====
 function serveStatic(req, res) {
   let pathname = url.parse(req.url).pathname;
-  if (pathname === '/' || pathname === '') pathname = '/needs.html';
+  if (pathname === '/' || pathname === '') pathname = '/index.html';
 
   const filePath = path.join(__dirname, 'public', pathname);
   const ext = path.extname(filePath);
@@ -550,6 +716,12 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/confirm' && req.method === 'POST') {
       return await handleConfirm(req, res);
+    }
+    if (pathname === '/api/sync-signed' && req.method === 'GET') {
+      return await handleSyncSigned(req, res);
+    }
+    if (pathname === '/api/webhook' && (req.method === 'POST' || req.method === 'GET')) {
+      return await handleWebhook(req, res);
     }
 
     // Static files
