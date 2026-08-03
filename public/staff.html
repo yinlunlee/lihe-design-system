@@ -352,6 +352,149 @@
     background: var(--white); -webkit-appearance: none;
     color: var(--text-main);
   }
+
+  /* ===== 项目详情页 ===== */
+  .detail-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .detail-card-title {
+    font-size: 14px; font-weight: 600;
+    color: var(--sage-dark); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .info-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; font-size: 13px;
+    border-bottom: 1px solid var(--sage-bg);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--text-light); }
+  .info-value { color: var(--text-main); font-weight: 500; }
+
+  /* 进度条 */
+  .progress-bar-wrap {
+    height: 8px; background: var(--sage-bg);
+    border-radius: 4px; overflow: hidden; margin: 8px 0 4px;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--sage);
+    border-radius: 4px; transition: width 0.6s ease;
+  }
+  .progress-text {
+    font-size: 12px; color: var(--text-light);
+    display: flex; justify-content: space-between;
+  }
+  .stage-badge {
+    display: inline-block;
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600;
+  }
+  .stage-badge.active { background: var(--sage); color: var(--white); }
+  .stage-badge.normal { background: var(--sage-bg); color: var(--sage-dark); }
+  .stage-badge.warn { background: #FFF3CD; color: #856404; }
+  .stage-badge.danger { background: #F8D7DA; color: #721C24; }
+
+  /* 阶段时间线 */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 5px; top: 4px; bottom: 4px;
+    width: 2px; background: var(--sage-border);
+  }
+  .timeline-item {
+    position: relative; padding: 4px 0 4px 16px;
+    font-size: 13px; color: var(--text-secondary);
+  }
+  .timeline-item::before {
+    content: ''; position: absolute;
+    left: -19px; top: 8px;
+    width: 10px; height: 10px;
+    border-radius: 50%; background: var(--sage-border);
+    border: 2px solid var(--white);
+  }
+  .timeline-item.done { color: var(--sage); }
+  .timeline-item.done::before { background: var(--sage); }
+  .timeline-item.current { color: var(--sage-dark); font-weight: 600; }
+  .timeline-item.current::before {
+    background: var(--accent); border-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(212,165,116,0.3);
+  }
+  .timeline-group-header {
+    font-size: 12px; font-weight: 600;
+    color: var(--sage); margin: 12px 0 4px;
+  }
+
+  /* 详情页 Tab */
+  .detail-tabs {
+    display: flex; margin: 0 0 4px;
+    border-bottom: 2px solid var(--sage-border);
+  }
+  .detail-tab {
+    flex: 1; text-align: center; padding: 10px 8px;
+    font-size: 14px; font-weight: 600; color: var(--text-light);
+    cursor: pointer; border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .detail-tab.active { color: var(--sage-dark); border-bottom-color: var(--sage); }
+
+  /* 节点/巡检列表项 */
+  .record-item {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 12px; margin-bottom: 8px;
+    box-shadow: var(--shadow);
+  }
+  .record-item-head {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 6px;
+  }
+  .record-item-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
+  .record-item-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .record-item-desc { font-size: 13px; color: var(--text-secondary); margin: 6px 0; }
+  .record-item-attachments {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+  }
+  .record-att-thumb {
+    width: 60px; height: 60px;
+    border-radius: 6px; overflow: hidden;
+    border: 1px solid var(--sage-border);
+  }
+  .record-att-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .record-att-file {
+    width: 60px; height: 60px;
+    border-radius: 6px; background: var(--sage-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; text-decoration: none;
+  }
+  .status-tag {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .status-tag.pending { background: #FFF3CD; color: #856404; }
+  .status-tag.confirmed { background: #D4EDDA; color: #155724; }
+  .status-tag.rejected { background: #F8D7DA; color: #721C24; }
+
+  /* 返回按钮 */
+  .back-btn {
+    display: flex; align-items: center; gap: 4px;
+    cursor: pointer; color: var(--sage); font-size: 14px; font-weight: 600;
+  }
+
+  /* 浮动上传按钮 */
+  .fab-upload {
+    position: fixed; bottom: 24px; right: 50%; transform: translateX(250px);
+    width: 52px; height: 52px;
+    background: var(--sage); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white); font-size: 24px; font-weight: 300;
+    box-shadow: 0 4px 16px rgba(90,125,107,0.3);
+    cursor: pointer; z-index: 50; border: none;
+  }
+  .fab-upload:active { transform: translateX(250px) scale(0.92); }
 </style>
 </head>
 <body>
@@ -366,15 +509,73 @@
   <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
 </div>
 
-<!-- ===== 主页面 ===== -->
+<!-- ===== 主页面（项目列表） ===== -->
 <div id="mainPage" style="display:none;">
   <!-- 导航栏 -->
   <div class="nav-bar">
     <div class="nav-brand">
       <div class="nav-logo">立</div>
-      <div class="nav-title">成果上传</div>
+      <div class="nav-title">我的项目</div>
     </div>
     <div class="nav-user" id="navUser"></div>
+  </div>
+
+  <div class="form-section">
+    <div class="field-label">我的项目 <span class="field-hint" id="projectCount"></span></div>
+    <div id="projectListArea">
+      <div class="loading"><div class="spinner"></div>加载项目中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 项目详情页 ===== -->
+<div id="detailPage" style="display:none;">
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <div class="back-btn" onclick="backToProjectList()">‹ 返回</div>
+    <div class="nav-title" id="detailNavTitle">项目详情</div>
+    <div class="nav-user"></div>
+  </div>
+
+  <div class="form-section">
+    <!-- 项目信息卡片 -->
+    <div class="detail-card">
+      <div class="detail-card-title">📋 项目信息</div>
+      <div id="detailProjectInfo"></div>
+    </div>
+
+    <!-- 进度卡片 -->
+    <div class="detail-card">
+      <div class="detail-card-title">📊 当前进度</div>
+      <div id="detailProgress"></div>
+    </div>
+
+    <!-- 阶段时间线 -->
+    <div class="detail-card">
+      <div class="detail-card-title">🗺️ 阶段时间线</div>
+      <div id="detailTimeline"></div>
+    </div>
+
+    <!-- Tab：确认节点 / 巡检记录 -->
+    <div class="detail-tabs">
+      <div class="detail-tab active" data-tab="nodes" onclick="switchDetailTab('nodes')">确认节点</div>
+      <div class="detail-tab" data-tab="inspections" onclick="switchDetailTab('inspections')">巡检记录</div>
+    </div>
+    <div id="detailNodesArea"></div>
+    <div id="detailInspectionsArea" style="display:none;"></div>
+  </div>
+
+  <!-- 浮动上传按钮 -->
+  <button class="fab-upload" onclick="goToUpload()">＋</button>
+</div>
+
+<!-- ===== 上传页面 ===== -->
+<div id="uploadPage" style="display:none;">
+  <!-- 导航栏 -->
+  <div class="nav-bar">
+    <div class="back-btn" onclick="backToDetail()">‹ 返回</div>
+    <div class="nav-title">成果上传</div>
+    <div class="nav-user" id="uploadNavUser"></div>
   </div>
 
   <!-- 模式切换 -->
@@ -387,11 +588,9 @@
 
   <!-- 上传表单 -->
   <div class="form-section">
-    <!-- 选择项目 -->
-    <div class="field-label">选择项目</div>
-    <div id="projectListArea">
-      <div class="loading"><div class="spinner"></div>加载项目中...</div>
-    </div>
+    <!-- 已选项目 -->
+    <div class="field-label">当前项目</div>
+    <div id="uploadProjectInfo" style="background:var(--sage-bg); padding:10px 14px; border-radius:var(--radius); margin-bottom:12px; font-size:13px; color:var(--sage-dark);"></div>
 
     <!-- ===== 客户确认节点字段 ===== -->
     <div id="confirmFields">
@@ -524,6 +723,9 @@
     selectedInspectionStage: null,
     mode: 'confirm', // 'confirm' | 'inspection'
     files: [],
+    detailNodes: [],
+    detailInspections: [],
+    detailTab: 'nodes',
   };
 
   // ===== 模式切换 =====
@@ -585,8 +787,12 @@
         }
       })
       .catch(err => {
-        console.warn('API未连接，使用演示模式:', err);
-        showDemoProjects();
+        console.error('加载项目失败:', err);
+        document.getElementById('projectListArea').innerHTML =
+          `<div style="text-align:center; padding:20px; color:var(--danger); font-size:13px;">加载失败：${err.message || '网络错误'}<br>请检查网络后刷新重试</div>`;
+        // 恢复登录按钮
+        const btn = document.getElementById('loginBtn');
+        if (btn) { btn.disabled = false; btn.textContent = '登 录'; }
       });
   }
 
@@ -603,8 +809,10 @@
   function showMainPage() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainPage').style.display = 'block';
+    document.getElementById('detailPage').style.display = 'none';
+    document.getElementById('uploadPage').style.display = 'none';
     document.getElementById('navUser').textContent = `工号 ${state.staffId}`;
-
+    document.getElementById('projectCount').textContent = `共 ${state.projects.length} 个`;
     renderProjectList();
     initStageSelector();
   }
@@ -617,24 +825,252 @@
       return;
     }
 
-    area.innerHTML = state.projects.map(p => `
+    area.innerHTML = state.projects.map(p => {
+      const statusClass = p.status === '正常' ? 'normal' : (p.status === '停工' ? 'danger' : 'warn');
+      return `
       <div class="project-list-item" onclick="selectProject('${p.recordId}')">
         <div class="project-list-name">${p.name}</div>
-        <div class="project-list-meta">${p.code || ''} · ${p.stage || '待启动'} · ${p.progress || 0}%</div>
-      </div>
-    `).join('');
+        <div class="project-list-meta">
+          ${p.clientName ? p.clientName + ' · ' : ''}${p.code || '无编号'}
+          ${p.stage ? ' · ' + p.stage : ''}
+          ${p.address ? ' · ' + p.address : ''}
+        </div>
+        <div style="margin-top:8px;">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:${p.progress || 0}%"></div>
+          </div>
+          <div class="progress-text">
+            <span class="stage-badge ${statusClass}">${p.status || '正常'}</span>
+            <span>${p.progress || 0}%</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
   }
 
+  // ===== 选择项目 → 进入详情页 =====
   function selectProject(recordId) {
     state.selectedProject = state.projects.find(p => p.recordId === recordId);
-    // 更新UI
-    document.querySelectorAll('.project-list-item').forEach(el => {
-      el.style.borderColor = '';
-      el.style.background = '';
+    if (!state.selectedProject) return;
+    showProjectDetail();
+  }
+
+  // ===== 项目详情页 =====
+  function showProjectDetail() {
+    const p = state.selectedProject;
+    if (!p) return;
+
+    document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('detailPage').style.display = 'block';
+    document.getElementById('detailNavTitle').textContent = p.name || '项目详情';
+
+    // 项目信息
+    const statusClass = p.status === '正常' ? 'normal' : (p.status === '停工' ? 'danger' : 'warn');
+    document.getElementById('detailProjectInfo').innerHTML = `
+      <div class="info-row"><span class="info-label">客户姓名</span><span class="info-value">${p.clientName || '-'}</span></div>
+      <div class="info-row"><span class="info-label">联系方式</span><span class="info-value">${p.clientPhone || '-'}</span></div>
+      <div class="info-row"><span class="info-label">项目地址</span><span class="info-value">${p.address || '-'}</span></div>
+      <div class="info-row"><span class="info-label">空间类型</span><span class="info-value">${p.spaceType || '-'}</span></div>
+      <div class="info-row"><span class="info-label">面积</span><span class="info-value">${p.area ? p.area + ' ㎡' : '-'}</span></div>
+      <div class="info-row"><span class="info-label">合同金额</span><span class="info-value">${p.budget ? '¥' + p.budget.toLocaleString() : '-'}</span></div>
+      <div class="info-row"><span class="info-label">已收款</span><span class="info-value">${p.paidAmount ? '¥' + p.paidAmount.toLocaleString() : '-'}</span></div>
+      <div class="info-row"><span class="info-label">状态</span><span class="info-value"><span class="stage-badge ${statusClass}">${p.status || '正常'}</span></span></div>
+    `;
+
+    // 进度
+    document.getElementById('detailProgress').innerHTML = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:13px; color:var(--text-secondary);">当前阶段</span>
+        <span class="stage-badge active">${p.stage || '待启动'}</span>
+      </div>
+      <div class="progress-bar-wrap" style="height:12px;">
+        <div class="progress-bar-fill" style="width:${p.progress || 0}%"></div>
+      </div>
+      <div class="progress-text">
+        <span>总进度</span>
+        <span style="font-size:16px; font-weight:700; color:var(--sage-dark);">${p.progress || 0}%</span>
+      </div>
+    `;
+
+    // 阶段时间线
+    renderTimeline(p.stage);
+
+    // 加载节点和巡检
+    loadProjectNodes(p.recordId);
+    loadProjectInspections(p.recordId);
+  }
+
+  // ===== 渲染阶段时间线 =====
+  function renderTimeline(currentStage) {
+    const groups = {
+      '设计阶段': ['平面布局方案', '效果图设计', '物料整理', '施工图设计', '报价签合同'],
+      '施工阶段': ['开工前期准备', '拆除改造', '水电隐蔽工程', '防水工程', '泥瓦工程', '木工吊顶', '油漆墙面', '安装阶段', '开荒保洁竣工验收'],
+      '软装阶段': ['软装-前期对接', '软装-方案设计', '软装-深化定品', '软装-采购跟单', '软装-进场摆场', '软装-售后质保'],
+      '竣工交付': ['竣工交付'],
+    };
+
+    // 找到当前阶段在主流程中的位置
+    const mainStages = [...groups['设计阶段'], ...groups['施工阶段'], ...groups['竣工交付']];
+    const softStages = groups['软装阶段'];
+    const currentIdx = mainStages.indexOf(currentStage);
+    const currentSoftIdx = softStages.indexOf(currentStage);
+
+    let html = '';
+    for (const [groupName, stages] of Object.entries(groups)) {
+      html += `<div class="timeline-group-header">${groupName}</div><div class="timeline">`;
+      stages.forEach(stage => {
+        let cls = '';
+        const mainIdx = mainStages.indexOf(stage);
+        const softIdx = softStages.indexOf(stage);
+
+        if (stage === currentStage) {
+          cls = 'current';
+        } else if (groupName === '软装阶段') {
+          // 软装独立判断
+          if (currentSoftIdx >= 0 && softIdx < currentSoftIdx) cls = 'done';
+        } else {
+          if (currentIdx >= 0 && mainIdx < currentIdx) cls = 'done';
+        }
+        const label = stage.replace('软装-', '');
+        html += `<div class="timeline-item ${cls}">${label}</div>`;
+      });
+      html += '</div>';
+    }
+    document.getElementById('detailTimeline').innerHTML = html;
+  }
+
+  // ===== 详情页 Tab 切换 =====
+  function switchDetailTab(tab) {
+    state.detailTab = tab;
+    document.querySelectorAll('.detail-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === tab);
     });
-    event.currentTarget.style.borderColor = 'var(--sage)';
-    event.currentTarget.style.background = 'var(--sage-bg)';
-    checkSubmitReady();
+    document.getElementById('detailNodesArea').style.display = tab === 'nodes' ? 'block' : 'none';
+    document.getElementById('detailInspectionsArea').style.display = tab === 'inspections' ? 'block' : 'none';
+  }
+
+  // ===== 加载项目确认节点 =====
+  function loadProjectNodes(projectId) {
+    document.getElementById('detailNodesArea').innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+    fetch(`${API_BASE}/api/nodes?projectId=${projectId}&staffId=${state.staffId}&password=${encodeURIComponent(state.password)}`)
+      .then(r => r.json())
+      .then(data => {
+        state.detailNodes = (data.success && data.nodes) ? data.nodes : [];
+        renderNodes();
+      })
+      .catch(() => {
+        state.detailNodes = [];
+        renderNodes();
+      });
+  }
+
+  function renderNodes() {
+    const area = document.getElementById('detailNodesArea');
+    if (state.detailNodes.length === 0) {
+      area.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">暂无确认节点</div>';
+      return;
+    }
+    area.innerHTML = state.detailNodes.map(n => {
+      const statusClass = n.status === '已确认' ? 'confirmed' : (n.status === '已驳回' ? 'rejected' : 'pending');
+      const time = n.uploadTime ? new Date(n.uploadTime).toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : '';
+      let attachments = '';
+      if (n.attachments && n.attachments.length > 0) {
+        attachments = '<div class="record-item-attachments">' + n.attachments.map(att => {
+          if (att.type && att.type.startsWith('image/')) {
+            return `<div class="record-att-thumb"><img src="${API_BASE}${att.url}" alt="${att.name}"></div>`;
+          }
+          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank">📎</a>`;
+        }).join('') + '</div>';
+      }
+      return `
+        <div class="record-item">
+          <div class="record-item-head">
+            <div>
+              <div class="record-item-title">${n.nodeName || n.stage || '未命名节点'}</div>
+              <div class="record-item-meta">${n.stage || ''} · ${n.uploader || ''} · ${time}</div>
+            </div>
+            <span class="status-tag ${statusClass}">${n.status || '待确认'}</span>
+          </div>
+          ${n.description ? `<div class="record-item-desc">${n.description}</div>` : ''}
+          ${n.clientNotes ? `<div class="record-item-desc" style="color:var(--accent);">客户意见：${n.clientNotes}</div>` : ''}
+          ${attachments}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 加载项目巡检记录 =====
+  function loadProjectInspections(projectId) {
+    document.getElementById('detailInspectionsArea').innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+    fetch(`${API_BASE}/api/inspection?staffId=${state.staffId}&password=${encodeURIComponent(state.password)}&projectId=${projectId}`)
+      .then(r => r.json())
+      .then(data => {
+        state.detailInspections = (data.success && data.items) ? data.items : [];
+        renderInspections();
+      })
+      .catch(() => {
+        state.detailInspections = [];
+        renderInspections();
+      });
+  }
+
+  function renderInspections() {
+    const area = document.getElementById('detailInspectionsArea');
+    if (state.detailInspections.length === 0) {
+      area.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">暂无巡检记录</div>';
+      return;
+    }
+    area.innerHTML = state.detailInspections.map(insp => {
+      let attachments = '';
+      if (insp.attachments && insp.attachments.length > 0) {
+        attachments = '<div class="record-item-attachments">' + insp.attachments.map(att => {
+          if (att.type && att.type.startsWith('image/')) {
+            return `<div class="record-att-thumb"><img src="${API_BASE}${att.url}" alt="${att.name}"></div>`;
+          }
+          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank">📎</a>`;
+        }).join('') + '</div>';
+      }
+      return `
+        <div class="record-item">
+          <div class="record-item-head">
+            <div>
+              <div class="record-item-title">${insp.stage || '巡检'}</div>
+              <div class="record-item-meta">${insp.inspectDate || ''} · ${insp.inspector || ''}</div>
+            </div>
+          </div>
+          ${insp.notes ? `<div class="record-item-desc">${insp.notes}</div>` : ''}
+          ${insp.issues ? `<div class="record-item-desc" style="color:var(--danger);">问题：${insp.issues}</div>` : ''}
+          ${attachments}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 返回项目列表 =====
+  function backToProjectList() {
+    document.getElementById('detailPage').style.display = 'none';
+    document.getElementById('mainPage').style.display = 'block';
+  }
+
+  // ===== 进入上传页面 =====
+  function goToUpload() {
+    const p = state.selectedProject;
+    if (!p) return;
+    document.getElementById('detailPage').style.display = 'none';
+    document.getElementById('uploadPage').style.display = 'block';
+    document.getElementById('uploadNavUser').textContent = `工号 ${state.staffId}`;
+    document.getElementById('uploadProjectInfo').textContent = `${p.name} · ${p.stage || '待启动'} · ${p.progress || 0}%`;
+  }
+
+  // ===== 从上传页返回详情页 =====
+  function backToDetail() {
+    document.getElementById('uploadPage').style.display = 'none';
+    document.getElementById('detailPage').style.display = 'block';
+    // 刷新节点和巡检
+    if (state.selectedProject) {
+      loadProjectNodes(state.selectedProject.recordId);
+      loadProjectInspections(state.selectedProject.recordId);
+    }
   }
 
   // ===== 阶段选择 =====
@@ -800,7 +1236,7 @@
               isInspection
                 ? `巡检记录已上传：${state.selectedProject.name} - ${stage}`
                 : `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」，客户已收到通知`;
-            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('uploadPage').style.display = 'none';
             document.getElementById('successPage').style.display = 'block';
           }, 500);
         } else {
@@ -830,7 +1266,6 @@
 
   // ===== 重置表单 =====
   function resetForm() {
-    state.selectedProject = null;
     state.selectedStage = null;
     state.selectedInspectionStage = null;
     state.files = [];
@@ -844,9 +1279,14 @@
     document.querySelectorAll('#stageGroup .select-tag, #inspectionStageGroup .select-tag').forEach(t => t.classList.remove('active'));
 
     document.getElementById('successPage').style.display = 'none';
-    document.getElementById('mainPage').style.display = 'block';
 
-    renderProjectList();
+    // 返回详情页并刷新数据
+    if (state.selectedProject) {
+      backToDetail();
+    } else {
+      document.getElementById('mainPage').style.display = 'block';
+      renderProjectList();
+    }
     checkSubmitReady();
   }
 

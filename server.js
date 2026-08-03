@@ -218,42 +218,58 @@ async function handleNeeds(req, res) {
   }
 }
 
+function mapProjectFields(item) {
+  const f = item.fields;
+  return {
+    recordId: item.record_id,
+    name: parseFieldValue(f['项目名称']) || '未命名',
+    code: parseFieldValue(f['项目编号']),
+    clientName: parseFieldValue(f['客户姓名']) || '',
+    clientPhone: parseFieldValue(f['客户联系方式']) || '',
+    spaceType: parseFieldValue(f['空间类型']),
+    area: typeof f['面积'] === 'number' ? f['面积'] : 0,
+    address: parseFieldValue(f['项目地址']),
+    stage: parseFieldValue(f['当前阶段']),
+    progress: typeof f['阶段进度'] === 'number' ? f['阶段进度'] : 0,
+    budget: typeof f['合同金额'] === 'number' ? f['合同金额'] : 0,
+    paidAmount: typeof f['已收款'] === 'number' ? f['已收款'] : 0,
+    status: parseFieldValue(f['停工状态']) || '正常',
+    staffId: parseFieldValue(f['负责人工号']) || '',
+  };
+}
+
 async function handleProject(req, res) {
   const parsed = url.parse(req.url, true);
   const { phone, staffId, password } = parsed.query;
 
-  // Staff query: load all projects
+  // Staff query: load projects assigned to this staff
   if (staffId) {
     if (!config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
       return sendJSON(res, 401, { success: false, error: 'Auth failed' });
     }
 
-    const result = await feishuRequest('GET',
-      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records?page_size=100`
+    // Search projects where 负责人工号 = staffId
+    const searchResult = await feishuRequest('POST',
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search`,
+      { filter: { conjunction: 'and', conditions: [{ field_name: '负责人工号', operator: 'is', value: [staffId] }] } }
     );
 
-    if (result.code === 0) {
-      const projects = (result.data.items || []).map(item => {
-        const f = item.fields;
-        return {
-          recordId: item.record_id,
-          name: parseFieldValue(f['项目名称']) || '未命名',
-          code: parseFieldValue(f['项目编号']),
-          spaceType: parseFieldValue(f['空间类型']),
-          area: typeof f['面积'] === 'number' ? f['面积'] : 0,
-          address: parseFieldValue(f['项目地址']),
-          stage: parseFieldValue(f['当前阶段']),
-          progress: typeof f['阶段进度'] === 'number' ? f['阶段进度'] : 0,
-          budget: typeof f['合同金额'] === 'number' ? f['合同金额'] : 0,
-          status: parseFieldValue(f['停工状态']) || '正常',
-          designLead: 'D-01',
-          projectLead: 'P-01',
-        };
-      });
-      return sendJSON(res, 200, { success: true, projects });
-    } else {
-      return sendJSON(res, 500, { success: false, error: result.msg });
+    let projects = [];
+    if (searchResult.code === 0 && searchResult.data.items) {
+      projects = searchResult.data.items.map(item => mapProjectFields(item));
     }
+
+    // Fallback: if no assigned projects, load all (backward compat)
+    if (projects.length === 0) {
+      const result = await feishuRequest('GET',
+        `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records?page_size=100`
+      );
+      if (result.code === 0 && result.data.items) {
+        projects = result.data.items.map(item => mapProjectFields(item));
+      }
+    }
+
+    return sendJSON(res, 200, { success: true, projects, staffId });
   }
 
   // Client query: find by phone
@@ -276,22 +292,7 @@ async function handleProject(req, res) {
     );
 
     if (searchResult.code === 0) {
-      const projects = (searchResult.data.items || []).map(item => {
-        const f = item.fields;
-        return {
-          recordId: item.record_id,
-          name: parseFieldValue(f['项目名称']) || '未命名项目',
-          code: parseFieldValue(f['项目编号']),
-          spaceType: parseFieldValue(f['空间类型']),
-          area: typeof f['面积'] === 'number' ? f['面积'] : 0,
-          address: parseFieldValue(f['项目地址']),
-          stage: parseFieldValue(f['当前阶段']) || '需求解析',
-          progress: typeof f['阶段进度'] === 'number' ? f['阶段进度'] : 0,
-          status: parseFieldValue(f['停工状态']) || '正常',
-          designLead: 'D-01',
-          projectLead: 'P-01',
-        };
-      });
+      const projects = (searchResult.data.items || []).map(item => mapProjectFields(item));
 
       // If no project found but needs exist, create a virtual project from needs
       if (projects.length === 0 && clientName) {
@@ -300,14 +301,15 @@ async function handleProject(req, res) {
           recordId: needsResult.data.items[0].record_id,
           name: `${clientName}的装修项目`,
           code: '待创建',
+          clientName,
+          clientPhone: phone,
           spaceType: parseFieldValue(needItem['空间类型']),
           area: typeof needItem['面积'] === 'number' ? needItem['面积'] : 0,
           address: parseFieldValue(needItem['项目地址']),
           stage: '需求解析',
           progress: 5,
           status: '正常',
-          designLead: '待分配',
-          projectLead: '待分配',
+          staffId: '',
         });
       }
 
@@ -370,12 +372,43 @@ async function handleFileProxy(req, res) {
   }
 }
 
+function mapNodeFields(item) {
+  const f = item.fields;
+  return {
+    recordId: item.record_id,
+    projectId: parseFieldValue(f['关联项目']),
+    stage: parseFieldValue(f['节点阶段']),
+    nodeName: parseFieldValue(f['节点名称']),
+    status: parseFieldValue(f['客户确认状态']) || '待确认',
+    description: parseFieldValue(f['上传描述']),
+    uploadTime: f['上传时间'] ? Number(f['上传时间']) : null,
+    uploader: parseFieldValue(f['员工工号']),
+    clientNotes: parseFieldValue(f['客户修改意见']),
+    attachments: parseAttachments(f['成果附件']),
+  };
+}
+
 async function handleNodes(req, res) {
   const parsed = url.parse(req.url, true);
-  const { phone } = parsed.query;
+  const { phone, projectId, staffId, password } = parsed.query;
 
+  // Staff query: by projectId
+  if (projectId && staffId) {
+    if (!config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+      return sendJSON(res, 401, { success: false, error: 'Auth failed' });
+    }
+    const result = await feishuRequest('POST',
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.confirm}/records/search`,
+      { filter: { conjunction: 'and', conditions: [{ field_name: '关联项目', operator: 'is', value: [projectId] }] } }
+    );
+    const nodes = (result.code === 0 && result.data.items) ? result.data.items.map(item => mapNodeFields(item)) : [];
+    nodes.sort((a, b) => (b.uploadTime || 0) - (a.uploadTime || 0));
+    return sendJSON(res, 200, { success: true, nodes });
+  }
+
+  // Client query: by phone
   if (!phone) {
-    return sendJSON(res, 400, { success: false, error: 'Missing phone' });
+    return sendJSON(res, 400, { success: false, error: 'Missing phone or projectId' });
   }
 
   // Get all confirm nodes for this client's phone
@@ -385,21 +418,7 @@ async function handleNodes(req, res) {
   );
 
   if (result.code === 0) {
-    const nodes = (result.data.items || []).map(item => {
-      const f = item.fields;
-      return {
-        recordId: item.record_id,
-        projectId: parseFieldValue(f['关联项目']),
-        stage: parseFieldValue(f['节点阶段']),
-        nodeName: parseFieldValue(f['节点名称']),
-        status: parseFieldValue(f['客户确认状态']) || '待确认',
-        description: parseFieldValue(f['上传描述']),
-        uploadTime: f['上传时间'] ? Number(f['上传时间']) : null,
-        uploader: parseFieldValue(f['员工工号']),
-        clientNotes: parseFieldValue(f['客户修改意见']),
-        attachments: parseAttachments(f['成果附件']),
-      };
-    });
+    const nodes = (result.data.items || []).map(item => mapNodeFields(item));
 
     // Sort by upload time
     nodes.sort((a, b) => (b.uploadTime || 0) - (a.uploadTime || 0));
