@@ -808,21 +808,19 @@
         }
       })
       .catch(err => {
-        console.warn('API未连接，模拟上传:', err);
+        console.error('上传失败:', err);
         state.files.forEach((f, i) => {
           const el = document.getElementById(`prog-${i}`);
           if (el) {
-            el.textContent = `✓ ${f.file.name} - 演示上传成功`;
-            el.classList.add('done');
+            el.textContent = `✗ ${f.file.name} - 上传失败`;
+            el.style.color = '#e53935';
           }
         });
-        showToast('演示模式：上传成功（未实际写入飞书）');
+        showToast('上传失败：' + (err.message || '网络错误'));
         setTimeout(() => {
-          document.getElementById('successMsg').textContent =
-            `演示模式：${state.files.length} 个文件已模拟上传到「${state.selectedProject.name}」`;
-          document.getElementById('mainPage').style.display = 'none';
-          document.getElementById('successPage').style.display = 'block';
-        }, 800);
+          btn.disabled = false;
+          btn.textContent = isInspection ? '上 传 巡 检 记 录' : '上 传 并 通 知 客 户';
+        }, 1500);
       })
       .finally(() => {
         btn.disabled = false;

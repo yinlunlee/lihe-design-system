@@ -850,7 +850,8 @@ async function handleInspectionUpload(req, res) {
   const password = fields.password;
   const projectId = fields.projectId;
   const stage = fields.stage || '';
-  const inspectDate = fields.inspectDate || new Date().toISOString().slice(0, 10);
+  const rawDate = fields.inspectDate || new Date().toISOString().slice(0, 10);
+  const inspectDate = new Date(rawDate).getTime() || Date.now();
   const notes = fields.notes || '';
   const issues = fields.issues || '';
 
