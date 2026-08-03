@@ -570,9 +570,22 @@
 
   function getPhaseByStage(stage) {
     const map = {
-      '需求解析': '洽谈', '概念方案': '设计', '深化方案': '设计', '施工图': '设计',
+      '需求解析': '洽谈',
+      // 设计阶段
+      '平面布局方案': '设计', '效果图设计': '设计', '物料整理': '设计',
+      '施工图设计': '设计', '报价签合同': '设计',
+      '概念方案': '设计', '深化方案': '设计', '施工图': '设计',
+      // 施工阶段
+      '开工前期准备': '施工', '拆除改造': '施工', '水电隐蔽工程': '施工',
+      '防水工程': '施工', '泥瓦工程': '施工', '木工吊顶': '施工',
+      '油漆墙面': '施工', '安装阶段': '施工', '开荒保洁竣工验收': '施工',
       '施工-拆除水电': '施工', '施工-泥木': '施工', '施工-油漆安装': '施工',
-      '软装方案': '软装', '软装落地': '软装', '竣工验收': '竣工',
+      // 软装阶段
+      '软装-前期对接': '软装', '软装-方案设计': '软装', '软装-深化定品': '软装',
+      '软装-采购跟单': '软装', '软装-进场摆场': '软装', '软装-售后质保': '软装',
+      '软装方案': '软装', '软装落地': '软装',
+      // 竣工
+      '竣工交付': '竣工', '竣工验收': '竣工',
     };
     return map[stage] || '设计';
   }
@@ -588,11 +601,12 @@
     if (node.attachments && node.attachments.length > 0) {
       attachHtml = '<div class="attachment-grid">';
       node.attachments.slice(0, 6).forEach((att, i) => {
+        const fullUrl = `${API_BASE}${att.url}`;
         const isImage = att.type && att.type.startsWith('image/');
         if (isImage && att.url) {
-          attachHtml += `<div class="attachment-thumb" onclick="viewImage('${att.url}')"><img src="${att.url}" alt="${att.name}"></div>`;
+          attachHtml += `<div class="attachment-thumb" onclick="viewImage('${fullUrl}')"><img src="${fullUrl}" alt="${att.name}"></div>`;
         } else {
-          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${att.url}','${att.name}')">📄</div>`;
+          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')">📄</div>`;
         }
       });
       if (node.attachments.length > 6) {
@@ -663,12 +677,16 @@
       .then(r => r.json())
       .then(data => {
         if (data.success) {
-          showToast(data.message);
+          let msg = data.message;
+          if (data.advanceInfo) {
+            msg = `已确认！项目已推进至「${data.advanceInfo.to}」阶段`;
+          }
+          showToast(msg);
           // 刷新页面
           setTimeout(() => {
             const phone = localStorage.getItem('lihe_phone');
             if (phone) doLogin();
-          }, 1500);
+          }, 2000);
         } else {
           showToast(data.error || '操作失败');
         }

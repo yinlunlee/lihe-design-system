@@ -325,6 +325,33 @@
     margin: 0 auto 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Mode tabs */
+  .mode-tabs { display: flex; margin: 0 0 4px; border-bottom: 2px solid var(--sage-border); }
+  .mode-tab {
+    flex: 1; text-align: center; padding: 12px 8px;
+    font-size: 14px; font-weight: 600; color: var(--text-light);
+    cursor: pointer; border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .mode-tab.active { color: var(--sage-dark); border-bottom-color: var(--sage); }
+
+  /* Stage group headers */
+  .stage-group-header {
+    font-size: 12px; font-weight: 600; color: var(--sage);
+    margin: 12px 0 6px; padding-left: 4px;
+    border-left: 3px solid var(--sage); padding-left: 8px;
+  }
+  .stage-group-header:first-child { margin-top: 0; }
+
+  /* Date input */
+  .date-input {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius); font-size: 14px;
+    background: var(--white); -webkit-appearance: none;
+    color: var(--text-main);
+  }
 </style>
 </head>
 <body>
@@ -350,6 +377,14 @@
     <div class="nav-user" id="navUser"></div>
   </div>
 
+  <!-- 模式切换 -->
+  <div class="form-section" style="padding-bottom:0;">
+    <div class="mode-tabs">
+      <div class="mode-tab active" data-mode="confirm" onclick="switchMode('confirm')">成果上传（客户确认）</div>
+      <div class="mode-tab" data-mode="inspection" onclick="switchMode('inspection')">施工巡检（内部记录）</div>
+    </div>
+  </div>
+
   <!-- 上传表单 -->
   <div class="form-section">
     <!-- 选择项目 -->
@@ -358,27 +393,82 @@
       <div class="loading"><div class="spinner"></div>加载项目中...</div>
     </div>
 
-    <!-- 选择阶段 -->
-    <div class="field-label">上传节点 <span class="field-hint">请选择当前对应的阶段</span></div>
-    <div class="select-group" id="stageGroup">
-      <div class="select-tag" data-val="概念方案">概念方案</div>
-      <div class="select-tag" data-val="深化方案">深化方案</div>
-      <div class="select-tag" data-val="施工图">施工图</div>
-      <div class="select-tag" data-val="施工-拆除水电">施工-拆除水电</div>
-      <div class="select-tag" data-val="施工-泥木">施工-泥木</div>
-      <div class="select-tag" data-val="施工-油漆安装">施工-油漆安装</div>
-      <div class="select-tag" data-val="软装方案">软装方案</div>
-      <div class="select-tag" data-val="软装落地">软装落地</div>
-      <div class="select-tag" data-val="竣工验收">竣工验收</div>
+    <!-- ===== 客户确认节点字段 ===== -->
+    <div id="confirmFields">
+      <!-- 选择阶段 -->
+      <div class="field-label">上传节点 <span class="field-hint">请选择当前对应的阶段</span></div>
+      <div id="stageGroup">
+        <div class="stage-group-header">设计阶段</div>
+        <div class="select-group">
+          <div class="select-tag" data-val="平面布局方案">平面布局方案</div>
+          <div class="select-tag" data-val="效果图设计">效果图设计</div>
+          <div class="select-tag" data-val="物料整理">物料整理</div>
+          <div class="select-tag" data-val="施工图设计">施工图设计</div>
+          <div class="select-tag" data-val="报价签合同">报价签合同</div>
+        </div>
+        <div class="stage-group-header">施工阶段</div>
+        <div class="select-group">
+          <div class="select-tag" data-val="开工前期准备">开工前期准备</div>
+          <div class="select-tag" data-val="拆除改造">拆除改造</div>
+          <div class="select-tag" data-val="水电隐蔽工程">水电隐蔽工程</div>
+          <div class="select-tag" data-val="防水工程">防水工程</div>
+          <div class="select-tag" data-val="泥瓦工程">泥瓦工程</div>
+          <div class="select-tag" data-val="木工吊顶">木工吊顶</div>
+          <div class="select-tag" data-val="油漆墙面">油漆墙面</div>
+          <div class="select-tag" data-val="安装阶段">安装阶段</div>
+          <div class="select-tag" data-val="开荒保洁竣工验收">开荒保洁竣工验收</div>
+        </div>
+        <div class="stage-group-header">软装阶段（与施工并行）</div>
+        <div class="select-group">
+          <div class="select-tag" data-val="软装-前期对接">前期对接</div>
+          <div class="select-tag" data-val="软装-方案设计">方案设计</div>
+          <div class="select-tag" data-val="软装-深化定品">深化定品</div>
+          <div class="select-tag" data-val="软装-采购跟单">采购跟单</div>
+          <div class="select-tag" data-val="软装-进场摆场">进场摆场</div>
+          <div class="select-tag" data-val="软装-售后质保">售后质保</div>
+        </div>
+        <div class="stage-group-header">竣工交付</div>
+        <div class="select-group">
+          <div class="select-tag" data-val="竣工交付">竣工交付</div>
+        </div>
+      </div>
+
+      <!-- 节点名称 -->
+      <div class="field-label">节点名称 <span class="field-hint">可选，默认使用阶段名</span></div>
+      <input class="input-text" id="nodeNameInput" type="text" placeholder="如：水电隐蔽工程验收">
+
+      <!-- 描述 -->
+      <div class="field-label">上传描述 <span class="field-hint">简要说明本次上传内容</span></div>
+      <textarea class="input-text" id="descInput" placeholder="如：水电隐蔽工程完工，已完成打压试验..."></textarea>
     </div>
 
-    <!-- 节点名称 -->
-    <div class="field-label">节点名称 <span class="field-hint">可选，默认使用阶段名</span></div>
-    <input class="input-text" id="nodeNameInput" type="text" placeholder="如：水电隐蔽工程验收">
+    <!-- ===== 巡检记录字段 ===== -->
+    <div id="inspectionFields" style="display:none;">
+      <div class="field-label">巡检阶段 <span class="field-hint">选择当前施工阶段</span></div>
+      <div id="inspectionStageGroup">
+        <div class="stage-group-header">施工阶段</div>
+        <div class="select-group">
+          <div class="select-tag" data-val="开工前期准备">开工前期准备</div>
+          <div class="select-tag" data-val="拆除改造">拆除改造</div>
+          <div class="select-tag" data-val="水电隐蔽工程">水电隐蔽工程</div>
+          <div class="select-tag" data-val="防水工程">防水工程</div>
+          <div class="select-tag" data-val="泥瓦工程">泥瓦工程</div>
+          <div class="select-tag" data-val="木工吊顶">木工吊顶</div>
+          <div class="select-tag" data-val="油漆墙面">油漆墙面</div>
+          <div class="select-tag" data-val="安装阶段">安装阶段</div>
+          <div class="select-tag" data-val="开荒保洁竣工验收">开荒保洁竣工验收</div>
+        </div>
+      </div>
 
-    <!-- 描述 -->
-    <div class="field-label">上传描述 <span class="field-hint">简要说明本次上传内容</span></div>
-    <textarea class="input-text" id="descInput" placeholder="如：水电隐蔽工程完工，已完成打压试验..."></textarea>
+      <div class="field-label">巡检日期</div>
+      <input class="date-input" id="inspectDateInput" type="date">
+
+      <div class="field-label">巡检备注 <span class="field-hint">施工进展简述</span></div>
+      <textarea class="input-text" id="inspectNotesInput" placeholder="如：今日完成客厅吊顶龙骨安装..."></textarea>
+
+      <div class="field-label">发现问题 <span class="field-hint">如有问题请描述，无则留空</span></div>
+      <textarea class="input-text" id="inspectIssuesInput" placeholder="如：主卧插座位置偏差2cm，需调整..."></textarea>
+    </div>
 
     <!-- 文件上传 -->
     <div class="field-label">上传文件 <span class="field-hint">拍照或从相册选择，单次最多10张</span></div>
@@ -431,8 +521,29 @@
     projects: [],
     selectedProject: null,
     selectedStage: null,
-    files: [], // {file, preview}
+    selectedInspectionStage: null,
+    mode: 'confirm', // 'confirm' | 'inspection'
+    files: [],
   };
+
+  // ===== 模式切换 =====
+  function switchMode(mode) {
+    state.mode = mode;
+    document.querySelectorAll('.mode-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.mode === mode);
+    });
+    document.getElementById('confirmFields').style.display = mode === 'confirm' ? 'block' : 'none';
+    document.getElementById('inspectionFields').style.display = mode === 'inspection' ? 'block' : 'none';
+    // 重置阶段选择
+    state.selectedStage = null;
+    state.selectedInspectionStage = null;
+    document.querySelectorAll('#stageGroup .select-tag, #inspectionStageGroup .select-tag').forEach(t => t.classList.remove('active'));
+    // 设置默认巡检日期
+    if (mode === 'inspection' && !document.getElementById('inspectDateInput').value) {
+      document.getElementById('inspectDateInput').value = new Date().toISOString().slice(0, 10);
+    }
+    checkSubmitReady();
+  }
 
   // ===== 登录 =====
   function doLogin() {
@@ -528,11 +639,21 @@
 
   // ===== 阶段选择 =====
   function initStageSelector() {
+    // 确认节点阶段
     document.querySelectorAll('#stageGroup .select-tag').forEach(tag => {
       tag.addEventListener('click', () => {
         document.querySelectorAll('#stageGroup .select-tag').forEach(t => t.classList.remove('active'));
         tag.classList.add('active');
         state.selectedStage = tag.dataset.val;
+        checkSubmitReady();
+      });
+    });
+    // 巡检阶段
+    document.querySelectorAll('#inspectionStageGroup .select-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        document.querySelectorAll('#inspectionStageGroup .select-tag').forEach(t => t.classList.remove('active'));
+        tag.classList.add('active');
+        state.selectedInspectionStage = tag.dataset.val;
         checkSubmitReady();
       });
     });
@@ -611,13 +732,19 @@
 
   // ===== 检查提交按钮状态 =====
   function checkSubmitReady() {
-    const ready = state.selectedProject && state.selectedStage && state.files.length > 0;
-    document.getElementById('submitBtn').disabled = !ready;
+    const hasStage = state.mode === 'confirm' ? state.selectedStage : state.selectedInspectionStage;
+    const ready = state.selectedProject && hasStage && state.files.length > 0;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = !ready;
+    btn.textContent = state.mode === 'inspection' ? '上 传 巡 检 记 录' : '上 传 并 通 知 客 户';
   }
 
   // ===== 提交上传 =====
   function submitUpload() {
-    if (!state.selectedProject || !state.selectedStage || state.files.length === 0) {
+    const isInspection = state.mode === 'inspection';
+    const stage = isInspection ? state.selectedInspectionStage : state.selectedStage;
+
+    if (!state.selectedProject || !stage || state.files.length === 0) {
       showToast('请完成所有选择');
       return;
     }
@@ -626,19 +753,22 @@
     btn.disabled = true;
     btn.textContent = '上传中...';
 
-    const nodeName = document.getElementById('nodeNameInput').value.trim() || state.selectedStage;
-    const description = document.getElementById('descInput').value.trim();
-
-    // 构造 FormData
     const formData = new FormData();
     formData.append('staffId', state.staffId);
     formData.append('password', state.password);
     formData.append('projectId', state.selectedProject.recordId);
-    formData.append('stage', state.selectedStage);
-    formData.append('nodeName', nodeName);
-    formData.append('description', description);
+    formData.append('stage', stage);
 
-    state.files.forEach((f, i) => {
+    if (isInspection) {
+      formData.append('inspectDate', document.getElementById('inspectDateInput').value || new Date().toISOString().slice(0, 10));
+      formData.append('notes', document.getElementById('inspectNotesInput').value.trim());
+      formData.append('issues', document.getElementById('inspectIssuesInput').value.trim());
+    } else {
+      formData.append('nodeName', document.getElementById('nodeNameInput').value.trim() || stage);
+      formData.append('description', document.getElementById('descInput').value.trim());
+    }
+
+    state.files.forEach((f) => {
       formData.append('files', f.file, f.file.name);
     });
 
@@ -648,14 +778,15 @@
       `<div class="progress-item" id="prog-${i}">⏳ ${f.file.name} - 等待上传</div>`
     ).join('');
 
-    fetch(`${API_BASE}/api/upload`, {
+    const apiPath = isInspection ? '/api/inspection' : '/api/upload';
+
+    fetch(`${API_BASE}${apiPath}`, {
       method: 'POST',
       body: formData,
     })
       .then(r => r.json())
       .then(data => {
         if (data.success) {
-          // 更新进度
           state.files.forEach((f, i) => {
             const el = document.getElementById(`prog-${i}`);
             if (el) {
@@ -664,10 +795,11 @@
             }
           });
 
-          // 显示成功页
           setTimeout(() => {
             document.getElementById('successMsg').textContent =
-              `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」`;
+              isInspection
+                ? `巡检记录已上传：${state.selectedProject.name} - ${stage}`
+                : `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」，客户已收到通知`;
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('successPage').style.display = 'block';
           }, 500);
@@ -676,7 +808,6 @@
         }
       })
       .catch(err => {
-        // 演示模式
         console.warn('API未连接，模拟上传:', err);
         state.files.forEach((f, i) => {
           const el = document.getElementById(`prog-${i}`);
@@ -695,7 +826,7 @@
       })
       .finally(() => {
         btn.disabled = false;
-        btn.textContent = '上 传 并 通 知 客 户';
+        btn.textContent = isInspection ? '上 传 巡 检 记 录' : '上 传 并 通 知 客 户';
       });
   }
 
@@ -703,13 +834,16 @@
   function resetForm() {
     state.selectedProject = null;
     state.selectedStage = null;
+    state.selectedInspectionStage = null;
     state.files = [];
 
     document.getElementById('nodeNameInput').value = '';
     document.getElementById('descInput').value = '';
+    document.getElementById('inspectNotesInput').value = '';
+    document.getElementById('inspectIssuesInput').value = '';
     document.getElementById('filePreview').innerHTML = '';
     document.getElementById('progressList').innerHTML = '';
-    document.querySelectorAll('#stageGroup .select-tag').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#stageGroup .select-tag, #inspectionStageGroup .select-tag').forEach(t => t.classList.remove('active'));
 
     document.getElementById('successPage').style.display = 'none';
     document.getElementById('mainPage').style.display = 'block';

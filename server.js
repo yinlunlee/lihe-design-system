@@ -320,6 +320,56 @@ async function handleProject(req, res) {
   sendJSON(res, 400, { success: false, error: 'Missing phone or staffId' });
 }
 
+// 解析飞书附件字段
+function parseAttachments(attachField) {
+  if (!attachField || !Array.isArray(attachField)) return [];
+  return attachField.map(att => ({
+    name: att.name || att.file_name || '附件',
+    token: att.file_token || att.token || '',
+    type: att.type || att.mime_type || '',
+    size: att.size || 0,
+    url: `/api/file/${att.file_token || att.token || ''}`,
+  }));
+}
+
+// 文件代理：从飞书下载附件并流式转发给客户端
+async function handleFileProxy(req, res) {
+  const parsed = url.parse(req.url);
+  const parts = parsed.pathname.split('/');
+  const fileToken = parts[parts.length - 1];
+
+  if (!fileToken || fileToken === 'file') {
+    return sendJSON(res, 400, { error: 'Missing file token' });
+  }
+
+  try {
+    const token = await getToken();
+    const https = require('https');
+
+    https.get({
+      hostname: 'open.feishu.cn',
+      path: `/open-apis/drive/v1/medias/${fileToken}/download`,
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
+    }, (proxyRes) => {
+      if (proxyRes.statusCode !== 200) {
+        return sendJSON(res, proxyRes.statusCode, { error: `Feishu returned ${proxyRes.statusCode}` });
+      }
+      const ct = proxyRes.headers['content-type'] || 'application/octet-stream';
+      res.writeHead(200, {
+        'Content-Type': ct,
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+      });
+      proxyRes.pipe(res);
+    }).on('error', (err) => {
+      sendJSON(res, 500, { error: err.message });
+    });
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
 async function handleNodes(req, res) {
   const parsed = url.parse(req.url, true);
   const { phone } = parsed.query;
@@ -347,7 +397,7 @@ async function handleNodes(req, res) {
         uploadTime: f['上传时间'] ? Number(f['上传时间']) : null,
         uploader: parseFieldValue(f['员工工号']),
         clientNotes: parseFieldValue(f['客户修改意见']),
-        attachments: [],
+        attachments: parseAttachments(f['成果附件']),
       };
     });
 
@@ -469,6 +519,20 @@ async function handleConfirm(req, res) {
     return sendJSON(res, 400, { success: false, error: 'Missing recordId or action' });
   }
 
+  // 1. 先获取确认节点记录，拿到阶段和关联项目
+  const nodeResult = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.confirm}/records/${recordId}`
+  );
+
+  let stage = '';
+  let projectId = '';
+  if (nodeResult.code === 0 && nodeResult.data && nodeResult.data.record) {
+    const f = nodeResult.data.record.fields;
+    stage = parseFieldValue(f['节点阶段']);
+    projectId = parseFieldValue(f['关联项目']);
+  }
+
+  // 2. 更新确认状态
   const updateData = {
     fields: {
       '客户确认状态': action === 'confirm' ? '已确认' : '有修改意见',
@@ -485,16 +549,42 @@ async function handleConfirm(req, res) {
     updateData
   );
 
-  if (result.code === 0) {
-    console.log(`[confirm] Record ${recordId}: ${action === 'confirm' ? 'confirmed' : 'revision requested'}`);
-    sendJSON(res, 200, {
-      success: true,
-      message: action === 'confirm' ? '已确认，感谢您的反馈' : '修改意见已提交，我们会尽快处理',
-    });
-  } else {
+  if (result.code !== 0) {
     console.error('[confirm] Error:', result.msg);
-    sendJSON(res, 500, { success: false, error: result.msg });
+    return sendJSON(res, 500, { success: false, error: result.msg });
   }
+
+  console.log(`[confirm] Record ${recordId}: ${action === 'confirm' ? 'confirmed' : 'revision requested'}`);
+
+  // 3. 如果是确认通过，自动推进项目阶段
+  let advanceInfo = null;
+  if (action === 'confirm' && stage && projectId) {
+    const flow = config.stageFlow[stage];
+    if (flow && flow.next) {
+      const projectUpdate = { fields: { '当前阶段': flow.next } };
+      if (flow.progress !== null) {
+        projectUpdate.fields['阶段进度'] = flow.progress;
+      }
+
+      const advResult = await feishuRequest('PUT',
+        `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/${projectId}`,
+        projectUpdate
+      );
+
+      if (advResult.code === 0) {
+        advanceInfo = { from: stage, to: flow.next, progress: flow.progress };
+        console.log(`[confirm] Project ${projectId} advanced: ${stage} -> ${flow.next}`);
+      } else {
+        console.error('[confirm] Failed to advance project:', advResult.msg);
+      }
+    }
+  }
+
+  sendJSON(res, 200, {
+    success: true,
+    message: action === 'confirm' ? '已确认，感谢您的反馈' : '修改意见已提交，我们会尽快处理',
+    advanceInfo,
+  });
 }
 
 // ===== Sync: 已签约需求 → 自动创建项目记录 =====
@@ -600,8 +690,8 @@ async function handleNeedsList(req, res) {
       address: parseFieldValue(f['项目地址']),
       spaceType: parseFieldValue(f['空间类型']),
       area: parseFieldValue(f['面积']),
-      budget: parseFieldValue(f['预算范围']),
-      timeline: parseFieldValue(f['期望工期']),
+      budget: parseFieldValue(f['每平米预算']),
+      timeline: parseFieldValue(f['工期期望']),
       status: parseFieldValue(f['跟进状态']) || '待联系',
       createdAt: item.created_time || '',
     };
@@ -699,6 +789,135 @@ async function handleSyncSigned(req, res) {
     skipped,
     results,
   });
+}
+
+// ===== 巡检记录 API =====
+
+// 获取项目巡检记录列表
+async function handleInspectionList(req, res) {
+  const parsed = url.parse(req.url, true);
+  const { staffId, password, projectId } = parsed.query;
+
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+
+  if (!projectId) {
+    return sendJSON(res, 400, { success: false, error: '缺少 projectId' });
+  }
+
+  const result = await feishuRequest('POST',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.inspection}/records/search`,
+    { filter: { conjunction: 'and', conditions: [{ field_name: '关联项目', operator: 'is', value: [projectId] }] } }
+  );
+
+  if (result.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: result.msg });
+  }
+
+  const items = (result.data.items || []).map(item => {
+    const f = item.fields;
+    return {
+      recordId: item.record_id,
+      projectId: parseFieldValue(f['关联项目']),
+      stage: parseFieldValue(f['巡检阶段']),
+      inspectDate: parseFieldValue(f['巡检日期']),
+      inspector: parseFieldValue(f['巡检人']),
+      notes: parseFieldValue(f['巡检备注']),
+      issues: parseFieldValue(f['发现问题']),
+      attachments: parseAttachments(f['巡检照片']),
+      createdAt: item.created_time || '',
+    };
+  });
+
+  items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  return sendJSON(res, 200, { success: true, total: items.length, items });
+}
+
+// 员工上传巡检记录
+async function handleInspectionUpload(req, res) {
+  const contentType = req.headers['content-type'] || '';
+  const boundaryMatch = contentType.match(/boundary=(.+)/);
+  if (!boundaryMatch) {
+    return sendJSON(res, 400, { success: false, error: 'No boundary' });
+  }
+
+  const body = await getBody(req);
+  const { fields, files } = parseMultipart(body, boundaryMatch[1]);
+
+  const staffId = fields.staffId;
+  const password = fields.password;
+  const projectId = fields.projectId;
+  const stage = fields.stage || '';
+  const inspectDate = fields.inspectDate || new Date().toISOString().slice(0, 10);
+  const notes = fields.notes || '';
+  const issues = fields.issues || '';
+
+  if (!config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: 'Auth failed' });
+  }
+
+  if (!projectId || files.length === 0) {
+    return sendJSON(res, 400, { success: false, error: '缺少项目或文件' });
+  }
+
+  // 获取项目名称
+  let projectName = '';
+  const projectResult = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/${projectId}`
+  );
+  if (projectResult.code === 0) {
+    projectName = parseFieldValue(projectResult.data.record.fields['项目名称']);
+  }
+
+  // 上传文件到飞书
+  const uploadedFiles = [];
+  for (const file of files) {
+    if (file.size > 20 * 1024 * 1024) continue;
+    const uploadResult = await uploadToFeishu(file, config.feishu.appToken);
+    if (uploadResult.code === 0) {
+      uploadedFiles.push({
+        name: file.originalname,
+        token: uploadResult.data.file_token,
+        type: file.mimetype,
+      });
+    }
+  }
+
+  // 创建巡检记录
+  const record = {
+    fields: {
+      '关联项目': projectId,
+      '项目名称': projectName,
+      '巡检阶段': stage,
+      '巡检日期': inspectDate,
+      '巡检人': staffId,
+      '巡检备注': notes,
+      '发现问题': issues,
+    }
+  };
+
+  if (uploadedFiles.length > 0) {
+    record.fields['巡检照片'] = uploadedFiles.map(f => ({ file_token: f.token }));
+  }
+
+  const createResult = await feishuRequest('POST',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.inspection}/records`,
+    record
+  );
+
+  if (createResult.code === 0) {
+    console.log(`[inspection] Record created for ${projectName}: ${stage}`);
+    sendJSON(res, 200, {
+      success: true,
+      recordId: createResult.data.record.record_id,
+      uploadedCount: uploadedFiles.length,
+    });
+  } else {
+    console.error('[inspection] Create failed:', createResult.msg);
+    sendJSON(res, 500, { success: false, error: createResult.msg });
+  }
 }
 
 // 飞书事件订阅 Webhook
@@ -808,6 +1027,15 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/update-status' && req.method === 'POST') {
       return await handleUpdateStatus(req, res);
+    }
+    if (pathname.startsWith('/api/file/') && req.method === 'GET') {
+      return await handleFileProxy(req, res);
+    }
+    if (pathname === '/api/inspection' && req.method === 'GET') {
+      return await handleInspectionList(req, res);
+    }
+    if (pathname === '/api/inspection' && req.method === 'POST') {
+      return await handleInspectionUpload(req, res);
     }
     if (pathname === '/api/webhook' && (req.method === 'POST' || req.method === 'GET')) {
       return await handleWebhook(req, res);

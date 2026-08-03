@@ -139,7 +139,7 @@
   <div class="header">
     <h1>立和设计 · 自动化运营管理系统</h1>
     <p>H5 ↔ Node.js 后端 ↔ 飞书多维表格 · 全链路测试报告</p>
-    <p style="margin-top:8px;font-size:13px;opacity:0.7">生成时间：2026-08-02 23:00</p>
+    <p style="margin-top:8px;font-size:13px;opacity:0.7">更新时间：2026-08-03 · v2.0 全流程补全版</p>
   </div>
 
   <!-- Test Results -->
@@ -210,9 +210,15 @@
       <tbody>
         <tr><td><code>/api/needs</code></td><td>POST</td><td>客户提交需求表</td><td>客户需求表</td><td><span class="badge badge-green">已通</span></td></tr>
         <tr><td><code>/api/project</code></td><td>GET</td><td>客户按手机号查项目 / 员工查全部</td><td>项目管理表</td><td><span class="badge badge-green">已通</span></td></tr>
-        <tr><td><code>/api/nodes</code></td><td>GET</td><td>客户查看确认节点</td><td>客户确认节点表</td><td><span class="badge badge-green">已通</span></td></tr>
-        <tr><td><code>/api/upload</code></td><td>POST</td><td>员工上传成果文件</td><td>客户确认节点表</td><td><span class="badge badge-amber">待文件测试</span></td></tr>
-        <tr><td><code>/api/confirm</code></td><td>POST</td><td>客户确认/提交修改意见</td><td>客户确认节点表</td><td><span class="badge badge-blue">已实现</span></td></tr>
+        <tr><td><code>/api/nodes</code></td><td>GET</td><td>客户查看确认节点（含附件预览）</td><td>客户确认节点表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/upload</code></td><td>POST</td><td>员工上传成果文件（客户确认）</td><td>客户确认节点表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/confirm</code></td><td>POST</td><td>客户确认/修改 + 自动推进阶段</td><td>确认表+项目表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/inspection</code></td><td>GET</td><td>获取项目巡检记录列表</td><td>巡检记录表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/inspection</code></td><td>POST</td><td>员工上传巡检照片（内部记录）</td><td>巡检记录表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/file/:token</code></td><td>GET</td><td>文件代理（飞书附件下载）</td><td>飞书云空间</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/needs-list</code></td><td>GET</td><td>需求列表（管理后台）</td><td>客户需求表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/update-status</code></td><td>POST</td><td>更新跟进状态 + 签约同步</td><td>需求表+项目表</td><td><span class="badge badge-green">已通</span></td></tr>
+        <tr><td><code>/api/sync-signed</code></td><td>GET</td><td>手动同步所有已签约需求</td><td>需求表+项目表</td><td><span class="badge badge-green">已通</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -287,9 +293,9 @@
       <tbody>
         <tr><td>1</td><td>飞书机器人消息推送</td><td>客户提交需求/确认节点时，自动推送到飞书群</td><td><span class="badge badge-amber">高</span></td></tr>
         <tr><td>2</td><td>飞书审批流对接</td><td>验收节点走飞书审批流，自动记录</td><td><span class="badge badge-amber">高</span></td></tr>
-        <tr><td>3</td><td>部署到云服务器</td><td>当前本地运行，部署后可外部访问</td><td><span class="badge badge-blue">中</span></td></tr>
+        <tr><td>3</td><td>部署到Render</td><td>已部署：lihe-design.onrender.com</td><td><span class="badge badge-green">已完成</span></td></tr>
         <tr><td>4</td><td>飞书工作台嵌入H5</td><td>在飞书App内直接打开H5页面</td><td><span class="badge badge-blue">中</span></td></tr>
-        <tr><td>5</td><td>H5页面品牌定制</td><td>加入公司Logo、配色统一</td><td><span class="badge badge-green">低</span></td></tr>
+        <tr><td>5</td><td>财务台账API对接</td><td>报价/合同金额/收支流水管理</td><td><span class="badge badge-blue">中</span></td></tr>
         <tr><td>6</td><td>数据看板开发</td><td>老板视角的异常事件看板</td><td><span class="badge badge-green">低</span></td></tr>
       </tbody>
     </table>
