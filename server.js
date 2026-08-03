@@ -238,6 +238,103 @@ function mapProjectFields(item) {
   };
 }
 
+async function handleBoss(req, res) {
+  const parsed = url.parse(req.url, true);
+  const { staffId, password } = parsed.query;
+
+  // Boss auth - B01 account or any account with "boss" role
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '认证失败' });
+  }
+  // Only B01 is boss account
+  if (staffId !== 'B01') {
+    return sendJSON(res, 403, { success: false, error: '无管理员权限' });
+  }
+
+  // Load ALL projects
+  const projectResult = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records?page_size=500`
+  );
+  let projects = [];
+  if (projectResult.code === 0 && projectResult.data.items) {
+    projects = projectResult.data.items.map(item => mapProjectFields(item));
+  }
+
+  // Load ALL confirm nodes (pending ones for alerts)
+  const confirmResult = await feishuRequest('POST',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.confirm}/records/search?page_size=500`,
+    { filter: { conjunction: 'and', conditions: [{ field_name: '客户确认状态', operator: 'is', value: ['待确认'] }] } }
+  );
+  let pendingNodes = [];
+  if (confirmResult.code === 0 && confirmResult.data && confirmResult.data.items) {
+    pendingNodes = confirmResult.data.items.map(item => mapNodeFields(item));
+  }
+
+  // Load ALL confirm nodes (for stats)
+  const allConfirmResult = await feishuRequest('GET',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.confirm}/records?page_size=500`
+  );
+  let allNodes = [];
+  if (allConfirmResult.code === 0 && allConfirmResult.data && allConfirmResult.data.items) {
+    allNodes = allConfirmResult.data.items.map(item => mapNodeFields(item));
+  }
+
+  // Statistics
+  const stats = {
+    totalProjects: projects.length,
+    activeProjects: projects.filter(p => p.status === '正常').length,
+    pausedProjects: projects.filter(p => p.status !== '正常').length,
+    pendingConfirmations: pendingNodes.length,
+    totalBudget: projects.reduce((sum, p) => sum + (p.budget || 0), 0),
+    totalPaid: projects.reduce((sum, p) => sum + (p.paidAmount || 0), 0),
+    // By stage group
+    designCount: projects.filter(p => {
+      const s = p.stage || '';
+      return ['平面布局方案','效果图设计','物料整理','施工图设计','报价签合同'].includes(s);
+    }).length,
+    constructionCount: projects.filter(p => {
+      const s = p.stage || '';
+      return ['开工前期准备','拆除改造','水电隐蔽工程','防水工程','泥瓦工程','木工吊顶','油漆墙面','安装阶段','开荒保洁竣工验收'].includes(s);
+    }).length,
+    softDecoCount: projects.filter(p => {
+      const s = p.stage || '';
+      return s.startsWith('软装-');
+    }).length,
+    deliveredCount: projects.filter(p => p.stage === '竣工交付').length,
+    // By staff
+    byStaff: {},
+    // Recent nodes (last 7 days)
+    recentNodes: allNodes.filter(n => n.uploadTime && (Date.now() - n.uploadTime < 7 * 86400000)).length,
+    // Confirmed nodes
+    confirmedNodes: allNodes.filter(n => n.status === '已确认').length,
+    // Revised nodes
+    revisedNodes: allNodes.filter(n => n.status === '有修改意见').length,
+  };
+
+  // Group projects by staffId
+  projects.forEach(p => {
+    const sid = p.staffId || '未分配';
+    if (!stats.byStaff[sid]) {
+      stats.byStaff[sid] = { count: 0, avgProgress: 0, budget: 0, pending: 0 };
+    }
+    stats.byStaff[sid].count++;
+    stats.byStaff[sid].budget += p.budget || 0;
+  });
+  // Calculate avg progress and pending count per staff
+  Object.keys(stats.byStaff).forEach(sid => {
+    const staffProjects = projects.filter(p => (p.staffId || '未分配') === sid);
+    stats.byStaff[sid].avgProgress = staffProjects.length > 0
+      ? Math.round(staffProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / staffProjects.length)
+      : 0;
+    stats.byStaff[sid].pending = pendingNodes.filter(n => {
+      const proj = staffProjects.find(p => p.recordId === n.projectId);
+      return !!proj;
+    }).length;
+  });
+
+  return sendJSON(res, 200, { success: true, projects, pendingNodes, allNodes, stats });
+}
+
 async function handleProject(req, res) {
   const parsed = url.parse(req.url, true);
   const { phone, staffId, password } = parsed.query;
@@ -470,7 +567,7 @@ async function handleUpload(req, res) {
   // Upload files to Feishu
   const uploadedFiles = [];
   for (const file of files) {
-    if (file.size > 20 * 1024 * 1024) {
+    if (file.size > 50 * 1024 * 1024) {
       console.warn(`[upload] File too large: ${file.originalname} (${file.size} bytes)`);
       continue;
     }
@@ -894,7 +991,7 @@ async function handleInspectionUpload(req, res) {
   // 上传文件到飞书
   const uploadedFiles = [];
   for (const file of files) {
-    if (file.size > 20 * 1024 * 1024) continue;
+    if (file.size > 50 * 1024 * 1024) continue;
     const uploadResult = await uploadToFeishu(file, config.feishu.appToken);
     if (uploadResult.code === 0) {
       uploadedFiles.push({
@@ -1027,6 +1124,9 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/needs' && req.method === 'POST') {
       return await handleNeeds(req, res);
     }
+    if (pathname === '/api/boss' && req.method === 'GET') {
+      return await handleBoss(req, res);
+    }
     if (pathname === '/api/project' && req.method === 'GET') {
       return await handleProject(req, res);
     }
@@ -1079,6 +1179,7 @@ server.listen(config.port, () => {
   console.log(`  客户需求表: http://localhost:${config.port}/needs.html`);
   console.log(`  客户查看端: http://localhost:${config.port}/client.html`);
   console.log(`  员工上传端: http://localhost:${config.port}/staff.html`);
+  console.log(`  老板管理台: http://localhost:${config.port}/boss.html`);
   console.log(`  管理后台: http://localhost:${config.port}/manage.html`);
   console.log(`\n  员工账号:`);
   Object.keys(config.staffAccounts).forEach(id => {

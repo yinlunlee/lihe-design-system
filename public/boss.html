@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>立和设计 · 管理总台</title>
+<style>
+:root {
+  --primary: #2C3E50;
+  --accent: #3498DB;
+  --success: #27AE60;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --border: #E1E8ED;
+  --text-main: #2C3E50;
+  --text-light: #7F8C8D;
+  --text-white: #FFFFFF;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text-main); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ===== State =====
+const API_BASE = new URLSearchParams(window.location.search).get('api') || '';
+let state = { staffId: '', password: '', data: null, filter: { staff: '', stage: '', status: '' }, activeView: 'overview' };
+
+// ===== Login =====
+function renderLogin() {
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2C3E50,#34495E);">
+      <div style="background:#fff;padding:40px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.2);width:360px;">
+        <div style="text-align:center;margin-bottom:30px;">
+          <div style="width:60px;height:60px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:#fff;font-weight:700;">立</div>
+          <h2 style="font-size:20px;color:var(--primary);">管理总台</h2>
+          <p style="font-size:13px;color:var(--text-light);margin-top:4px;">立和设计 · 全局管理视角</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;">管理员账号</label>
+          <input id="bossId" type="text" placeholder="B01" value="B01" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;">
+        </div>
+        <div style="margin-bottom:24px;">
+          <label style="display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;">密码</label>
+          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;">
+        </div>
+        <button onclick="login()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">登 录</button>
+        <p style="text-align:center;font-size:12px;color:var(--text-light);margin-top:16px;">管理员账号：B01 / 默认密码：lihe2026</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('bossPwd').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+}
+
+async function login() {
+  const staffId = document.getElementById('bossId').value.trim();
+  const password = document.getElementById('bossPwd').value.trim();
+  if (!staffId || !password) return alert('请输入账号密码');
+  try {
+    const resp = await fetch(`${API_BASE}/api/boss?staffId=${encodeURIComponent(staffId)}&password=${encodeURIComponent(password)}`);
+    const data = await resp.json();
+    if (data.success) {
+      state.staffId = staffId;
+      state.password = password;
+      state.data = data;
+      renderDashboard();
+    } else {
+      alert(data.error || '登录失败');
+    }
+  } catch (err) {
+    alert('网络错误：' + err.message);
+  }
+}
+
+async function refresh() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/boss?staffId=${state.staffId}&password=${state.password}`);
+    const data = await resp.json();
+    if (data.success) { state.data = data; renderDashboard(); }
+  } catch(e) { console.error(e); }
+}
+
+// ===== Dashboard =====
+function renderDashboard() {
+  const { stats, projects, pendingNodes } = state.data;
+  const staffList = Object.keys(stats.byStaff);
+  const fmt = n => n >= 10000 ? (n/10000).toFixed(1)+'万' : (n||0).toString();
+  
+  document.getElementById('app').innerHTML = `
+    <!-- Nav -->
+    <div style="background:var(--primary);color:#fff;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;">立</div>
+        <div>
+          <div style="font-size:15px;font-weight:600;">管理总台</div>
+          <div style="font-size:11px;opacity:0.7;">立和设计运营管理系统</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <button onclick="refresh()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">🔄 刷新</button>
+        <span style="font-size:13px;opacity:0.8;">管理员 ${state.staffId}</span>
+      </div>
+    </div>
+
+    <div style="max-width:1200px;margin:0 auto;padding:20px;">
+      <!-- Stats Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:24px;">
+        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">在管项目</div>
+          <div style="font-size:32px;font-weight:700;color:var(--primary);">${stats.totalProjects}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">活跃 ${stats.activeProjects} · 停工 ${stats.pausedProjects}</div>
+        </div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">待客户确认</div>
+          <div style="font-size:32px;font-weight:700;color:var(--warning);">${stats.pendingConfirmations}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">本周新增 ${stats.recentNodes} 个节点</div>
+        </div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">合同总额</div>
+          <div style="font-size:32px;font-weight:700;color:var(--accent);">¥${fmt(stats.totalBudget)}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">已收款 ¥${fmt(stats.totalPaid)}</div>
+        </div>
+        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
+          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">设计阶段</div>
+          <div style="font-size:32px;font-weight:700;color:#9B59B6;">${stats.designCount}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">施工 ${stats.constructionCount} · 软装 ${stats.softDecoCount} · 交付 ${stats.deliveredCount}</div>
+        </div>
+      </div>
+
+      <!-- View Tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);">
+        ${['overview','projects','staff','pending'].map(v => `
+          <button onclick="switchView('${v}')" style="padding:10px 20px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:${state.activeView===v?'var(--accent)':'var(--text-light)'};border-bottom:2px solid ${state.activeView===v?'var(--accent)':'transparent'};margin-bottom:-2px;">
+            ${ {overview:'📊 概览',projects:'📁 项目列表',staff:'👥 员工管理',pending:'⏳ 待确认'}[v] }
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="contentArea"></div>
+    </div>
+  `;
+  renderContent();
+}
+
+function switchView(v) { state.activeView = v; renderDashboard(); }
+
+function renderContent() {
+  const area = document.getElementById('contentArea');
+  if (state.activeView === 'overview') area.innerHTML = renderOverview();
+  else if (state.activeView === 'projects') area.innerHTML = renderProjects();
+  else if (state.activeView === 'staff') area.innerHTML = renderStaff();
+  else if (state.activeView === 'pending') area.innerHTML = renderPending();
+}
+
+function renderOverview() {
+  const { stats } = state.data;
+  const staffList = Object.keys(stats.byStaff);
+  const fmt = n => n >= 10000 ? (n/10000).toFixed(1)+'万' : (n||0).toString();
+  const totalProgress = stats.totalProjects > 0 ? Math.round(state.data.projects.reduce((s,p)=>s+(p.progress||0),0)/stats.totalProjects) : 0;
+
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <!-- Progress Overview -->
+      <div style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <h3 style="font-size:15px;margin-bottom:16px;">项目进度分布</h3>
+        ${[
+          {label:'设计阶段',count:stats.designCount,color:'#9B59B6'},
+          {label:'施工阶段',count:stats.constructionCount,color:'#E67E22'},
+          {label:'软装阶段',count:stats.softDecoCount,color:'#1ABC9C'},
+          {label:'竣工交付',count:stats.deliveredCount,color:'var(--success)'},
+        ].map(s => {
+          const pct = stats.totalProjects > 0 ? (s.count/stats.totalProjects*100).toFixed(0) : 0;
+          return `<div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+              <span>${s.label}</span><span>${s.count} 个 (${pct}%)</span>
+            </div>
+            <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${s.color};border-radius:4px;"></div>
+            </div>
+          </div>`;
+        }).join('')}
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--text-light);">
+          全部项目平均进度：<b style="color:var(--accent);">${totalProgress}%</b>
+        </div>
+      </div>
+
+      <!-- Node Stats -->
+      <div style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <h3 style="font-size:15px;margin-bottom:16px;">节点确认统计</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:8px;">
+            <div style="font-size:28px;font-weight:700;color:var(--warning);">${stats.pendingConfirmations}</div>
+            <div style="font-size:12px;color:var(--text-light);margin-top:4px;">待确认</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:8px;">
+            <div style="font-size:28px;font-weight:700;color:var(--success);">${stats.confirmedNodes}</div>
+            <div style="font-size:12px;color:var(--text-light);margin-top:4px;">已确认</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:8px;">
+            <div style="font-size:28px;font-weight:700;color:var(--danger);">${stats.revisedNodes}</div>
+            <div style="font-size:12px;color:var(--text-light);margin-top:4px;">有修改意见</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--bg);border-radius:8px;">
+            <div style="font-size:28px;font-weight:700;color:var(--accent);">${stats.recentNodes}</div>
+            <div style="font-size:12px;color:var(--text-light);margin-top:4px;">本周新增</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--text-light);">
+          确认率：<b style="color:var(--success);">${(stats.confirmedNodes+stats.revisedNodes) > 0 ? Math.round(stats.confirmedNodes/(stats.confirmedNodes+stats.revisedNodes)*100) : 0}%</b>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderProjects() {
+  const { projects } = state.data;
+  const staffIds = [...new Set(projects.map(p => p.staffId || '未分配'))];
+  const fmt = n => n >= 10000 ? (n/10000).toFixed(1)+'万' : (n||0).toString();
+
+  let filtered = projects;
+  if (state.filter.staff) filtered = filtered.filter(p => (p.staffId||'未分配') === state.filter.staff);
+  if (state.filter.status) filtered = filtered.filter(p => p.status === state.filter.status);
+
+  return `
+    <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:14px;font-weight:600;">全部项目 (${filtered.length})</span>
+        <select id="filterStaff" onchange="state.filter.staff=this.value;renderContent()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;">
+          <option value="">全部员工</option>
+          ${staffIds.map(s => `<option value="${s}" ${state.filter.staff===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <select id="filterStatus" onchange="state.filter.status=this.value;renderContent()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;">
+          <option value="">全部状态</option>
+          <option value="正常" ${state.filter.status==='正常'?'selected':''}>正常</option>
+          <option value="停工" ${state.filter.status==='停工'?'selected':''}>停工</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:var(--bg);">
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">项目</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">客户</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">负责人</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">当前阶段</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">进度</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">合同/已收</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(p => `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:12px 16px;">
+                  <div style="font-weight:600;">${p.name}</div>
+                  <div style="font-size:11px;color:var(--text-light);">${p.code || ''} · ${p.spaceType||''} ${p.area?p.area+'㎡':''}</div>
+                </td>
+                <td style="padding:12px 16px;">
+                  <div>${p.clientName || '-'}</div>
+                  <div style="font-size:11px;color:var(--text-light);">${p.clientPhone || ''}</div>
+                </td>
+                <td style="padding:12px 16px;">${p.staffId || '<span style="color:var(--danger);">未分配</span>'}</td>
+                <td style="padding:12px 16px;">${p.stage || '<span style="color:var(--text-light);">待启动</span>'}</td>
+                <td style="padding:12px 16px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:80px;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;">
+                      <div style="height:100%;width:${p.progress||0}%;background:${(p.progress||0)>=80?'var(--success)':(p.progress||0)>=50?'var(--accent)':'var(--warning)'};border-radius:3px;"></div>
+                    </div>
+                    <span style="font-size:12px;">${p.progress||0}%</span>
+                  </div>
+                </td>
+                <td style="padding:12px 16px;">
+                  <div style="font-weight:600;">¥${fmt(p.budget)}</div>
+                  <div style="font-size:11px;color:var(--success);">已收 ¥${fmt(p.paidAmount)}</div>
+                </td>
+                <td style="padding:12px 16px;">
+                  ${p.status === '正常'
+                    ? '<span style="padding:2px 8px;background:#E8F5E9;color:var(--success);border-radius:4px;font-size:12px;">正常</span>'
+                    : '<span style="padding:2px 8px;background:#FFEBEE;color:var(--danger);border-radius:4px;font-size:12px;">停工</span>'}
+                </td>
+              </tr>
+            `).join('') || '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-light);">暂无项目</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderStaff() {
+  const { stats, projects, pendingNodes } = state.data;
+  const staffIds = Object.keys(stats.byStaff);
+  const fmt = n => n >= 10000 ? (n/10000).toFixed(1)+'万' : (n||0).toString();
+
+  return `
+    <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+        <span style="font-size:14px;font-weight:600;">员工工作概览</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:var(--bg);">
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">工号</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">在管项目</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">平均进度</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">合同总额</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">待确认节点</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">项目列表</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${staffIds.map(sid => {
+              const s = stats.byStaff[sid];
+              const staffProjects = projects.filter(p => (p.staffId||'未分配') === sid);
+              const staffPending = pendingNodes.filter(n => staffProjects.find(p => p.recordId === n.projectId));
+              return `
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:14px 16px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div style="width:32px;height:32px;border-radius:50%;background:${s.count>0?'var(--accent)':'var(--border)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">${sid.substring(0,2)}</div>
+                      <span style="font-weight:600;">${sid}</span>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;font-size:18px;font-weight:700;">${s.count}</td>
+                  <td style="padding:14px 16px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div style="width:60px;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:${s.avgProgress}%;background:var(--accent);border-radius:3px;"></div>
+                      </div>
+                      <span>${s.avgProgress}%</span>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;font-weight:600;">¥${fmt(s.budget)}</td>
+                  <td style="padding:14px 16px;">
+                    ${staffPending.length > 0
+                      ? `<span style="padding:3px 10px;background:#FFF3E0;color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${staffPending.length} 待确认</span>`
+                      : '<span style="color:var(--success);font-size:12px;">✓ 无待办</span>'}
+                  </td>
+                  <td style="padding:14px 16px;">
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                      ${staffProjects.slice(0,3).map(p => `<span style="padding:2px 8px;background:var(--bg);border-radius:4px;font-size:11px;">${p.name}</span>`).join('')}
+                      ${staffProjects.length > 3 ? `<span style="padding:2px 8px;font-size:11px;color:var(--text-light);">+${staffProjects.length-3}</span>` : ''}
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('') || '<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text-light);">暂无员工数据</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderPending() {
+  const { pendingNodes, projects } = state.data;
+  const fmtTime = t => t ? new Date(t).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+
+  return `
+    <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+        <span style="font-size:14px;font-weight:600;">待客户确认节点</span>
+        ${pendingNodes.length > 0 ? `<span style="padding:2px 10px;background:#FFF3E0;color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${pendingNodes.length}</span>` : ''}
+      </div>
+      <div style="padding:8px 0;">
+        ${pendingNodes.length === 0
+          ? '<div style="padding:60px;text-align:center;color:var(--text-light);">🎉 所有节点已确认完毕</div>'
+          : pendingNodes.map(n => {
+              const proj = projects.find(p => p.recordId === n.projectId);
+              const elapsed = n.uploadTime ? Math.floor((Date.now() - n.uploadTime) / 86400000) : 0;
+              const urgency = elapsed > 3 ? 'var(--danger)' : elapsed > 1 ? 'var(--warning)' : 'var(--success)';
+              return `
+                <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                  <div>
+                    <div style="font-weight:600;font-size:14px;">${n.nodeName || n.stage || '未命名节点'}</div>
+                    <div style="font-size:12px;color:var(--text-light);margin-top:2px;">
+                      ${proj ? proj.name : n.projectId || ''} · ${proj ? proj.clientName : ''} · 负责人 ${proj ? (proj.staffId||'-') : (n.uploader||'-')}
+                    </div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:2px;">上传于 ${fmtTime(n.uploadTime)} · ${n.uploader || ''}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;color:#fff;background:${urgency};">
+                      ${elapsed === 0 ? '今天' : elapsed + '天前'}
+                    </div>
+                    <div style="font-size:11px;color:var(--text-light);margin-top:4px;">${n.stage || ''}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// Init
+renderLogin();
+</script>
+</body>
+</html>

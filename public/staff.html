@@ -670,7 +670,7 @@
     </div>
 
     <!-- 文件上传 -->
-    <div class="field-label">上传文件 <span class="field-hint">拍照或从相册选择，单次最多10张</span></div>
+    <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个</span></div>
     <div class="upload-actions">
       <button class="upload-btn camera" onclick="document.getElementById('cameraInput').click()">
         📷 拍 照 上 传
@@ -680,7 +680,7 @@
       </button>
     </div>
     <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" multiple onchange="handleFiles(this.files)">
-    <input type="file" id="albumInput" accept="image/*,application/pdf,video/*" style="display:none" multiple onchange="handleFiles(this.files)">
+    <input type="file" id="albumInput" accept="image/*,video/*,application/pdf,.pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip,.rar,.7z,.txt,.csv" style="display:none" multiple onchange="handleFiles(this.files)">
 
     <!-- 文件预览 -->
     <div class="file-preview" id="filePreview"></div>
@@ -712,6 +712,22 @@
     || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
       ? 'http://localhost:3000'
       : window.location.origin);
+
+  // 文件图标工具
+  function getStaffFileIcon(name) {
+    if (!name) return { icon: '📄', label: '文件' };
+    const ext = name.toLowerCase().split('.').pop();
+    const map = {
+      'pdf': { icon: '📕', label: 'PDF' },
+      'doc': { icon: '📘', label: 'Word' }, 'docx': { icon: '📘', label: 'Word' },
+      'ppt': { icon: '📙', label: 'PPT' }, 'pptx': { icon: '📙', label: 'PPT' },
+      'xls': { icon: '📗', label: 'Excel' }, 'xlsx': { icon: '📗', label: 'Excel' },
+      'dwg': { icon: '📐', label: 'CAD' }, 'dxf': { icon: '📐', label: 'CAD' },
+      'zip': { icon: '🗜️', label: 'ZIP' }, 'rar': { icon: '🗜️', label: 'RAR' },
+      'mp4': { icon: '🎥', label: '视频' }, 'mov': { icon: '🎥', label: '视频' },
+    };
+    return map[ext] || { icon: '📄', label: '文件' };
+  }
 
   // 全局状态
   let state = {
@@ -979,7 +995,8 @@
           if (att.type && att.type.startsWith('image/')) {
             return `<div class="record-att-thumb"><img src="${API_BASE}${att.url}" alt="${att.name}"></div>`;
           }
-          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank">📎</a>`;
+          const fi = getStaffFileIcon(att.name);
+          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank" title="${att.name}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;">${fi.icon}<span style="font-size:9px;color:var(--text-light);">${fi.label}</span></a>`;
         }).join('') + '</div>';
       }
       return `
@@ -1027,7 +1044,8 @@
           if (att.type && att.type.startsWith('image/')) {
             return `<div class="record-att-thumb"><img src="${API_BASE}${att.url}" alt="${att.name}"></div>`;
           }
-          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank">📎</a>`;
+          const fi = getStaffFileIcon(att.name);
+          return `<a class="record-att-file" href="${API_BASE}${att.url}" target="_blank" title="${att.name}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;">${fi.icon}<span style="font-size:9px;color:var(--text-light);">${fi.label}</span></a>`;
         }).join('') + '</div>';
       }
       return `
@@ -1106,13 +1124,13 @@
     }
 
     files.forEach(file => {
-      // 检查大小（20MB限制）
-      if (file.size > 20 * 1024 * 1024) {
-        showToast(`${file.name} 超过20MB`);
+      // 检查大小（50MB限制）
+      if (file.size > 50 * 1024 * 1024) {
+        showToast(`${file.name} 超过50MB`);
         return;
       }
 
-      const fileObj = { file, preview: null };
+      const fileObj = { file, preview: null, fileIcon: getFileIcon(file) };
 
       // 生成预览
       if (file.type.startsWith('image/')) {
@@ -1140,6 +1158,32 @@
     checkSubmitReady();
   }
 
+  // 获取文件图标和类型标签
+  function getFileIcon(file) {
+    const name = file.name.toLowerCase();
+    const ext = name.substring(name.lastIndexOf('.') + 1);
+    const iconMap = {
+      'pdf': { icon: '📕', label: 'PDF' },
+      'doc': { icon: '📘', label: 'Word' },
+      'docx': { icon: '📘', label: 'Word' },
+      'ppt': { icon: '📙', label: 'PPT' },
+      'pptx': { icon: '📙', label: 'PPT' },
+      'xls': { icon: '📗', label: 'Excel' },
+      'xlsx': { icon: '📗', label: 'Excel' },
+      'dwg': { icon: '📐', label: 'CAD' },
+      'dxf': { icon: '📐', label: 'CAD' },
+      'zip': { icon: '🗜️', label: 'ZIP' },
+      'rar': { icon: '🗜️', label: 'RAR' },
+      '7z': { icon: '🗜️', label: '7Z' },
+      'txt': { icon: '📄', label: 'TXT' },
+      'csv': { icon: '📄', label: 'CSV' },
+      'mp4': { icon: '🎥', label: '视频' },
+      'mov': { icon: '🎥', label: '视频' },
+      'avi': { icon: '🎥', label: '视频' },
+    };
+    return iconMap[ext] || { icon: '📄', label: '文件' };
+  }
+
   function renderFilePreview() {
     const container = document.getElementById('filePreview');
     container.innerHTML = state.files.map((f, i) => {
@@ -1149,10 +1193,12 @@
       } else if (f.preview === 'video') {
         inner = `<div class="file-thumb-file">🎥</div>`;
       } else {
-        inner = `<div class="file-thumb-file">📄</div>`;
+        const fi = f.fileIcon || { icon: '📄', label: '文件' };
+        inner = `<div class="file-thumb-file">${fi.icon}<div style="font-size:9px;margin-top:2px;color:var(--text-light);">${fi.label}</div></div>`;
       }
+      const fileSize = (f.file.size / 1024 / 1024).toFixed(1);
       return `
-        <div class="file-thumb">
+        <div class="file-thumb" title="${f.file.name} (${fileSize}MB)">
           ${inner}
           <div class="file-remove" onclick="removeFile(${i})">&times;</div>
         </div>

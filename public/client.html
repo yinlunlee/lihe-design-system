@@ -603,10 +603,14 @@
       node.attachments.slice(0, 6).forEach((att, i) => {
         const fullUrl = `${API_BASE}${att.url}`;
         const isImage = att.type && att.type.startsWith('image/');
+        const isVideo = att.type && att.type.startsWith('video/');
+        const fileIcon = getAttachmentIcon(att.name, att.type);
         if (isImage && att.url) {
           attachHtml += `<div class="attachment-thumb" onclick="viewImage('${fullUrl}')"><img src="${fullUrl}" alt="${att.name}"></div>`;
+        } else if (isVideo && att.url) {
+          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="font-size:24px;">🎥</div>`;
         } else {
-          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')">📄</div>`;
+          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="flex-direction:column;padding:4px;">${fileIcon.icon}<span style="font-size:9px;margin-top:2px;color:var(--text-light);">${fileIcon.label}</span></div>`;
         }
       });
       if (node.attachments.length > 6) {
@@ -707,6 +711,21 @@
   function downloadFile(url, name) {
     if (url) window.open(url, '_blank');
     else showToast('文件链接已过期，请刷新页面');
+  }
+
+  function getAttachmentIcon(name, type) {
+    if (!name) return { icon: '📄', label: '文件' };
+    const ext = name.toLowerCase().split('.').pop();
+    const map = {
+      'pdf': { icon: '📕', label: 'PDF' },
+      'doc': { icon: '📘', label: 'Word' }, 'docx': { icon: '📘', label: 'Word' },
+      'ppt': { icon: '📙', label: 'PPT' }, 'pptx': { icon: '📙', label: 'PPT' },
+      'xls': { icon: '📗', label: 'Excel' }, 'xlsx': { icon: '📗', label: 'Excel' },
+      'dwg': { icon: '📐', label: 'CAD' }, 'dxf': { icon: '📐', label: 'CAD' },
+      'zip': { icon: '🗜️', label: 'ZIP' }, 'rar': { icon: '🗜️', label: 'RAR' },
+      'mp4': { icon: '🎥', label: '视频' }, 'mov': { icon: '🎥', label: '视频' },
+    };
+    return map[ext] || { icon: '📄', label: '文件' };
   }
 
   // ===== 工具函数 =====
