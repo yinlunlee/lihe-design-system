@@ -1116,7 +1116,14 @@ function serveStatic(req, res) {
     if (err) {
       return sendJSON(res, 404, { error: 'File not found: ' + pathname });
     }
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'text/plain' });
+    const headers = { 'Content-Type': MIME[ext] || 'text/plain' };
+    // Prevent browser caching of HTML/JS files to ensure latest code is served
+    if (ext === '.html' || ext === '.js' || ext === '.css') {
+      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      headers['Pragma'] = 'no-cache';
+      headers['Expires'] = '0';
+    }
+    res.writeHead(200, headers);
     res.end(data);
   });
 }
