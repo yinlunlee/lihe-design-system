@@ -6,25 +6,29 @@
 <title>立和设计 · 管理总台</title>
 <style>
 :root {
-  --primary: #2D5440;
-  --accent: #4A7C59;
-  --accent-light: #6FA07C;
-  --success: #4A7C59;
-  --warning: #D4945A;
-  --danger: #D95A5A;
-  --bg: #F5FAF6;
-  --card: #FFFFFF;
-  --border: #D4E4D8;
-  --text-main: #1E3829;
-  --text-light: #8BA897;
+  /* Premium Green Palette */
+  --primary: #153D2C;
+  --accent: #2A6B50;
+  --accent-light: #3A8A68;
+  --success: #2A6B50;
+  --warning: #C98B4F;
+  --danger: #C75B5B;
+    --bg: #FAFCFA;
+    --sage-bg: #F0F7F2;
+    --card: #FFFFFF;
+    --border: #D8E8DE;
+  --text-main: #0A241B;
+  --text-light: #6E8B7D;
   --text-white: #FFFFFF;
+  --gold-pale: #F0E6D6;
   --radius: 12px;
   --radius-lg: 16px;
-  --shadow: 0 4px 18px rgba(30, 80, 50, 0.08);
-  --shadow-soft: 0 2px 8px rgba(30, 80, 50, 0.06);
+  --shadow: 0 4px 18px rgba(10, 36, 27, 0.07);
+  --shadow-soft: 0 2px 8px rgba(10, 36, 27, 0.05);
+  --shadow-glow: 0 0 0 4px rgba(42, 107, 80, 0.08);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text-main); }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-main); }
 </style>
 </head>
 <body>
@@ -38,24 +42,26 @@ let state = { staffId: '', password: '', data: null, filter: { staff: '', stage:
 function renderLogin() {
   document.getElementById('app').innerHTML = `
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);padding:20px;">
-      <div style="background:#fff;padding:40px 36px;border-radius:24px;box-shadow:0 20px 60px rgba(30,80,50,0.2);width:100%;max-width:380px;">
+      <div style="background:#fff;padding:40px 36px;border-radius:24px;box-shadow:0 20px 60px rgba(10,36,27,0.18);width:100%;max-width:380px;">
         <div style="text-align:center;margin-bottom:32px;">
-          <div style="width:90px;height:90px;background:rgba(74,124,89,0.12);border:1.5px solid rgba(74,124,89,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden;">
-            <img src="/images/logo.png" alt="立和设计" style="width:70%;height:70%;object-fit:contain;filter:brightness(0) saturate(100%) invert(34%) sepia(24%) saturate(911%) hue-rotate(95deg) brightness(95%) contrast(88%);">
+          <div style="width:96px;height:96px;margin:0 auto 18px;padding:5px;border:1.5px solid rgba(255,255,255,0.28);border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);box-shadow:0 8px 28px rgba(0,0,0,0.12);">
+            <div style="width:100%;height:100%;background:rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <img src="/images/logo.png" alt="立和设计" style="width:68%;height:68%;object-fit:contain;filter:brightness(0) invert(1);">
+            </div>
           </div>
           <h2 style="font-size:22px;color:var(--primary);font-weight:700;">管理总台</h2>
           <p style="font-size:13px;color:var(--text-light);margin-top:6px;">全局数据 · 项目 overview</p>
         </div>
         <div style="margin-bottom:18px;">
           <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">管理员账号</label>
-          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#F7FBF8;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(74,124,89,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#FAFCFA;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(42,107,80,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
         <div style="margin-bottom:24px;">
           <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">密码</label>
-          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#F7FBF8;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(74,124,89,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#FAFCFA;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(42,107,80,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
-        <button onclick="login()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(74,124,89,0.25);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(74,124,89,0.32)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(74,124,89,0.25)';">登 录</button>
-        <div id="loginError" style="display:none;text-align:center;padding:10px;margin-top:12px;color:var(--danger);font-size:13px;background:#FDF2F2;border-radius:8px;"></div>
+        <button onclick="login()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(21,61,44,0.22);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(21,61,44,0.28)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(21,61,44,0.22)';">登 录</button>
+        <div id="loginError" style="display:none;text-align:center;padding:10px;margin-top:12px;color:var(--danger);font-size:13px;background:#FCE8E8;border-radius:8px;"></div>
         <div style="text-align:center;margin-top:14px;">
           <a href="/login.html" style="font-size:12px;color:var(--text-light);text-decoration:none;">返回统一登录</a>
         </div>
@@ -117,7 +123,7 @@ function renderDashboard() {
   
   document.getElementById('app').innerHTML = `
     <!-- Nav -->
-    <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(30,80,50,0.14);border-radius:0 0 16px 16px;">
+    <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 6px 20px rgba(10,36,27,0.14);border-radius:0 0 20px 20px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="width:36px;height:36px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
           <img src="/images/logo.png" alt="立和设计" style="width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1);">
@@ -137,22 +143,22 @@ function renderDashboard() {
     <div style="max-width:1200px;margin:0 auto;padding:24px 20px;">
       <!-- Stats Cards -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-bottom:24px;">
-        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(216,232,222,0.5);">
           <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">在管项目</div>
           <div style="font-size:32px;font-weight:700;color:var(--primary);">${stats.totalProjects}</div>
           <div style="font-size:11px;color:var(--text-light);margin-top:6px;">活跃 ${stats.activeProjects} · 停工 ${stats.pausedProjects}</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(216,232,222,0.5);">
           <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">待客户确认</div>
           <div style="font-size:32px;font-weight:700;color:var(--warning);">${stats.pendingConfirmations}</div>
           <div style="font-size:11px;color:var(--text-light);margin-top:6px;">本周新增 ${stats.recentNodes} 个节点</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(216,232,222,0.5);">
           <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">合同总额</div>
           <div style="font-size:32px;font-weight:700;color:var(--accent);">¥${fmt(stats.totalBudget)}</div>
           <div style="font-size:11px;color:var(--text-light);margin-top:6px;">已收款 ¥${fmt(stats.totalPaid)}</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(216,232,222,0.5);">
           <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">设计阶段</div>
           <div style="font-size:32px;font-weight:700;color:var(--accent);">${stats.designCount}</div>
           <div style="font-size:11px;color:var(--text-light);margin-top:6px;">施工 ${stats.constructionCount} · 软装 ${stats.softDecoCount} · 交付 ${stats.deliveredCount}</div>
@@ -340,8 +346,8 @@ function renderProjects() {
                 </td>
                 <td style="padding:12px 16px;">
                   ${p.status === '正常'
-                    ? '<span style="padding:2px 8px;background:#E8F5E9;color:var(--success);border-radius:4px;font-size:12px;">正常</span>'
-                    : '<span style="padding:2px 8px;background:#FFEBEE;color:var(--danger);border-radius:4px;font-size:12px;">停工</span>'}
+                    ? '<span style="padding:2px 8px;background:#E6F4EC;color:var(--success);border-radius:4px;font-size:12px;">正常</span>'
+                    : '<span style="padding:2px 8px;background:#FCE8E8;color:var(--danger);border-radius:4px;font-size:12px;">停工</span>'}
                 </td>
               </tr>
             `).join('') || '<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--text-light);">暂无项目</td></tr>'}
@@ -392,7 +398,7 @@ function renderStaff() {
                     </div>
                   </td>
                   <td style="padding:14px 16px;">
-                    <span style="padding:2px 8px;background:#E3F2FD;color:var(--accent);border-radius:4px;font-size:12px;">${s.role || '-'}</span>
+                    <span style="padding:2px 8px;background:var(--sage-bg);color:var(--sage-dark);border-radius:4px;font-size:12px;">${s.role || '-'}</span>
                   </td>
                   <td style="padding:14px 16px;font-size:18px;font-weight:700;">${s.count}</td>
                   <td style="padding:14px 16px;">
@@ -406,7 +412,7 @@ function renderStaff() {
                   <td style="padding:14px 16px;font-weight:600;">¥${fmt(s.budget)}</td>
                   <td style="padding:14px 16px;">
                     ${staffPending.length > 0
-                      ? `<span style="padding:3px 10px;background:#FFF3E0;color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${staffPending.length} 待确认</span>`
+                      ? `<span style="padding:3px 10px;background:var(--gold-pale);color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${staffPending.length} 待确认</span>`
                       : '<span style="color:var(--success);font-size:12px;">✓ 无待办</span>'}
                   </td>
                   <td style="padding:14px 16px;">
@@ -433,7 +439,7 @@ function renderPending() {
     <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
       <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
         <span style="font-size:14px;font-weight:600;">待客户确认节点</span>
-        ${pendingNodes.length > 0 ? `<span style="padding:2px 10px;background:#FFF3E0;color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${pendingNodes.length}</span>` : ''}
+        ${pendingNodes.length > 0 ? `<span style="padding:2px 10px;background:var(--gold-pale);color:var(--warning);border-radius:12px;font-size:12px;font-weight:600;">${pendingNodes.length}</span>` : ''}
       </div>
       <div style="padding:8px 0;">
         ${pendingNodes.length === 0

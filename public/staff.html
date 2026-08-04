@@ -6,28 +6,30 @@
 <title>立和设计 · 员工端</title>
 <style>
   :root {
-    --sage: #4A7C59;
-    --sage-light: #6FA07C;
-    --sage-dark: #2D5440;
-    --sage-bg: #EDF5EF;
-    --sage-border: #D4E4D8;
-    --text-main: #1E3829;
-    --text-secondary: #4F6B5A;
-    --text-light: #8BA897;
-    --bg: #F5FAF6;
+    /* Premium Green Palette */
+    --sage: #2A6B50;
+    --sage-light: #3A8A68;
+    --sage-dark: #153D2C;
+    --sage-bg: #F0F7F2;
+    --sage-border: #D8E8DE;
+    --text-main: #0A241B;
+    --text-secondary: #3D5A4D;
+    --text-light: #6E8B7D;
+    --bg: #FAFCFA;
     --white: #FFFFFF;
-    --accent: #C89F6B;
-    --danger: #D95A5A;
+    --accent: #B8956B;
+    --danger: #C75B5B;
     --radius: 12px;
     --radius-lg: 20px;
-    --shadow: 0 4px 18px rgba(30, 80, 50, 0.08);
-    --shadow-hover: 0 8px 28px rgba(30, 80, 50, 0.12);
+    --shadow: 0 4px 18px rgba(10, 36, 27, 0.07);
+    --shadow-hover: 0 10px 32px rgba(10, 36, 27, 0.11);
+    --shadow-glow: 0 0 0 4px rgba(42, 107, 80, 0.08);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
     background: var(--bg);
     color: var(--text-main);
     line-height: 1.6;
@@ -42,10 +44,11 @@
     content: '';
     position: fixed;
     top: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 500px; height: 180px;
-    background: linear-gradient(160deg, var(--sage-dark) 0%, var(--sage) 100%);
-    border-radius: 0 0 28px 28px;
+    width: 100%; max-width: 500px; height: 188px;
+    background: linear-gradient(160deg, var(--sage-dark) 0%, var(--sage) 55%, var(--sage-light) 100%);
+    border-radius: 0 0 32px 32px;
     z-index: -1;
+    box-shadow: 0 8px 24px rgba(10, 36, 27, 0.14);
   }
 
   /* ===== 登录页 ===== */
@@ -75,7 +78,7 @@
     -webkit-appearance: none;
     transition: all 0.2s ease;
   }
-  .login-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.08); }
+  .login-input:focus { outline: none; border-color: var(--sage); box-shadow: var(--shadow-glow); }
   .login-btn {
     width: 100%;
     padding: 15px;
@@ -86,24 +89,24 @@
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(74, 124, 89, 0.25);
-    transition: all 0.2s ease;
+    box-shadow: 0 6px 20px rgba(21, 61, 44, 0.24);
+    transition: all 0.25s ease;
   }
-  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74, 124, 89, 0.32); }
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(21, 61, 44, 0.3); }
   .login-btn:active { background: var(--sage-dark); transform: translateY(0); }
   .login-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 
   /* ===== 导航栏 ===== */
   .nav-bar {
-    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 55%, var(--sage-light) 100%);
     padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky; top: 0; z-index: 100;
     color: var(--white);
-    border-radius: 0 0 20px 20px;
-    box-shadow: 0 4px 16px rgba(30, 80, 50, 0.14);
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 6px 20px rgba(10, 36, 27, 0.14);
   }
   .nav-brand { display: flex; align-items: center; gap: 8px; }
   .nav-logo {
@@ -147,13 +150,13 @@
     background: var(--white);
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(30,80,50,0.04);
+    box-shadow: 0 2px 6px rgba(10,36,27,0.04);
   }
   .select-tag.active {
     background: var(--sage);
     color: var(--white);
     border-color: var(--sage);
-    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.2);
+    box-shadow: 0 4px 12px rgba(21, 61, 44, 0.18);
   }
   .select-tag:active { transform: scale(0.95); }
 
@@ -183,7 +186,7 @@
     -webkit-appearance: none;
     transition: all 0.2s ease;
   }
-  .input-text:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.08); }
+  .input-text:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(42, 107, 80, 0.08); }
   textarea.input-text { resize: none; min-height: 70px; line-height: 1.6; }
 
   /* ===== 上传区 ===== */
@@ -196,7 +199,7 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .upload-area:active { border-color: var(--sage); background: rgba(74, 124, 89, 0.06); }
+  .upload-area:active { border-color: var(--sage); background: rgba(42, 107, 80, 0.06); }
   .upload-icon { font-size: 32px; color: var(--sage); margin-bottom: 10px; font-weight: 300; }
   .upload-text { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
   .upload-hint { font-size: 12px; color: var(--text-light); margin-top: 6px; }
@@ -221,7 +224,7 @@
     gap: 6px;
     transition: all 0.2s;
   }
-  .upload-btn.camera { background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%); color: var(--white); box-shadow: 0 4px 14px rgba(74, 124, 89, 0.22); }
+  .upload-btn.camera { background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%); color: var(--white); box-shadow: 0 4px 14px rgba(21, 61, 44, 0.2); }
   .upload-btn.camera:active { background: var(--sage-dark); }
   .upload-btn.album { background: var(--white); color: var(--sage-dark); border: 1.5px solid var(--sage-border); }
   .upload-btn:active { transform: scale(0.97); }
@@ -265,10 +268,10 @@
     font-weight: 700;
     margin-top: 24px;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(74, 124, 89, 0.22);
+    box-shadow: 0 6px 18px rgba(21, 61, 44, 0.2);
     transition: all 0.2s ease;
   }
-  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74, 124, 89, 0.28); }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(21, 61, 44, 0.24); }
   .submit-btn:active { background: var(--sage-dark); transform: translateY(0); }
   .submit-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 
@@ -294,7 +297,7 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(63, 93, 80, 0.95);
+    background: rgba(10, 36, 27, 0.94);
     color: var(--white);
     padding: 10px 24px;
     border-radius: 24px;
@@ -431,8 +434,8 @@
   }
   .stage-badge.active { background: var(--sage); color: var(--white); }
   .stage-badge.normal { background: var(--sage-bg); color: var(--sage-dark); }
-  .stage-badge.warn { background: #FFF3CD; color: #856404; }
-  .stage-badge.danger { background: #F8D7DA; color: #721C24; }
+  .stage-badge.warn { background: var(--gold-pale); color: #6B4E2E; }
+  .stage-badge.danger { background: #FCE8E8; color: #8B3A3A; }
 
   /* 阶段时间线 */
   .timeline { position: relative; padding-left: 20px; }
@@ -510,9 +513,9 @@
     padding: 2px 8px; border-radius: 10px;
     font-size: 11px; font-weight: 600; white-space: nowrap;
   }
-  .status-tag.pending { background: #FFF3CD; color: #856404; }
-  .status-tag.confirmed { background: #D4EDDA; color: #155724; }
-  .status-tag.rejected { background: #F8D7DA; color: #721C24; }
+  .status-tag.pending { background: var(--gold-pale); color: #6B4E2E; }
+  .status-tag.confirmed { background: var(--forest-50); color: var(--sage-dark); }
+  .status-tag.rejected { background: #FCE8E8; color: #8B3A3A; }
 
   /* 返回按钮 */
   .back-btn {
@@ -528,7 +531,7 @@
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--white); font-size: 26px; font-weight: 300;
-    box-shadow: 0 6px 20px rgba(74, 124, 89, 0.35);
+    box-shadow: 0 6px 20px rgba(21, 61, 44, 0.3);
     cursor: pointer; z-index: 50; border: none;
     transition: all 0.2s ease;
   }
@@ -1370,7 +1373,7 @@
           const el = document.getElementById(`prog-${i}`);
           if (el) {
             el.textContent = `✗ ${f.file.name} - 上传失败`;
-            el.style.color = '#e53935';
+            el.style.color = 'var(--danger)';
           }
         });
         showToast('上传失败：' + (err.message || '网络错误'));

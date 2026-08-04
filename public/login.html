@@ -3,173 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>立和设计 · 统一登录</title>
+<title>立和设计 · 项目协同平台</title>
 <style>
   :root {
-    --forest: #3D6B4A;
-    --forest-dark: #2D5440;
-    --forest-light: #5A8E6A;
-    --leaf: #7DB38A;
-    --mist: #E8F3EB;
-    --cream: #F7FBF8;
-    --card: #FFFFFF;
-    --text: #1E3829;
-    --text-secondary: #557A63;
-    --text-light: #8AA898;
-    --border: #D8E8DD;
-    --danger: #D95A5A;
-    --shadow: 0 20px 60px rgba(30, 80, 50, 0.18);
-    --shadow-soft: 0 4px 16px rgba(30, 80, 50, 0.08);
-    --radius-xl: 28px;
-    --radius-lg: 18px;
-    --radius-md: 14px;
+    /* Premium Green Palette */
+    --forest-900: #0A241B;
+    --forest-800: #0F2E22;
+    --forest-700: #153D2C;
+    --forest-600: #1E523D;
+    --forest-500: #2A6B50;
+    --forest-400: #3A8A68;
+    --forest-300: #5DAA88;
+    --forest-200: #8CC8AC;
+    --forest-100: #BCE3CD;
+    --forest-50: #E6F4EC;
+    --mint: #F0F7F2;
+    --cream: #FAFCFA;
+    --white: #FFFFFF;
+    /* Luxury Accent */
+    --gold: #B8956B;
+    --gold-light: #D4BA94;
+    --gold-pale: #F0E6D6;
+    /* Functional */
+    --text-primary: #0A241B;
+    --text-secondary: #3D5A4D;
+    --text-tertiary: #6E8B7D;
+    --text-inverse: #FFFFFF;
+    --border: #D8E8DE;
+    --border-light: #E8F0EB;
+    --danger: #C75B5B;
+    /* Elevation */
+    --shadow-sm: 0 2px 8px rgba(10, 36, 27, 0.04);
+    --shadow-md: 0 4px 16px rgba(10, 36, 27, 0.08);
+    --shadow-lg: 0 12px 32px rgba(10, 36, 27, 0.12);
+    --shadow-xl: 0 24px 56px rgba(10, 36, 27, 0.18);
+    /* Radius */
     --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg, var(--forest-dark) 0%, var(--forest) 45%, var(--forest-light) 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: linear-gradient(145deg, var(--forest-800) 0%, var(--forest-600) 50%, var(--forest-500) 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    position: relative;
+    overflow-x: hidden;
   }
-  .login-container {
-    background: var(--card);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
+
+  /* Organic background shapes */
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.22;
+    z-index: 0;
+    pointer-events: none;
+  }
+  body::before {
+    width: 420px; height: 420px;
+    background: var(--forest-300);
+    top: -120px; right: -120px;
+  }
+  body::after {
+    width: 360px; height: 360px;
+    background: var(--gold);
+    bottom: -100px; left: -100px;
+  }
+
+  .login-wrapper {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
+  }
+
+  .login-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
     overflow: hidden;
+    animation: cardEnter 0.6s ease-out;
+  }
+
+  @keyframes cardEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Header */
   .login-header {
-    background: linear-gradient(135deg, var(--forest-dark), var(--forest));
-    padding: 44px 32px 36px;
+    background: linear-gradient(135deg, var(--forest-700) 0%, var(--forest-500) 100%);
+    padding: 48px 32px 44px;
     text-align: center;
-    color: #fff;
+    color: var(--white);
     position: relative;
+    overflow: hidden;
   }
+
+  .login-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 160px; height: 160px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+
   .login-header::after {
     content: '';
     position: absolute;
-    bottom: -1px; left: 0; right: 0;
-    height: 32px;
-    background: var(--card);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 64px; height: 3px;
+    background: var(--gold);
+    border-radius: 2px;
   }
+
+  .logo-ring {
+    width: 112px; height: 112px;
+    margin: 0 auto 20px;
+    padding: 6px;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+
   .logo-box {
-    width: 110px; height: 110px;
-    background: rgba(255,255,255,0.14);
-    backdrop-filter: blur(10px);
-    border: 1.5px solid rgba(255,255,255,0.25);
+    width: 100%; height: 100%;
+    background: rgba(255,255,255,0.12);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 18px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   }
+
   .logo-box img {
-    width: 72%;
-    height: 72%;
+    width: 68%; height: 68%;
     object-fit: contain;
     filter: brightness(0) invert(1);
   }
-  .login-header h1 { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; position: relative; z-index: 1; }
-  .login-header p { font-size: 13px; opacity: 0.82; margin-top: 6px; position: relative; z-index: 1; }
+
+  .login-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .login-header p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.78);
+    letter-spacing: 0.3px;
+    position: relative;
+  }
 
   /* Role Selection */
-  .role-section { padding: 24px 32px 16px; }
-  .role-section .label {
-    font-size: 14px; font-weight: 600; color: var(--text-secondary);
-    margin-bottom: 16px; text-align: center;
+  .role-section {
+    padding: 28px 32px 18px;
   }
+
+  .role-section .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
   .role-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
   }
+
   .role-card {
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 16px 8px;
+    padding: 18px 8px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     background: var(--cream);
+    position: relative;
   }
+
+  .role-card:hover {
+    border-color: var(--forest-300);
+    transform: translateY(-2px);
+  }
+
   .role-card:active { transform: scale(0.96); }
-  .role-card .name { font-size: 15px; font-weight: 700; color: var(--text); }
-  .role-card .desc { font-size: 11px; color: var(--text-light); margin-top: 4px; font-weight: 500; }
-  .role-card.active {
-    border-color: var(--forest);
-    background: var(--mist);
-    box-shadow: var(--shadow-soft);
+
+  .role-card .role-icon {
+    width: 36px; height: 36px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: var(--forest-50);
+    color: var(--forest-500);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.25s ease;
   }
-  .role-card.active .name { color: var(--forest-dark); }
+
+  .role-card .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .role-card .desc {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  .role-card.active {
+    border-color: var(--forest-500);
+    background: linear-gradient(180deg, var(--forest-50) 0%, var(--white) 100%);
+    box-shadow: var(--shadow-md);
+  }
+
+  .role-card.active .role-icon {
+    background: var(--forest-500);
+    color: var(--white);
+  }
+
+  .role-card.active .name { color: var(--forest-700); }
 
   /* Form */
-  .form-section { padding: 8px 32px 32px; }
+  .form-section { padding: 10px 32px 36px; }
+
   .form-group { margin-bottom: 18px; }
+
   .form-group label {
-    display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
     margin-bottom: 8px;
   }
+
   .form-input {
     width: 100%;
     padding: 15px 18px;
     border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     font-size: 15px;
-    color: var(--text);
+    color: var(--text-primary);
     background: var(--cream);
     transition: all 0.2s ease;
   }
+
+  .form-input::placeholder { color: var(--text-tertiary); opacity: 0.7; }
+
   .form-input:focus {
     outline: none;
-    border-color: var(--forest);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(61, 107, 74, 0.08);
+    border-color: var(--forest-400);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(45, 107, 80, 0.08);
   }
+
   .login-btn {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-light) 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--forest-600) 0%, var(--forest-400) 100%);
+    color: var(--white);
     border: none;
     border-radius: var(--radius-md);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     margin-top: 6px;
-    box-shadow: 0 6px 18px rgba(61, 107, 74, 0.25);
+    box-shadow: 0 6px 20px rgba(21, 61, 44, 0.25);
+    letter-spacing: 0.5px;
   }
-  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(61, 107, 74, 0.32); }
-  .login-btn:active { transform: translateY(0); background: var(--forest-dark); }
-  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(21, 61, 44, 0.32);
+  }
+
+  .login-btn:active {
+    transform: translateY(0);
+    background: var(--forest-700);
+  }
+
+  .login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 
   /* Hint */
   .hint {
     margin-top: 18px;
     padding: 14px 16px;
-    background: var(--mist);
-    border-radius: var(--radius-sm);
+    background: var(--forest-50);
+    border-radius: var(--radius-md);
     font-size: 12px;
     color: var(--text-secondary);
     line-height: 1.7;
     text-align: center;
+    border: 1px solid var(--border-light);
   }
-  .hint b { color: var(--forest-dark); }
+
+  .hint b { color: var(--forest-700); font-weight: 700; }
+
+  /* Footer brand */
+  .login-footer {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.5px;
+  }
 
   /* Toast */
   .toast {
     position: fixed;
-    top: 24px; left: 50%; transform: translateX(-50%);
-    background: rgba(30, 56, 41, 0.92);
-    color: #fff;
+    top: 28px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 36, 27, 0.94);
+    color: var(--white);
     padding: 12px 28px;
     border-radius: var(--radius-md);
     font-size: 14px;
@@ -178,83 +351,101 @@
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
   }
+
   .toast.show { opacity: 1; }
 
-  /* Hidden by default */
   .hidden { display: none !important; }
+
+  @media (max-width: 420px) {
+    .login-card { border-radius: var(--radius-lg); }
+    .login-header { padding: 40px 24px 38px; }
+    .role-section, .form-section { padding-left: 22px; padding-right: 22px; }
+    .role-cards { gap: 8px; }
+    .role-card { padding: 16px 6px; }
+    .role-card .name { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="login-container">
-  <!-- Header -->
-  <div class="login-header">
-    <div class="logo-box">
-      <img src="/images/logo.png" alt="立和设计">
+<div class="login-wrapper">
+  <div class="login-card">
+    <!-- Header -->
+    <div class="login-header">
+      <div class="logo-ring">
+        <div class="logo-box">
+          <img src="/images/logo.png" alt="立和设计">
+        </div>
+      </div>
+      <h1>立和设计</h1>
+      <p>室内设计 · 项目协同平台</p>
     </div>
-    <h1>项目协同平台</h1>
-    <p>客户 · 员工 · 管理 一站式入口</p>
+
+    <!-- Role Selection -->
+    <div class="role-section">
+      <div class="label">选择您的身份</div>
+      <div class="role-cards">
+        <div class="role-card active" data-role="client" onclick="selectRole('client')">
+          <div class="role-icon">客</div>
+          <div class="name">客户</div>
+          <div class="desc">查看进度</div>
+        </div>
+        <div class="role-card" data-role="staff" onclick="selectRole('staff')">
+          <div class="role-icon">员</div>
+          <div class="name">员工</div>
+          <div class="desc">项目管理</div>
+        </div>
+        <div class="role-card" data-role="boss" onclick="selectRole('boss')">
+          <div class="role-icon">管</div>
+          <div class="name">管理</div>
+          <div class="desc">数据后台</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-section">
+      <!-- Client Form -->
+      <div id="clientForm">
+        <div class="form-group">
+          <label>手机号</label>
+          <input class="form-input" id="phoneInput" type="tel" placeholder="请输入登记手机号" maxlength="11">
+        </div>
+        <button class="login-btn" id="clientLoginBtn" onclick="doLogin()">查看我的项目</button>
+        <div class="hint">输入您在立和登记的手机号，即可查看所有项目进度与确认节点</div>
+      </div>
+
+      <!-- Staff Form -->
+      <div id="staffForm" class="hidden">
+        <div class="form-group">
+          <label>工号</label>
+          <input class="form-input" id="staffIdInput" type="text" placeholder="请输入工号">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input class="form-input" id="staffPwdInput" type="password" placeholder="请输入密码">
+        </div>
+        <button class="login-btn" id="staffLoginBtn" onclick="doLogin()">登 录</button>
+      </div>
+
+      <!-- Boss Form -->
+      <div id="bossForm" class="hidden">
+        <div class="form-group">
+          <label>管理员账号</label>
+          <input class="form-input" id="bossIdInput" type="text" placeholder="请输入管理员账号">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input class="form-input" id="bossPwdInput" type="password" placeholder="请输入密码">
+        </div>
+        <button class="login-btn" id="bossLoginBtn" onclick="doLogin()">登 录</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Role Selection -->
-  <div class="role-section">
-    <div class="label">请选择您的身份</div>
-    <div class="role-cards">
-      <div class="role-card active" data-role="client" onclick="selectRole('client')">
-        <div class="name">客户</div>
-        <div class="desc">查看项目进度</div>
-      </div>
-      <div class="role-card" data-role="staff" onclick="selectRole('staff')">
-        <div class="name">员工</div>
-        <div class="desc">项目上传管理</div>
-      </div>
-      <div class="role-card" data-role="boss" onclick="selectRole('boss')">
-        <div class="name">管理</div>
-        <div class="desc">全局数据后台</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Form -->
-  <div class="form-section">
-    <!-- Client Form -->
-    <div id="clientForm">
-      <div class="form-group">
-        <label>手机号</label>
-        <input class="form-input" id="phoneInput" type="tel" placeholder="请输入您的手机号" maxlength="11">
-      </div>
-      <button class="login-btn" id="clientLoginBtn" onclick="doLogin()">查看我的项目</button>
-      <div class="hint">📱 输入您在立和登记的手机号，即可查看所有项目进度和确认节点</div>
-    </div>
-
-    <!-- Staff Form -->
-    <div id="staffForm" class="hidden">
-      <div class="form-group">
-        <label>工号</label>
-        <input class="form-input" id="staffIdInput" type="text" placeholder="请输入工号">
-      </div>
-      <div class="form-group">
-        <label>密码</label>
-        <input class="form-input" id="staffPwdInput" type="password" placeholder="请输入密码">
-      </div>
-      <button class="login-btn" id="staffLoginBtn" onclick="doLogin()">登 录</button>
-    </div>
-
-    <!-- Boss Form -->
-    <div id="bossForm" class="hidden">
-      <div class="form-group">
-        <label>管理员账号</label>
-        <input class="form-input" id="bossIdInput" type="text" placeholder="请输入管理员账号">
-      </div>
-      <div class="form-group">
-        <label>密码</label>
-        <input class="form-input" id="bossPwdInput" type="password" placeholder="请输入密码">
-      </div>
-      <button class="login-btn" id="bossLoginBtn" onclick="doLogin()">登 录</button>
-    </div>
-  </div>
+  <div class="login-footer">LIHE DESIGN · 立和室内设计</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -386,7 +577,6 @@
   const oldIds = ['D01', 'D02', 'P01', 'P02', 'A01', 'A02'];
   const savedStaffId = localStorage.getItem('lihe_staffId');
   if (savedStaffId && oldIds.includes(savedStaffId.toUpperCase())) {
-    // Old credentials - clear everything to force fresh login
     localStorage.removeItem('lihe_role');
     localStorage.removeItem('lihe_staffId');
     localStorage.removeItem('lihe_password');
