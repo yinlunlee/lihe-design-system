@@ -258,8 +258,8 @@
 
   // ===== Login =====
   async function doLogin() {
-    const activeForm = ['clientForm', 'staffForm', 'bossForm'].find(id => !document.getElementById(id).classList.contains('hidden'));
-    const activeBtn = activeForm ? activeForm.querySelector('button') : null;
+    const activeFormId = ['clientForm', 'staffForm', 'bossForm'].find(id => !document.getElementById(id).classList.contains('hidden'));
+    const activeBtn = activeFormId ? document.getElementById(activeFormId).querySelector('button') : null;
     const origText = activeBtn ? activeBtn.textContent : '';
 
     if (activeBtn) { activeBtn.disabled = true; activeBtn.textContent = '验证中...'; }
