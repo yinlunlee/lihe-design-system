@@ -234,6 +234,16 @@ function mapProjectFields(item) {
     budget: typeof f['合同金额'] === 'number' ? f['合同金额'] : 0,
     paidAmount: typeof f['已收款'] === 'number' ? f['已收款'] : 0,
     status: parseFieldValue(f['停工状态']) || '正常',
+    // 多角色团队
+    designerId: parseFieldValue(f['设计师工号']) || '',
+    designerName: parseFieldValue(f['设计师姓名']) || '',
+    softDecoId: parseFieldValue(f['软装设计师工号']) || '',
+    softDecoName: parseFieldValue(f['软装设计师姓名']) || '',
+    drawingId: parseFieldValue(f['施工图设计师工号']) || '',
+    drawingName: parseFieldValue(f['施工图设计师姓名']) || '',
+    supervisorId: parseFieldValue(f['施工监理工号']) || '',
+    supervisorName: parseFieldValue(f['施工监理姓名']) || '',
+    // 兼容旧字段
     staffId: parseFieldValue(f['负责人工号']) || '',
   };
 }
@@ -311,25 +321,26 @@ async function handleBoss(req, res) {
     revisedNodes: allNodes.filter(n => n.status === '有修改意见').length,
   };
 
-  // Group projects by staffId
-  projects.forEach(p => {
-    const sid = p.staffId || '未分配';
-    if (!stats.byStaff[sid]) {
-      stats.byStaff[sid] = { count: 0, avgProgress: 0, budget: 0, pending: 0 };
-    }
-    stats.byStaff[sid].count++;
-    stats.byStaff[sid].budget += p.budget || 0;
-  });
-  // Calculate avg progress and pending count per staff
-  Object.keys(stats.byStaff).forEach(sid => {
-    const staffProjects = projects.filter(p => (p.staffId || '未分配') === sid);
-    stats.byStaff[sid].avgProgress = staffProjects.length > 0
-      ? Math.round(staffProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / staffProjects.length)
-      : 0;
-    stats.byStaff[sid].pending = pendingNodes.filter(n => {
-      const proj = staffProjects.find(p => p.recordId === n.projectId);
-      return !!proj;
+  // Group projects by staff across all 4 roles
+  const allStaffIds = Object.keys(config.staffRoles).filter(id => id !== 'B01');
+  allStaffIds.forEach(sid => {
+    const staffProjects = projects.filter(p => {
+      return p.designerId === sid || p.softDecoId === sid || p.drawingId === sid || p.supervisorId === sid || p.staffId === sid;
+    });
+    const staffPending = pendingNodes.filter(n => {
+      return staffProjects.some(p => p.recordId === n.projectId);
     }).length;
+    const staffInfo = config.staffRoles[sid] || { name: sid, label: '' };
+    stats.byStaff[sid] = {
+      name: staffInfo.name,
+      role: staffInfo.label,
+      count: staffProjects.length,
+      avgProgress: staffProjects.length > 0
+        ? Math.round(staffProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / staffProjects.length)
+        : 0,
+      budget: staffProjects.reduce((sum, p) => sum + (p.budget || 0), 0),
+      pending: staffPending,
+    };
   });
 
   return sendJSON(res, 200, { success: true, projects, pendingNodes, allNodes, stats });
@@ -339,16 +350,27 @@ async function handleProject(req, res) {
   const parsed = url.parse(req.url, true);
   const { phone, staffId, password } = parsed.query;
 
-  // Staff query: load projects assigned to this staff
+  // Staff query: load projects where staffId matches any of the 4 role fields
   if (staffId) {
     if (!config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
       return sendJSON(res, 401, { success: false, error: 'Auth failed' });
     }
 
-    // Search projects where 负责人工号 = staffId
+    // Search projects where ANY of the 4 role fields = staffId (OR conjunction)
     const searchResult = await feishuRequest('POST',
-      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search`,
-      { filter: { conjunction: 'and', conditions: [{ field_name: '负责人工号', operator: 'is', value: [staffId] }] } }
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search?page_size=500`,
+      {
+        filter: {
+          conjunction: 'or',
+          conditions: [
+            { field_name: '设计师工号', operator: 'is', value: [staffId] },
+            { field_name: '软装设计师工号', operator: 'is', value: [staffId] },
+            { field_name: '施工图设计师工号', operator: 'is', value: [staffId] },
+            { field_name: '施工监理工号', operator: 'is', value: [staffId] },
+            { field_name: '负责人工号', operator: 'is', value: [staffId] },
+          ]
+        }
+      }
     );
 
     let projects = [];
@@ -356,17 +378,13 @@ async function handleProject(req, res) {
       projects = searchResult.data.items.map(item => mapProjectFields(item));
     }
 
-    // Fallback: if no assigned projects, load all (backward compat)
-    if (projects.length === 0) {
-      const result = await feishuRequest('GET',
-        `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records?page_size=100`
-      );
-      if (result.code === 0 && result.data.items) {
-        projects = result.data.items.map(item => mapProjectFields(item));
-      }
-    }
-
-    return sendJSON(res, 200, { success: true, projects, staffId });
+    return sendJSON(res, 200, {
+      success: true,
+      projects,
+      staffId,
+      staffName: config.staffRoles[staffId] ? config.staffRoles[staffId].name : '',
+      staffRole: config.staffRoles[staffId] ? config.staffRoles[staffId].label : '',
+    });
   }
 
   // Client query: find by phone

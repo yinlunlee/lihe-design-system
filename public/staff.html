@@ -504,7 +504,7 @@
   <div class="login-logo">立</div>
   <div class="login-title">立和设计 · 员工端</div>
   <div class="login-subtitle">工地现场 · 成果上传</div>
-  <input class="login-input" id="staffIdInput" type="text" placeholder="工号（如 D01/P01/B01）">
+  <input class="login-input" id="staffIdInput" type="text" placeholder="工号（S01庄涛/S02林协莎/S03颜大然/S04王润鹏/S05谢佳润/S06谢建彬）">
   <input class="login-input" id="passwordInput" type="password" placeholder="密码">
   <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
 </div>
@@ -542,6 +542,12 @@
     <div class="detail-card">
       <div class="detail-card-title">📋 项目信息</div>
       <div id="detailProjectInfo"></div>
+    </div>
+
+    <!-- 团队信息卡片 -->
+    <div class="detail-card">
+      <div class="detail-card-title">👥 服务团队</div>
+      <div id="detailTeamInfo"></div>
     </div>
 
     <!-- 进度卡片 -->
@@ -797,6 +803,8 @@
       .then(data => {
         if (data.success && data.projects) {
           state.projects = data.projects;
+          state.staffName = data.staffName || '';
+          state.staffRole = data.staffRole || '';
           showMainPage();
         } else {
           throw new Error(data.error || '加载失败');
@@ -827,7 +835,7 @@
     document.getElementById('mainPage').style.display = 'block';
     document.getElementById('detailPage').style.display = 'none';
     document.getElementById('uploadPage').style.display = 'none';
-    document.getElementById('navUser').textContent = `工号 ${state.staffId}`;
+    document.getElementById('navUser').textContent = `${state.staffName || state.staffId}（${state.staffRole || ''}）`;
     document.getElementById('projectCount').textContent = `共 ${state.projects.length} 个`;
     renderProjectList();
     initStageSelector();
@@ -891,6 +899,14 @@
       <div class="info-row"><span class="info-label">合同金额</span><span class="info-value">${p.budget ? '¥' + p.budget.toLocaleString() : '-'}</span></div>
       <div class="info-row"><span class="info-label">已收款</span><span class="info-value">${p.paidAmount ? '¥' + p.paidAmount.toLocaleString() : '-'}</span></div>
       <div class="info-row"><span class="info-label">状态</span><span class="info-value"><span class="stage-badge ${statusClass}">${p.status || '正常'}</span></span></div>
+    `;
+
+    // 团队信息
+    document.getElementById('detailTeamInfo').innerHTML = `
+      <div class="info-row"><span class="info-label">设计师</span><span class="info-value">${p.designerName || p.designerId || '未分配'}</span></div>
+      <div class="info-row"><span class="info-label">软装设计师</span><span class="info-value">${p.softDecoName || p.softDecoId || '未分配'}</span></div>
+      <div class="info-row"><span class="info-label">施工图设计师</span><span class="info-value">${p.drawingName || p.drawingId || '未分配'}</span></div>
+      <div class="info-row"><span class="info-label">施工监理</span><span class="info-value">${p.supervisorName || p.supervisorId || '未分配'}</span></div>
     `;
 
     // 进度
@@ -1076,7 +1092,7 @@
     if (!p) return;
     document.getElementById('detailPage').style.display = 'none';
     document.getElementById('uploadPage').style.display = 'block';
-    document.getElementById('uploadNavUser').textContent = `工号 ${state.staffId}`;
+    document.getElementById('uploadNavUser').textContent = `${state.staffName || state.staffId}（${state.staffRole || ''}）`;
     document.getElementById('uploadProjectInfo').textContent = `${p.name} · ${p.stage || '待启动'} · ${p.progress || 0}%`;
   }
 

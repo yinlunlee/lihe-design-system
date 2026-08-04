@@ -189,10 +189,34 @@ function renderOverview() {
         </div>
       </div>
 
-      <!-- Node Stats -->
+      <!-- Staff Overview -->
       <div style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <h3 style="font-size:15px;margin-bottom:16px;">团队工作概览</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${staffList.map(sid => {
+            const s = stats.byStaff[sid];
+            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">${(s.name||sid).substring(0,1)}</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;">${s.name || sid}</div>
+                  <div style="font-size:11px;color:var(--text-light);">${s.role || ''}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:16px;text-align:center;">
+                <div><div style="font-size:16px;font-weight:700;color:var(--accent);">${s.count}</div><div style="font-size:10px;color:var(--text-light);">项目</div></div>
+                <div><div style="font-size:16px;font-weight:700;color:var(--success);">${s.avgProgress}%</div><div style="font-size:10px;color:var(--text-light);">平均</div></div>
+                ${s.pending > 0 ? `<div><div style="font-size:16px;font-weight:700;color:var(--warning);">${s.pending}</div><div style="font-size:10px;color:var(--text-light);">待确认</div></div>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Node Stats -->
+      <div style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);grid-column:1/-1;">
         <h3 style="font-size:15px;margin-bottom:16px;">节点确认统计</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
           <div style="text-align:center;padding:16px;background:var(--bg);border-radius:8px;">
             <div style="font-size:28px;font-weight:700;color:var(--warning);">${stats.pendingConfirmations}</div>
             <div style="font-size:12px;color:var(--text-light);margin-top:4px;">待确认</div>
@@ -220,11 +244,11 @@ function renderOverview() {
 
 function renderProjects() {
   const { projects } = state.data;
-  const staffIds = [...new Set(projects.map(p => p.staffId || '未分配'))];
+  const allStaffIds = [...new Set(projects.flatMap(p => [p.designerId, p.softDecoId, p.drawingId, p.supervisorId, p.staffId].filter(Boolean)))];
   const fmt = n => n >= 10000 ? (n/10000).toFixed(1)+'万' : (n||0).toString();
 
   let filtered = projects;
-  if (state.filter.staff) filtered = filtered.filter(p => (p.staffId||'未分配') === state.filter.staff);
+  if (state.filter.staff) filtered = filtered.filter(p => [p.designerId, p.softDecoId, p.drawingId, p.supervisorId, p.staffId].includes(state.filter.staff));
   if (state.filter.status) filtered = filtered.filter(p => p.status === state.filter.status);
 
   return `
@@ -233,7 +257,7 @@ function renderProjects() {
         <span style="font-size:14px;font-weight:600;">全部项目 (${filtered.length})</span>
         <select id="filterStaff" onchange="state.filter.staff=this.value;renderContent()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;">
           <option value="">全部员工</option>
-          ${staffIds.map(s => `<option value="${s}" ${state.filter.staff===s?'selected':''}>${s}</option>`).join('')}
+          ${allStaffIds.map(s => `<option value="${s}" ${state.filter.staff===s?'selected':''}>${s}</option>`).join('')}
         </select>
         <select id="filterStatus" onchange="state.filter.status=this.value;renderContent()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;">
           <option value="">全部状态</option>
@@ -247,7 +271,8 @@ function renderProjects() {
             <tr style="background:var(--bg);">
               <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">项目</th>
               <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">客户</th>
-              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">负责人</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">设计/软装</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">施工图/监理</th>
               <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">当前阶段</th>
               <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">进度</th>
               <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--text-light);">合同/已收</th>
@@ -265,7 +290,14 @@ function renderProjects() {
                   <div>${p.clientName || '-'}</div>
                   <div style="font-size:11px;color:var(--text-light);">${p.clientPhone || ''}</div>
                 </td>
-                <td style="padding:12px 16px;">${p.staffId || '<span style="color:var(--danger);">未分配</span>'}</td>
+                <td style="padding:12px 16px;font-size:12px;">
+                  <div>${p.designerName || p.designerId || '-'}</div>
+                  <div style="color:var(--text-light);">${p.softDecoName || p.softDecoId || '-'}</div>
+                </td>
+                <td style="padding:12px 16px;font-size:12px;">
+                  <div>${p.drawingName || p.drawingId || '-'}</div>
+                  <div style="color:var(--text-light);">${p.supervisorName || p.supervisorId || '-'}</div>
+                </td>
                 <td style="padding:12px 16px;">${p.stage || '<span style="color:var(--text-light);">待启动</span>'}</td>
                 <td style="padding:12px 16px;">
                   <div style="display:flex;align-items:center;gap:8px;">
@@ -285,7 +317,7 @@ function renderProjects() {
                     : '<span style="padding:2px 8px;background:#FFEBEE;color:var(--danger);border-radius:4px;font-size:12px;">停工</span>'}
                 </td>
               </tr>
-            `).join('') || '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-light);">暂无项目</td></tr>'}
+            `).join('') || '<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--text-light);">暂无项目</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -307,26 +339,33 @@ function renderStaff() {
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
             <tr style="background:var(--bg);">
-              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">工号</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">员工</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">角色</th>
               <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">在管项目</th>
               <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">平均进度</th>
               <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">合同总额</th>
-              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">待确认节点</th>
+              <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">待确认</th>
               <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--text-light);">项目列表</th>
             </tr>
           </thead>
           <tbody>
             ${staffIds.map(sid => {
               const s = stats.byStaff[sid];
-              const staffProjects = projects.filter(p => (p.staffId||'未分配') === sid);
+              const staffProjects = projects.filter(p => [p.designerId, p.softDecoId, p.drawingId, p.supervisorId, p.staffId].includes(sid));
               const staffPending = pendingNodes.filter(n => staffProjects.find(p => p.recordId === n.projectId));
               return `
                 <tr style="border-bottom:1px solid var(--border);">
                   <td style="padding:14px 16px;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                      <div style="width:32px;height:32px;border-radius:50%;background:${s.count>0?'var(--accent)':'var(--border)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">${sid.substring(0,2)}</div>
-                      <span style="font-weight:600;">${sid}</span>
+                      <div style="width:32px;height:32px;border-radius:50%;background:${s.count>0?'var(--accent)':'var(--border)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">${(s.name||sid).substring(0,1)}</div>
+                      <div>
+                        <div style="font-weight:600;">${s.name || sid}</div>
+                        <div style="font-size:11px;color:var(--text-light);">${sid}</div>
+                      </div>
                     </div>
+                  </td>
+                  <td style="padding:14px 16px;">
+                    <span style="padding:2px 8px;background:#E3F2FD;color:var(--accent);border-radius:4px;font-size:12px;">${s.role || '-'}</span>
                   </td>
                   <td style="padding:14px 16px;font-size:18px;font-weight:700;">${s.count}</td>
                   <td style="padding:14px 16px;">
@@ -351,7 +390,7 @@ function renderStaff() {
                   </td>
                 </tr>
               `;
-            }).join('') || '<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text-light);">暂无员工数据</td></tr>'}
+            }).join('') || '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-light);">暂无员工数据</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -381,7 +420,7 @@ function renderPending() {
                   <div>
                     <div style="font-weight:600;font-size:14px;">${n.nodeName || n.stage || '未命名节点'}</div>
                     <div style="font-size:12px;color:var(--text-light);margin-top:2px;">
-                      ${proj ? proj.name : n.projectId || ''} · ${proj ? proj.clientName : ''} · 负责人 ${proj ? (proj.staffId||'-') : (n.uploader||'-')}
+                      ${proj ? proj.name : n.projectId || ''} · ${proj ? proj.clientName : ''} · 设计师 ${proj ? (proj.designerName||proj.designerId||'-') : '-'} · 监理 ${proj ? (proj.supervisorName||proj.supervisorId||'-') : '-'}
                     </div>
                     <div style="font-size:11px;color:var(--text-light);margin-top:2px;">上传于 ${fmtTime(n.uploadTime)} · ${n.uploader || ''}</div>
                   </div>

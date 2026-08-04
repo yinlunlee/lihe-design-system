@@ -505,8 +505,10 @@
           ${p.spaceType ? `<div class="project-meta-item">🏠 ${p.spaceType}</div>` : ''}
           ${p.area ? `<div class="project-meta-item">📐 ${p.area}㎡</div>` : ''}
           ${p.address ? `<div class="project-meta-item">📍 ${p.address}</div>` : ''}
-          ${p.designLead ? `<div class="project-meta-item">✏️ 设计 ${p.designLead}</div>` : ''}
-          ${p.projectLead ? `<div class="project-meta-item">🔨 项目 ${p.projectLead}</div>` : ''}
+          ${p.designerName ? `<div class="project-meta-item">✏️ 设计 ${p.designerName}</div>` : ''}
+          ${p.softDecoName ? `<div class="project-meta-item">🛋️ 软装 ${p.softDecoName}</div>` : ''}
+          ${p.drawingName ? `<div class="project-meta-item">📐 施工图 ${p.drawingName}</div>` : ''}
+          ${p.supervisorName ? `<div class="project-meta-item">👷 监理 ${p.supervisorName}</div>` : ''}
         </div>
       </div>
       <div class="timeline" id="nodes-${p.recordId}">
