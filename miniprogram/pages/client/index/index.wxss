@@ -1,0 +1,91 @@
+/* pages/client/index/index.wxss */
+.page-header {
+  margin-bottom: 32rpx;
+}
+.page-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #2C3E35;
+}
+.page-sub {
+  font-size: 26rpx;
+  color: #9AA8A2;
+  margin-top: 4rpx;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+.proj-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+.proj-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2C3E35;
+  flex: 1;
+}
+.proj-info {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 20rpx;
+}
+.proj-info-item {
+  font-size: 24rpx;
+  color: #9AA8A2;
+}
+.proj-progress {
+  margin-bottom: 16rpx;
+}
+.proj-stage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #F0F4F2;
+}
+.stage-label {
+  font-size: 24rpx;
+  color: #9AA8A2;
+}
+.stage-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #5A7D6B;
+}
+
+.empty {
+  text-align: center;
+  padding: 120rpx 0;
+}
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+.empty-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #9AA8A2;
+  margin-top: 8rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 60rpx;
+  color: #9AA8A2;
+}
+
+.logout-btn {
+  text-align: center;
+  padding: 24rpx;
+  color: #F44336;
+  font-size: 26rpx;
+  margin-top: 40rpx;
+}

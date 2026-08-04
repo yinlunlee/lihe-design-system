@@ -1,0 +1,73 @@
+<!-- pages/staff/upload/upload.wxml -->
+<view class="container">
+  <!-- 项目信息 -->
+  <view class="card">
+    <view class="proj-name">{{projectName}}</view>
+    <view class="upload-hint">上传成果后客户将收到通知</view>
+  </view>
+
+  <!-- 选择阶段 -->
+  <view class="card">
+    <view class="field-label">上传节点 <text class="req">*</text></view>
+    <view class="field-hint">选择当前对应的施工阶段</view>
+    <picker mode="selector" range="{{stages}}" value="{{stageIndex}}" bindchange="onStageChange">
+      <view class="picker-box {{stageIndex >= 0 ? 'selected' : ''}}">
+        <text wx:if="{{stageIndex >= 0}}">{{stage}}</text>
+        <text wx:else class="picker-placeholder">请选择阶段</text>
+        <text class="picker-arrow">▾</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 上传描述 -->
+  <view class="card">
+    <view class="field-label">上传描述</view>
+    <view class="field-hint">简要说明本次上传内容</view>
+    <textarea class="desc-input" placeholder="如：客厅水电完工照片、施工图纸等" maxlength="500" bindinput="onDescInput" value="{{description}}" />
+  </view>
+
+  <!-- 文件选择 -->
+  <view class="card">
+    <view class="field-label">文件上传 <text class="req">*</text></view>
+    <view class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个，50MB以内</view>
+
+    <!-- 选择按钮 -->
+    <view class="upload-actions">
+      <view class="upload-btn" bindtap="takePhoto">
+        <text class="upload-icon">📷</text>
+        <text>拍照</text>
+      </view>
+      <view class="upload-btn" bindtap="chooseImage">
+        <text class="upload-icon">🖼</text>
+        <text>图片</text>
+      </view>
+      <view class="upload-btn" bindtap="chooseFiles">
+        <text class="upload-icon">📎</text>
+        <text>文件上传</text>
+      </view>
+      <view class="upload-btn" bindtap="chooseVideo">
+        <text class="upload-icon">🎥</text>
+        <text>视频</text>
+      </view>
+    </view>
+
+    <!-- 已选文件 -->
+    <view class="files-list" wx:if="{{files.length > 0}}">
+      <file-item wx:for="{{files}}" wx:key="name"
+        name="{{item.name}}" size="{{item.size}}" removable="{{true}}"
+        bind:tap="previewFile" bind:remove="removeFile" data-index="{{index}}"></file-item>
+    </view>
+  </view>
+
+  <!-- 上传进度 -->
+  <view class="progress-bar" wx:if="{{uploadProgress}}">
+    <text>{{uploadProgress}}</text>
+  </view>
+
+  <!-- 提交 -->
+  <button class="btn btn-primary submit-btn" bindtap="submit"
+    disabled="{{submitting || stageIndex < 0 || files.length === 0}}"
+    loading="{{submitting}}">
+    {{submitting ? '上传中...' : '上传并通知客户'}}
+  </button>
+</view>

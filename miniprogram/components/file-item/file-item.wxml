@@ -1,0 +1,9 @@
+<!-- components/file-item/file-item.wxml -->
+<view class="file-item" bindtap="onTap">
+  <view class="file-icon">{{icon}}</view>
+  <view class="file-info">
+    <text class="file-name">{{name}}</text>
+    <text class="file-meta">{{label}}<text wx:if="{{sizeText}}"> · {{sizeText}}</text></text>
+  </view>
+  <view wx:if="{{removable}}" class="file-remove" catchtap="onRemove">✕</view>
+</view>

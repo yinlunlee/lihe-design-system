@@ -1,0 +1,7 @@
+<!-- components/progress-bar/progress-bar.wxml -->
+<view class="progress-wrapper">
+  <view class="progress-bar">
+    <view class="progress-fill" style="width: {{progress}}%; background: {{barColor}};"></view>
+  </view>
+  <text wx:if="{{showText}}" class="progress-text">{{progress}}%</text>
+</view>

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "file-item": "/components/file-item/file-item"
+  },
+  "navigationBarTitleText": "上传成果"
+}

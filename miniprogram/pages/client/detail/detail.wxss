@@ -1,0 +1,162 @@
+/* pages/client/detail/detail.wxss */
+.proj-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #2C3E35;
+  margin-bottom: 20rpx;
+}
+.proj-meta {
+  margin-bottom: 24rpx;
+}
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+.meta-label {
+  font-size: 26rpx;
+  color: #9AA8A2;
+}
+.meta-value {
+  font-size: 26rpx;
+  color: #2C3E35;
+  font-weight: 500;
+}
+.proj-progress-box {
+  padding: 20rpx 0;
+  border-top: 2rpx solid #F0F4F2;
+}
+.proj-progress-label {
+  font-size: 24rpx;
+  color: #9AA8A2;
+  margin-bottom: 12rpx;
+}
+.proj-current-stage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx solid #F0F4F2;
+}
+.cs-label {
+  font-size: 24rpx;
+  color: #9AA8A2;
+}
+.cs-value {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5A7D6B;
+}
+
+/* Tab */
+.tab-bar {
+  display: flex;
+  margin-bottom: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 8rpx;
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  color: #9AA8A2;
+  border-radius: 12rpx;
+}
+.tab-item.active {
+  background: #5A7D6B;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 节点卡片 */
+.node-card {
+  margin-bottom: 20rpx;
+}
+.node-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.node-stage {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2C3E35;
+}
+.node-desc {
+  font-size: 26rpx;
+  color: #6B7B73;
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+.node-time {
+  font-size: 22rpx;
+  color: #9AA8A2;
+  margin-bottom: 16rpx;
+}
+.node-files {
+  margin-bottom: 16rpx;
+}
+.files-title {
+  font-size: 24rpx;
+  color: #9AA8A2;
+  margin-bottom: 12rpx;
+}
+.node-actions {
+  margin-top: 20rpx;
+}
+.node-btn {
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+.node-confirmed {
+  text-align: center;
+  color: #4CAF50;
+  font-size: 26rpx;
+  padding: 16rpx;
+}
+.node-rejected {
+  text-align: center;
+  color: #F44336;
+  font-size: 24rpx;
+  padding: 16rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+}
+.empty-icon {
+  font-size: 60rpx;
+  margin-bottom: 12rpx;
+}
+.empty-hint {
+  display: block;
+  font-size: 22rpx;
+  color: #9AA8A2;
+  margin-top: 4rpx;
+}
+
+.video-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.video-player {
+  width: 100%;
+}
+
+.loading {
+  text-align: center;
+  padding: 40rpx;
+  color: #9AA8A2;
+}

@@ -1,0 +1,11 @@
+/* pages/boss/pending/pending.wxss */
+.pending-card { background: #fff; border-radius: 16rpx; padding: 28rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04); }
+.pending-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
+.pending-stage { font-size: 30rpx; font-weight: 700; color: #2C3E35; }
+.pending-info { display: flex; gap: 24rpx; margin-bottom: 8rpx; }
+.pending-info text { font-size: 24rpx; color: #9AA8A2; }
+.pending-desc { font-size: 26rpx; color: #6B7B73; margin-top: 8rpx; line-height: 1.5; }
+.empty { text-align: center; padding: 80rpx 0; }
+.empty-icon { font-size: 60rpx; margin-bottom: 12rpx; color: #4CAF50; }
+.empty-hint { display: block; font-size: 22rpx; color: #9AA8A2; margin-top: 4rpx; }
+.loading { text-align: center; padding: 40rpx; color: #9AA8A2; }

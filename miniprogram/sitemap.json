@@ -1,0 +1,7 @@
+{
+  "desc": "立和设计小程序 - 关于本文件，请参考文档 https://developers.weixin.qq.com/miniprogram/dev/framework/sitemap.html",
+  "rules": [{
+    "action": "allow",
+    "page": "*"
+  }]
+}

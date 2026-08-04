@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "progress-bar": "/components/progress-bar/progress-bar",
+    "timeline": "/components/timeline/timeline",
+    "file-item": "/components/file-item/file-item"
+  },
+  "navigationBarTitleText": "项目详情",
+  "enablePullDownRefresh": true
+}

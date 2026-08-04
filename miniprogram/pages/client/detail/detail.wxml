@@ -1,0 +1,92 @@
+<!-- pages/client/detail/detail.wxml -->
+<view class="container">
+  <!-- 项目信息卡片 -->
+  <view class="card" wx:if="{{project}}">
+    <view class="proj-name">{{project.name || projectName}}</view>
+    <view class="proj-meta">
+      <view class="meta-row">
+        <text class="meta-label">客户</text>
+        <text class="meta-value">{{project.clientName || '—'}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">地址</text>
+        <text class="meta-value">{{project.address || '—'}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">面积</text>
+        <text class="meta-value">{{project.area || '—'}}㎡</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-label">设计师</text>
+        <text class="meta-value">{{project.designLead || '—'}}</text>
+      </view>
+    </view>
+    <view class="proj-progress-box">
+      <view class="proj-progress-label">项目进度</view>
+      <progress-bar progress="{{project.progress || 0}}"></progress-bar>
+    </view>
+    <view class="proj-current-stage" wx:if="{{project.currentStage}}">
+      <text class="cs-label">当前阶段</text>
+      <text class="cs-value">{{project.currentStage}}</text>
+    </view>
+  </view>
+
+  <!-- Tab切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'timeline' ? 'active' : ''}}" bindtap="switchTab" data-tab="timeline">阶段进度</view>
+    <view class="tab-item {{activeTab === 'nodes' ? 'active' : ''}}" bindtap="switchTab" data-tab="nodes">确认节点 ({{nodes.length}})</view>
+  </view>
+
+  <!-- 阶段时间线 -->
+  <view class="card" wx:if="{{activeTab === 'timeline'}}">
+    <timeline currentStage="{{project.currentStage}}" completedStages="{{[]}}"></timeline>
+  </view>
+
+  <!-- 确认节点列表 -->
+  <view class="nodes-list" wx:if="{{activeTab === 'nodes'}}">
+    <block wx:if="{{nodes.length > 0}}">
+      <view class="card node-card" wx:for="{{nodes}}" wx:key="recordId">
+        <view class="node-top">
+          <view class="node-stage">{{item.stage || item.nodeStage || '未指定阶段'}}</view>
+          <view class="badge {{item.status === 'confirmed' ? 'badge-green' : (item.status === 'rejected' ? 'badge-red' : 'badge-amber')}}">{{item.status === 'confirmed' ? '已确认' : (item.status === 'rejected' ? '已驳回' : '待确认')}}</view>
+        </view>
+        <view class="node-desc" wx:if="{{item.description}}">{{item.description}}</view>
+        <view class="node-time" wx:if="{{item.uploadTime}}">上传时间: {{item.uploadTime}}</view>
+
+        <!-- 附件列表 -->
+        <view class="node-files" wx:if="{{item.attachments && item.attachments.length > 0}}">
+          <view class="files-title">成果附件</view>
+          <file-item wx:for="{{item.attachments}}" wx:for-item="att" wx:key="name"
+            name="{{att.name}}" url="{{att.url}}"
+            bind:tap="onFileTap"></file-item>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="node-actions" wx:if="{{item.status !== 'confirmed' && item.status !== 'rejected'}}">
+          <button class="btn btn-primary node-btn" bindtap="goConfirm" data-node="{{item}}">查看并确认</button>
+        </view>
+        <view class="node-confirmed" wx:if="{{item.status === 'confirmed'}}">
+          <text>✓ 已于 {{item.confirmTime || ''}} 确认</text>
+        </view>
+        <view class="node-rejected" wx:if="{{item.status === 'rejected'}}">
+          <text>驳回意见: {{item.clientFeedback || '无'}}</text>
+        </view>
+      </view>
+    </block>
+    <view class="empty" wx:if="{{nodes.length === 0}}">
+      <view class="empty-icon">📭</view>
+      <text>暂无确认节点</text>
+      <text class="empty-hint">设计师上传成果后会出现</text>
+    </view>
+  </view>
+
+  <!-- 视频弹窗 -->
+  <view class="video-mask" wx:if="{{showVideo}}" bindtap="closeVideo">
+    <video src="{{videoUrl}}" autoplay="{{true}}" controls="{{true}}" class="video-player"></video>
+  </view>
+
+  <!-- 加载 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

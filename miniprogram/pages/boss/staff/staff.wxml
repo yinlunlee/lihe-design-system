@@ -1,0 +1,32 @@
+<!-- pages/boss/staff/staff.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <block wx:if="{{stats && stats.byStaff}}">
+    <view class="staff-card" wx:for="{{stats.byStaff}}" wx:key="staffId">
+      <view class="staff-header">
+        <view class="staff-avatar">{{item.staffId}}</view>
+        <view class="staff-info">
+          <view class="staff-id">{{item.staffId}}</view>
+          <view class="staff-role">{{item.role || '员工'}}</view>
+        </view>
+      </view>
+      <view class="staff-stats">
+        <view class="ss-item">
+          <text class="ss-value">{{item.projectCount}}</text>
+          <text class="ss-label">项目数</text>
+        </view>
+        <view class="ss-item">
+          <text class="ss-value">{{item.avgProgress}}%</text>
+          <text class="ss-label">平均进度</text>
+        </view>
+        <view class="ss-item">
+          <text class="ss-value {{item.pendingCount > 0 ? 'warn' : ''}}">{{item.pendingCount}}</text>
+          <text class="ss-label">待确认</text>
+        </view>
+      </view>
+    </view>
+  </block>
+  <view class="empty" wx:if="{{!loading && (!stats || !stats.byStaff || stats.byStaff.length === 0)}}">
+    <text>暂无员工数据</text>
+  </view>
+</view>

@@ -1,0 +1,69 @@
+<!-- pages/staff/inspection/inspection.wxml -->
+<view class="container">
+  <view class="card">
+    <view class="proj-name">{{projectName}}</view>
+    <view class="upload-hint">巡检记录（内部使用，客户不可见）</view>
+  </view>
+
+  <!-- 巡检信息 -->
+  <view class="card">
+    <view class="field-label">巡检阶段 <text class="req">*</text></view>
+    <picker mode="selector" range="{{stages}}" value="{{stageIndex}}" bindchange="onStageChange">
+      <view class="picker-box {{stageIndex >= 0 ? 'selected' : ''}}">
+        <text wx:if="{{stageIndex >= 0}}">{{stage}}</text>
+        <text wx:else class="picker-placeholder">请选择阶段</text>
+        <text class="picker-arrow">▾</text>
+      </view>
+    </picker>
+
+    <view class="field-label" style="margin-top:24rpx">巡检日期</view>
+    <picker mode="date" value="{{inspectDate}}" bindchange="onDateChange">
+      <view class="picker-box selected">
+        <text>{{inspectDate}}</text>
+        <text class="picker-arrow">▾</text>
+      </view>
+    </picker>
+
+    <view class="field-label" style="margin-top:24rpx">巡检人</view>
+    <input class="picker-box-input" placeholder="如张三（默认为工号）" data-field="inspector" bindinput="onInput" value="{{inspector}}" />
+  </view>
+
+  <!-- 备注 -->
+  <view class="card">
+    <view class="field-label">巡检备注</view>
+    <textarea class="desc-input" placeholder="巡检整体情况描述..." maxlength="500" data-field="note" bindinput="onInput" value="{{note}}" />
+  </view>
+
+  <!-- 问题 -->
+  <view class="card">
+    <view class="field-label">发现问题</view>
+    <view class="field-hint">如有问题隐患请详细描述</view>
+    <textarea class="desc-input" placeholder="描述发现的问题..." maxlength="500" data-field="issues" bindinput="onInput" value="{{issues}}" />
+  </view>
+
+  <!-- 照片 -->
+  <view class="card">
+    <view class="field-label">巡检照片 <text class="req">*</text></view>
+    <view class="upload-actions">
+      <view class="upload-btn" bindtap="takePhoto">
+        <text class="upload-icon">📷</text>
+        <text>拍照</text>
+      </view>
+      <view class="upload-btn" bindtap="chooseImage">
+        <text class="upload-icon">🖼</text>
+        <text>相册选择</text>
+      </view>
+    </view>
+    <view class="files-list" wx:if="{{files.length > 0}}">
+      <file-item wx:for="{{files}}" wx:key="name"
+        name="{{item.name}}" size="{{item.size}}" removable="{{true}}"
+        bind:remove="removeFile" data-index="{{index}}"></file-item>
+    </view>
+  </view>
+
+  <button class="btn btn-primary submit-btn" bindtap="submit"
+    disabled="{{submitting || stageIndex < 0 || files.length === 0}}"
+    loading="{{submitting}}">
+    {{submitting ? '上传中...' : '提交巡检记录'}}
+  </button>
+</view>

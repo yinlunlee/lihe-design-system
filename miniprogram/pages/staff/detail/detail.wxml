@@ -1,0 +1,89 @@
+<!-- pages/staff/detail/detail.wxml -->
+<view class="container">
+  <!-- 项目信息 -->
+  <view class="card" wx:if="{{project}}">
+    <view class="proj-name">{{project.name || projectName}}</view>
+    <view class="proj-meta">
+      <view class="meta-row"><text class="meta-label">客户</text><text class="meta-value">{{project.clientName || '—'}}</text></view>
+      <view class="meta-row"><text class="meta-label">电话</text><text class="meta-value">{{project.clientPhone || '—'}}</text></view>
+      <view class="meta-row"><text class="meta-label">地址</text><text class="meta-value">{{project.address || '—'}}</text></view>
+      <view class="meta-row"><text class="meta-label">面积</text><text class="meta-value">{{project.area || '—'}}㎡</text></view>
+      <view class="meta-row"><text class="meta-label">合同额</text><text class="meta-value">{{project.totalAmount || project.paidAmount || '—'}}</text></view>
+    </view>
+    <view class="proj-progress-box">
+      <view class="proj-progress-label">项目进度</view>
+      <progress-bar progress="{{project.progress || 0}}"></progress-bar>
+    </view>
+  </view>
+
+  <!-- Tab -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'timeline' ? 'active' : ''}}" bindtap="switchTab" data-tab="timeline">阶段进度</view>
+    <view class="tab-item {{activeTab === 'nodes' ? 'active' : ''}}" bindtap="switchTab" data-tab="nodes">确认节点 ({{nodes.length}})</view>
+    <view class="tab-item {{activeTab === 'inspection' ? 'active' : ''}}" bindtap="switchTab" data-tab="inspection">巡检 ({{inspections.length}})</view>
+  </view>
+
+  <!-- 时间线 -->
+  <view class="card" wx:if="{{activeTab === 'timeline'}}">
+    <timeline currentStage="{{project.currentStage}}" completedStages="{{[]}}"></timeline>
+  </view>
+
+  <!-- 确认节点 -->
+  <view wx:if="{{activeTab === 'nodes'}}">
+    <view class="card" wx:if="{{nodes.length > 0}}" wx:for="{{nodes}}" wx:key="recordId">
+      <view class="node-top">
+        <text class="node-stage">{{item.stage || '未指定'}}</text>
+        <view class="badge {{item.status === 'confirmed' ? 'badge-green' : (item.status === 'rejected' ? 'badge-red' : 'badge-amber')}}">{{item.status === 'confirmed' ? '已确认' : (item.status === 'rejected' ? '已驳回' : '待确认')}}</view>
+      </view>
+      <view class="node-desc" wx:if="{{item.description}}">{{item.description}}</view>
+      <view class="node-time" wx:if="{{item.uploadTime}}">{{item.uploadTime}}</view>
+      <view class="node-files" wx:if="{{item.attachments && item.attachments.length > 0}}">
+        <file-item wx:for="{{item.attachments}}" wx:for-item="att" wx:key="name"
+          name="{{att.name}}" url="{{att.url}}"
+          bind:tap="onFileTap"></file-item>
+      </view>
+      <view class="node-feedback" wx:if="{{item.clientFeedback}}">
+        <text class="feedback-label">客户意见:</text>
+        <text>{{item.clientFeedback}}</text>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{nodes.length === 0}}">
+      <view class="empty-icon">📭</view>
+      <text>暂无确认节点</text>
+    </view>
+    <view class="fab" bindtap="goUpload">📎</view>
+  </view>
+
+  <!-- 巡检记录 -->
+  <view wx:if="{{activeTab === 'inspection'}}">
+    <view class="card" wx:if="{{inspections.length > 0}}" wx:for="{{inspections}}" wx:key="recordId">
+      <view class="insp-top">
+        <text class="insp-stage">{{item.stage || item.inspectionStage || '巡检'}}</text>
+        <text class="insp-date">{{item.date || item.inspectDate || ''}}</text>
+      </view>
+      <view class="insp-person" wx:if="{{item.inspector}}">巡检人: {{item.inspector}}</view>
+      <view class="insp-note" wx:if="{{item.note || item.remark}}">{{item.note || item.remark}}</view>
+      <view class="insp-issue" wx:if="{{item.issues}}">
+        <text class="issue-label">发现问题:</text>
+        <text>{{item.issues}}</text>
+      </view>
+      <view class="insp-files" wx:if="{{item.attachments && item.attachments.length > 0}}">
+        <file-item wx:for="{{item.attachments}}" wx:for-item="att" wx:key="name"
+          name="{{att.name}}" url="{{att.url}}"
+          bind:tap="onFileTap"></file-item>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{inspections.length === 0}}">
+      <view class="empty-icon">📋</view>
+      <text>暂无巡检记录</text>
+    </view>
+    <view class="fab" bindtap="goInspection">📝</view>
+  </view>
+
+  <!-- 视频弹窗 -->
+  <view class="video-mask" wx:if="{{showVideo}}" bindtap="closeVideo">
+    <video src="{{videoUrl}}" autoplay="{{true}}" controls="{{true}}"></video>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+</view>

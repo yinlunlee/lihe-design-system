@@ -1,0 +1,19 @@
+<!-- components/timeline/timeline.wxml -->
+<view class="timeline">
+  <block wx:for="{{groups}}" wx:key="name">
+    <view class="tl-group">
+      <view class="tl-group-title">{{item.name}}</view>
+      <block wx:for="{{item.items}}" wx:for-item="stage" wx:key="name">
+        <view class="tl-item {{stage.status}}">
+          <view class="tl-dot {{stage.status}}">
+            <text wx:if="{{stage.status === 'done'}}">✓</text>
+            <text wx:elif="{{stage.status === 'current'}}">●</text>
+            <text wx:else>○</text>
+          </view>
+          <view class="tl-line {{stage.status}}" wx:if="{{index < groups.length - 1 || true}}"></view>
+          <text class="tl-label {{stage.status}}">{{stage.name}}</text>
+        </view>
+      </block>
+    </view>
+  </block>
+</view>

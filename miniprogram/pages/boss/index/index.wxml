@@ -1,0 +1,73 @@
+<!-- pages/boss/index/index.wxml -->
+<view class="container">
+  <view class="page-header">
+    <view class="page-title">管理后台</view>
+    <view class="page-sub">立和设计 · 全局视图</view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-grid" wx:if="{{stats}}">
+    <view class="stat-card">
+      <view class="stat-value">{{stats.totalProjects || 0}}</view>
+      <view class="stat-label">项目总数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value">{{stats.activeProjects || 0}}</view>
+      <view class="stat-label">进行中</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value warn">{{stats.pendingConfirmations || 0}}</view>
+      <view class="stat-label">待确认</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value">{{stats.totalStaff || 0}}</view>
+      <view class="stat-label">员工数</view>
+    </view>
+  </view>
+
+  <!-- 进度分布 -->
+  <view class="card" wx:if="{{stats}}">
+    <view class="section-title">进度分布</view>
+    <view class="dist-row" wx:for="{{stats.progressDist}}" wx:key="range">
+      <text class="dist-label">{{item.range}}</text>
+      <view class="dist-bar">
+        <view class="dist-fill" style="width: {{item.percent}}%"></view>
+      </view>
+      <text class="dist-num">{{item.count}}</text>
+    </view>
+  </view>
+
+  <!-- 员工概览 -->
+  <view class="card" wx:if="{{stats && stats.byStaff}}">
+    <view class="section-title">员工工作概览</view>
+    <view class="staff-row" wx:for="{{stats.byStaff}}" wx:key="staffId">
+      <view class="staff-info">
+        <text class="staff-id">{{item.staffId}}</text>
+        <text class="staff-proj">{{item.projectCount}}个项目</text>
+      </view>
+      <view class="staff-prog">
+        <text class="avg-prog">均进{{item.avgProgress}}%</text>
+        <text class="pending" wx:if="{{item.pendingCount > 0}}">待确认{{item.pendingCount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-grid">
+    <view class="quick-card" bindtap="goProjects">
+      <view class="quick-icon">📋</view>
+      <text>项目列表</text>
+    </view>
+    <view class="quick-card" bindtap="goStaff">
+      <view class="quick-icon">👥</view>
+      <text>员工管理</text>
+    </view>
+    <view class="quick-card" bindtap="goPending">
+      <view class="quick-icon">⏳</view>
+      <text>待确认 ({{stats.pendingConfirmations || 0}})</text>
+    </view>
+  </view>
+
+  <view class="logout-btn" bindtap="onLogout">退出登录</view>
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+</view>

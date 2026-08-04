@@ -1,0 +1,13 @@
+/* pages/boss/staff/staff.wxss */
+.staff-card { background: #fff; border-radius: 16rpx; padding: 28rpx; margin-bottom: 20rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04); }
+.staff-header { display: flex; align-items: center; margin-bottom: 24rpx; }
+.staff-avatar { width: 80rpx; height: 80rpx; border-radius: 50%; background: linear-gradient(135deg, #3F5D50, #5A7D6B); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: 700; margin-right: 20rpx; }
+.staff-id { font-size: 32rpx; font-weight: 700; color: #2C3E35; }
+.staff-role { font-size: 24rpx; color: #9AA8A2; }
+.staff-stats { display: flex; justify-content: space-around; padding-top: 20rpx; border-top: 2rpx solid #F0F4F2; }
+.ss-item { text-align: center; }
+.ss-value { font-size: 36rpx; font-weight: 700; color: #5A7D6B; display: block; }
+.ss-value.warn { color: #FF9800; }
+.ss-label { font-size: 22rpx; color: #9AA8A2; }
+.empty { text-align: center; padding: 80rpx 0; color: #9AA8A2; }
+.loading { text-align: center; padding: 40rpx; color: #9AA8A2; }

@@ -1,0 +1,53 @@
+<!-- pages/client/confirm/confirm.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:if="{{node && !loading}}">
+    <!-- 节点信息 -->
+    <view class="card">
+      <view class="confirm-stage">{{stage}}</view>
+      <view class="confirm-desc" wx:if="{{node.description}}">{{node.description}}</view>
+      <view class="confirm-time" wx:if="{{node.uploadTime}}">上传时间: {{node.uploadTime}}</view>
+    </view>
+
+    <!-- 附件列表 -->
+    <view class="card" wx:if="{{node.attachments && node.attachments.length > 0}}">
+      <view class="section-title">成果附件</view>
+      <view class="files-tip">点击可预览/下载文件</view>
+      <file-item wx:for="{{node.attachments}}" wx:key="name"
+        name="{{item.name}}" url="{{item.url}}"
+        bind:tap="onFileTap"></file-item>
+    </view>
+
+    <!-- 操作选择 -->
+    <view class="card">
+      <view class="section-title">确认结果</view>
+      <view class="action-row">
+        <view class="action-card {{action === 'confirm' ? 'selected confirm' : ''}}" bindtap="selectAction" data-action="confirm">
+          <view class="action-icon">✓</view>
+          <text>确认通过</text>
+        </view>
+        <view class="action-card {{action === 'reject' ? 'selected reject' : ''}}" bindtap="selectAction" data-action="reject">
+          <view class="action-icon">✕</view>
+          <text>需要修改</text>
+        </view>
+      </view>
+
+      <!-- 修改意见 -->
+      <view class="feedback-box" wx:if="{{action === 'reject'}}">
+        <view class="feedback-label">修改意见 <text class="req">*</text></view>
+        <textarea class="feedback-input" placeholder="请填写需要修改的具体内容..." maxlength="500" bindinput="onInput" value="{{feedback}}" />
+      </view>
+    </view>
+
+    <!-- 提交 -->
+    <button class="btn btn-primary submit-btn" bindtap="onSubmit" disabled="{{!action || submitting}}" loading="{{submitting}}">
+      {{action === 'reject' ? '提交驳回' : (action === 'confirm' ? '提交确认' : '请选择操作')}}
+    </button>
+  </block>
+
+  <view class="empty" wx:if="{{!node && !loading}}">
+    <view class="empty-icon">⚠</view>
+    <text>节点信息加载失败</text>
+  </view>
+</view>

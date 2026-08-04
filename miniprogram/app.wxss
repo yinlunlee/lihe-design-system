@@ -1,0 +1,134 @@
+/* app.wxss - 立和设计小程序全局样式 */
+
+/* 主题色 */
+page {
+  --sage: #5A7D6B;
+  --sage-dark: #3F5D50;
+  --sage-light: #7A9D8B;
+  --sage-bg: #F0F4F2;
+  --green: #4CAF50;
+  --amber: #FF9800;
+  --red: #F44336;
+  --blue: #2196F3;
+  --bg: #F5F6F4;
+  --card: #FFFFFF;
+  --text: #2C3E35;
+  --text-2: #6B7B73;
+  --text-light: #9AA8A2;
+  --border: #E0E5E2;
+
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+/* 容器 */
+.container {
+  padding: 24rpx;
+}
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+/* 标题 */
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--sage-dark);
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--sage);
+  line-height: 1.4;
+}
+
+/* 标签 */
+.label {
+  font-size: 24rpx;
+  color: var(--text-2);
+  margin-bottom: 8rpx;
+}
+
+.value {
+  font-size: 28rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* 徽章 */
+.badge {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+.badge-green { background: #E8F5E9; color: #2E7D32; }
+.badge-amber { background: #FFF3E0; color: #E65100; }
+.badge-red   { background: #FFEBEE; color: #C62828; }
+.badge-blue  { background: #E3F2FD; color: #1565C0; }
+.badge-gray  { background: #ECEFF1; color: #546E7A; }
+.badge-sage  { background: #E8F0EC; color: var(--sage-dark); }
+
+/* 按钮 */
+.btn {
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+  color: #fff;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--sage);
+  border: 2rpx solid var(--sage);
+}
+.btn-disabled {
+  background: #ccc;
+  color: #999;
+}
+
+/* 输入框 */
+.input {
+  height: 88rpx;
+  background: var(--sage-bg);
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  border: 2rpx solid transparent;
+}
+.input:focus {
+  border-color: var(--sage);
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+  color: var(--text-light);
+}
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+/* flex工具 */
+.flex-row { display: flex; flex-direction: row; align-items: center; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+.gap-sm { gap: 12rpx; }
+.gap-md { gap: 20rpx; }
+.justify-between { justify-content: space-between; }

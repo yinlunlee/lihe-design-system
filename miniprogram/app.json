@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/client/index/index",
+    "pages/client/detail/detail",
+    "pages/client/confirm/confirm",
+    "pages/staff/index/index",
+    "pages/staff/detail/detail",
+    "pages/staff/upload/upload",
+    "pages/staff/inspection/inspection",
+    "pages/boss/index/index",
+    "pages/boss/projects/projects",
+    "pages/boss/staff/staff",
+    "pages/boss/pending/pending"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#3F5D50",
+    "navigationBarTitleText": "立和设计",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F0F4F2"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#5A7D6B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/client/index/index",
+        "text": "我的项目"
+      },
+      {
+        "pagePath": "pages/staff/index/index",
+        "text": "工作台"
+      },
+      {
+        "pagePath": "pages/boss/index/index",
+        "text": "管理"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

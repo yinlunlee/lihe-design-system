@@ -1,0 +1,29 @@
+<!-- pages/boss/pending/pending.wxml -->
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:if="{{pending.length > 0}}">
+    <view class="pending-card" wx:for="{{pending}}" wx:key="recordId">
+      <view class="pending-top">
+        <view class="pending-stage">{{item.stage || '未指定阶段'}}</view>
+        <view class="badge {{item.daysWaiting > 3 ? 'badge-red' : 'badge-amber'}}">
+          {{item.daysWaiting || 0}}天
+        </view>
+      </view>
+      <view class="pending-info">
+        <text>🏠 {{item.projectName || '—'}}</text>
+      </view>
+      <view class="pending-info">
+        <text>👤 {{item.staffId || '—'}}</text>
+        <text>📅 {{item.uploadTime || '—'}}</text>
+      </view>
+      <view class="pending-desc" wx:if="{{item.description}}">{{item.description}}</view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && pending.length === 0}}">
+    <view class="empty-icon">✓</view>
+    <text>暂无待确认节点</text>
+    <text class="empty-hint">客户已确认全部节点</text>
+  </view>
+</view>

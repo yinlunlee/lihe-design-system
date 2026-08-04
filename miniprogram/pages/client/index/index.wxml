@@ -1,0 +1,44 @@
+<!-- pages/client/index/index.wxml -->
+<view class="container">
+  <!-- 顶部信息 -->
+  <view class="page-header">
+    <view class="page-title">我的项目</view>
+    <view class="page-sub">{{phone}}</view>
+  </view>
+
+  <!-- 项目列表 -->
+  <block wx:if="{{projects.length > 0}}">
+    <view class="project-card" wx:for="{{projects}}" wx:key="recordId" bindtap="goDetail" data-project="{{item}}">
+      <view class="proj-top">
+        <view class="proj-name">{{item.name || item.projectName || '未命名项目'}}</view>
+        <view class="badge {{item.status === '进行中' ? 'badge-green' : 'badge-gray'}}">{{item.status || '进行中'}}</view>
+      </view>
+      <view class="proj-info">
+        <text class="proj-info-item">📍 {{item.address || '地址待定'}}</text>
+        <text class="proj-info-item">📐 {{item.area || '—'}}㎡</text>
+      </view>
+      <view class="proj-progress">
+        <progress-bar progress="{{item.progress || 0}}" label="进度"></progress-bar>
+      </view>
+      <view class="proj-stage">
+        <text class="stage-label">当前阶段</text>
+        <text class="stage-value">{{item.currentStage || '—'}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && projects.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <text>暂无项目信息</text>
+    <text class="empty-hint">请联系设计师确认手机号是否正确</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 退出 -->
+  <view class="logout-btn" bindtap="onLogout" wx:if="{{projects.length > 0}}">退出登录</view>
+</view>

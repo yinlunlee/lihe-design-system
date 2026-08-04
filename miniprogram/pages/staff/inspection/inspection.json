@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "file-item": "/components/file-item/file-item"
+  },
+  "navigationBarTitleText": "巡检记录"
+}

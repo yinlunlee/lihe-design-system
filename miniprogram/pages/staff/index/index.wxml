@@ -1,0 +1,39 @@
+<!-- pages/staff/index/index.wxml -->
+<view class="container">
+  <view class="page-header">
+    <view class="page-title">工作台</view>
+    <view class="page-sub">工号: {{staffId}} · 负责项目 {{projects.length}} 个</view>
+  </view>
+
+  <block wx:if="{{projects.length > 0}}">
+    <view class="project-card" wx:for="{{projects}}" wx:key="recordId">
+      <view class="card-top" bindtap="goDetail" data-project="{{item}}">
+        <view class="proj-name">{{item.name || '未命名项目'}}</view>
+        <view class="badge badge-sage">{{item.status || '进行中'}}</view>
+      </view>
+      <view class="proj-info" bindtap="goDetail" data-project="{{item}}">
+        <text>🏠 {{item.clientName || '—'}}</text>
+        <text>📍 {{item.address || '—'}}</text>
+      </view>
+      <view class="proj-progress">
+        <progress-bar progress="{{item.progress || 0}}"></progress-bar>
+      </view>
+      <view class="proj-stage">
+        <text>{{item.currentStage || '未开始'}}</text>
+      </view>
+      <view class="card-actions">
+        <view class="action-btn upload" catchtap="goUpload" data-project="{{item}}">📎 上传成果</view>
+        <view class="action-btn detail" catchtap="goDetail" data-project="{{item}}">查看详情 ›</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && projects.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <text>暂无负责的项目</text>
+    <text class="empty-hint">请联系管理员分配项目</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <view class="logout-btn" bindtap="onLogout" wx:if="{{projects.length > 0}}">退出登录</view>
+</view>

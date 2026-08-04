@@ -1,0 +1,43 @@
+<!-- pages/boss/projects/projects.wxml -->
+<view class="container">
+  <!-- 筛选 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{['全部员工'].concat(staffList)}}" bindchange="onFilterStaff">
+      <view class="filter-item">
+        <text>{{filterStaff || '全部员工'}}</text>
+        <text class="filter-arrow">▾</text>
+      </view>
+    </picker>
+    <picker mode="selector" range="{{['全部', '进行中', '已完成', '待启动']}}" bindchange="onFilterStatus">
+      <view class="filter-item">
+        <text>{{filterStatus || '全部状态'}}</text>
+        <text class="filter-arrow">▾</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 项目列表 -->
+  <view class="project-card" wx:for="{{filtered}}" wx:key="recordId">
+    <view class="card-top">
+      <view class="proj-name">{{item.name || '未命名'}}</view>
+      <view class="badge badge-sage">{{item.status || '进行中'}}</view>
+    </view>
+    <view class="proj-info">
+      <text>🏠 {{item.clientName || '—'}}</text>
+      <text>👤 {{item.staffId || '—'}}</text>
+    </view>
+    <view class="proj-info">
+      <text>📍 {{item.address || '—'}}</text>
+    </view>
+    <view class="proj-progress">
+      <progress-bar progress="{{item.progress || 0}}"></progress-bar>
+    </view>
+    <view class="proj-stage">{{item.currentStage || '—'}}</view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && filtered.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <text>暂无项目</text>
+  </view>
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+</view>

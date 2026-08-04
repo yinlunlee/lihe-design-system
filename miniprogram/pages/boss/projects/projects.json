@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "progress-bar": "/components/progress-bar/progress-bar"
+  },
+  "navigationBarTitleText": "全部项目",
+  "enablePullDownRefresh": true
+}
