@@ -6,21 +6,22 @@
 <title>立和设计 · 员工端</title>
 <style>
   :root {
-    --sage: #5A7D6B;
-    --sage-light: #7A9D8B;
-    --sage-dark: #3F5D50;
-    --sage-bg: #F0F4F2;
-    --sage-border: #C5D5CC;
-    --text-main: #2C3E35;
-    --text-secondary: #5A6B62;
-    --text-light: #8A9B92;
-    --bg: #FAFBF9;
+    --sage: #4A7C59;
+    --sage-light: #6FA07C;
+    --sage-dark: #2D5440;
+    --sage-bg: #EDF5EF;
+    --sage-border: #D4E4D8;
+    --text-main: #1E3829;
+    --text-secondary: #4F6B5A;
+    --text-light: #8BA897;
+    --bg: #F5FAF6;
     --white: #FFFFFF;
-    --accent: #D4A574;
-    --danger: #C75450;
-    --radius: 10px;
-    --radius-lg: 14px;
-    --shadow: 0 2px 12px rgba(90, 125, 107, 0.08);
+    --accent: #C89F6B;
+    --danger: #D95A5A;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --shadow: 0 4px 18px rgba(30, 80, 50, 0.08);
+    --shadow-hover: 0 8px 28px rgba(30, 80, 50, 0.12);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,70 +37,97 @@
     min-height: 100vh;
   }
 
-  /* ===== 登录页 ===== */
-  .login-page { padding: 50px 24px; text-align: center; }
-  .login-logo {
-    width: 56px; height: 56px;
-    background: var(--sage);
-    border-radius: 14px;
-    margin: 0 auto 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; color: var(--white); font-weight: 700;
+  /* 顶部装饰条 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 500px; height: 180px;
+    background: linear-gradient(160deg, var(--sage-dark) 0%, var(--sage) 100%);
+    border-radius: 0 0 28px 28px;
+    z-index: -1;
   }
-  .login-title { font-size: 20px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
-  .login-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 32px; }
+
+  /* ===== 登录页 ===== */
+  .login-page { padding: 70px 28px 40px; text-align: center; }
+  .login-logo {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.28);
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .login-logo img { width: 70%; height: 70%; object-fit: contain; filter: brightness(0) invert(1); }
+  .login-title { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .login-subtitle { font-size: 13px; color: rgba(255,255,255,0.82); margin-bottom: 36px; }
   .login-input {
     width: 100%;
-    padding: 14px 16px;
+    padding: 15px 18px;
     border: 1.5px solid var(--sage-border);
     border-radius: var(--radius);
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     background: var(--white);
     -webkit-appearance: none;
+    transition: all 0.2s ease;
   }
-  .login-input:focus { outline: none; border-color: var(--sage); }
+  .login-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.08); }
   .login-btn {
     width: 100%;
-    padding: 14px;
-    background: var(--sage);
+    padding: 15px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
     color: var(--white);
     border: none;
     border-radius: var(--radius);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 6px 18px rgba(74, 124, 89, 0.25);
+    transition: all 0.2s ease;
   }
-  .login-btn:active { background: var(--sage-dark); }
+  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74, 124, 89, 0.32); }
+  .login-btn:active { background: var(--sage-dark); transform: translateY(0); }
+  .login-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 
   /* ===== 导航栏 ===== */
   .nav-bar {
-    background: var(--white);
-    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--sage-border);
     position: sticky; top: 0; z-index: 100;
+    color: var(--white);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 16px rgba(30, 80, 50, 0.14);
   }
   .nav-brand { display: flex; align-items: center; gap: 8px; }
   .nav-logo {
     width: 28px; height: 28px;
-    background: var(--sage);
-    border-radius: 7px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--white); font-size: 14px; font-weight: 700;
+    color: var(--white); font-size: 12px; font-weight: 700;
+    overflow: hidden;
   }
-  .nav-title { font-size: 16px; font-weight: 600; color: var(--sage-dark); }
-  .nav-user { font-size: 13px; color: var(--text-light); }
+  .nav-logo img { width: 80%; height: 80%; object-fit: contain; filter: brightness(0) invert(1); }
+  .nav-title { font-size: 16px; font-weight: 700; color: var(--white); }
+  .nav-user { font-size: 13px; color: rgba(255,255,255,0.8); }
+  .nav-logout { font-size: 13px; color: rgba(255,255,255,0.85); cursor: pointer; font-weight: 500; }
 
   /* ===== 表单区 ===== */
   .form-section { padding: 16px; }
   .field-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--sage-dark);
-    margin: 16px 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0 0 12px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
   .field-hint {
     font-size: 12px;
@@ -119,11 +147,13 @@
     background: var(--white);
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(30,80,50,0.04);
   }
   .select-tag.active {
     background: var(--sage);
     color: var(--white);
     border-color: var(--sage);
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.2);
   }
   .select-tag:active { transform: scale(0.95); }
 
@@ -137,7 +167,7 @@
     background: var(--white);
     -webkit-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235A7D6B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A7C59' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
   }
@@ -145,30 +175,31 @@
   /* 文本框 */
   .input-text {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border: 1.5px solid var(--sage-border);
     border-radius: var(--radius);
     font-size: 14px;
     background: var(--white);
     -webkit-appearance: none;
+    transition: all 0.2s ease;
   }
-  .input-text:focus { outline: none; border-color: var(--sage); }
+  .input-text:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.08); }
   textarea.input-text { resize: none; min-height: 70px; line-height: 1.6; }
 
   /* ===== 上传区 ===== */
   .upload-area {
     border: 2px dashed var(--sage-border);
     border-radius: var(--radius-lg);
-    padding: 24px 16px;
+    padding: 28px 16px;
     text-align: center;
     background: var(--sage-bg);
     cursor: pointer;
     transition: all 0.2s;
   }
-  .upload-area:active { border-color: var(--sage); background: rgba(90,125,107,0.06); }
-  .upload-icon { font-size: 36px; color: var(--sage); margin-bottom: 8px; }
-  .upload-text { font-size: 14px; color: var(--text-secondary); }
-  .upload-hint { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .upload-area:active { border-color: var(--sage); background: rgba(74, 124, 89, 0.06); }
+  .upload-icon { font-size: 32px; color: var(--sage); margin-bottom: 10px; font-weight: 300; }
+  .upload-text { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+  .upload-hint { font-size: 12px; color: var(--text-light); margin-top: 6px; }
 
   /* 上传按钮行 */
   .upload-actions {
@@ -190,7 +221,7 @@
     gap: 6px;
     transition: all 0.2s;
   }
-  .upload-btn.camera { background: var(--sage); color: var(--white); }
+  .upload-btn.camera { background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%); color: var(--white); box-shadow: 0 4px 14px rgba(74, 124, 89, 0.22); }
   .upload-btn.camera:active { background: var(--sage-dark); }
   .upload-btn.album { background: var(--white); color: var(--sage-dark); border: 1.5px solid var(--sage-border); }
   .upload-btn:active { transform: scale(0.97); }
@@ -208,8 +239,8 @@
   .file-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .file-thumb-file {
     width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; color: var(--sage);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--sage); letter-spacing: 0.5px;
   }
   .file-remove {
     position: absolute; top: 2px; right: 2px;
@@ -225,18 +256,21 @@
   /* 提交按钮 */
   .submit-btn {
     width: 100%;
-    padding: 14px;
-    background: var(--sage);
+    padding: 15px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
     color: var(--white);
     border: none;
     border-radius: var(--radius);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 24px;
     cursor: pointer;
+    box-shadow: 0 6px 18px rgba(74, 124, 89, 0.22);
+    transition: all 0.2s ease;
   }
-  .submit-btn:active { background: var(--sage-dark); }
-  .submit-btn:disabled { opacity: 0.6; }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74, 124, 89, 0.28); }
+  .submit-btn:active { background: var(--sage-dark); transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 
   /* 上传进度 */
   .progress-list { margin-top: 12px; }
@@ -304,16 +338,17 @@
   /* 项目列表 */
   .project-list-item {
     background: var(--white);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 8px;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 10px;
     box-shadow: var(--shadow);
     cursor: pointer;
     transition: all 0.2s;
+    border: 1px solid rgba(212, 228, 216, 0.5);
   }
   .project-list-item:active { transform: scale(0.98); }
-  .project-list-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
-  .project-list-meta { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .project-list-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+  .project-list-meta { font-size: 12px; color: var(--text-light); margin-top: 6px; }
 
   .loading { text-align: center; padding: 40px; color: var(--text-light); }
   .spinner {
@@ -357,14 +392,15 @@
   .detail-card {
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
     box-shadow: var(--shadow);
+    border: 1px solid rgba(212, 228, 216, 0.5);
   }
   .detail-card-title {
-    font-size: 14px; font-weight: 600;
-    color: var(--sage-dark); margin-bottom: 12px;
-    display: flex; align-items: center; gap: 6px;
+    font-size: 15px; font-weight: 700;
+    color: var(--sage-dark); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
   }
   .info-row {
     display: flex; justify-content: space-between;
@@ -467,8 +503,8 @@
   .record-att-file {
     width: 60px; height: 60px;
     border-radius: 6px; background: var(--sage-bg);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; text-decoration: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--sage); text-decoration: none; letter-spacing: 0.5px;
   }
   .status-tag {
     padding: 2px 8px; border-radius: 10px;
@@ -487,23 +523,26 @@
   /* 浮动上传按钮 */
   .fab-upload {
     position: fixed; bottom: 24px; right: 50%; transform: translateX(250px);
-    width: 52px; height: 52px;
-    background: var(--sage); border-radius: 50%;
+    width: 54px; height: 54px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: var(--white); font-size: 24px; font-weight: 300;
-    box-shadow: 0 4px 16px rgba(90,125,107,0.3);
+    color: var(--white); font-size: 26px; font-weight: 300;
+    box-shadow: 0 6px 20px rgba(74, 124, 89, 0.35);
     cursor: pointer; z-index: 50; border: none;
+    transition: all 0.2s ease;
   }
-  .fab-upload:active { transform: translateX(250px) scale(0.92); }
+  .fab-upload:hover { transform: translateX(250px) scale(1.05); }
+  .fab-upload:active { transform: translateX(250px) scale(0.95); }
 </style>
 </head>
 <body>
 
 <!-- ===== 登录页 ===== -->
 <div id="loginPage" class="login-page">
-  <div class="login-logo">立</div>
-  <div class="login-title">立和设计 · 员工端</div>
-  <div class="login-subtitle">工地现场 · 成果上传</div>
+  <div class="login-logo"><img src="/images/logo.png" alt="立和设计"></div>
+  <div class="login-title">员工工作台</div>
+  <div class="login-subtitle">项目协同 · 成果管理</div>
   <input class="login-input" id="staffIdInput" type="text" placeholder="工号（S01庄涛/S02林协莎/S03颜大然/S04王润鹏/S05谢佳润/S06谢建彬）">
   <input class="login-input" id="passwordInput" type="password" placeholder="密码">
   <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
@@ -518,7 +557,7 @@
   <!-- 导航栏 -->
   <div class="nav-bar">
     <div class="nav-brand">
-      <div class="nav-logo">立</div>
+      <div class="nav-logo"><img src="/images/logo.png" alt="立和设计"></div>
       <div class="nav-title">我的项目</div>
     </div>
     <div class="nav-user" id="navUser"></div>
@@ -545,25 +584,25 @@
   <div class="form-section">
     <!-- 项目信息卡片 -->
     <div class="detail-card">
-      <div class="detail-card-title">📋 项目信息</div>
+      <div class="detail-card-title">项目信息</div>
       <div id="detailProjectInfo"></div>
     </div>
 
     <!-- 团队信息卡片 -->
     <div class="detail-card">
-      <div class="detail-card-title">👥 服务团队</div>
+      <div class="detail-card-title">服务团队</div>
       <div id="detailTeamInfo"></div>
     </div>
 
     <!-- 进度卡片 -->
     <div class="detail-card">
-      <div class="detail-card-title">📊 当前进度</div>
+      <div class="detail-card-title">当前进度</div>
       <div id="detailProgress"></div>
     </div>
 
     <!-- 阶段时间线 -->
     <div class="detail-card">
-      <div class="detail-card-title">🗺️ 阶段时间线</div>
+      <div class="detail-card-title">阶段时间线</div>
       <div id="detailTimeline"></div>
     </div>
 
@@ -684,10 +723,10 @@
     <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个</span></div>
     <div class="upload-actions">
       <button class="upload-btn camera" onclick="document.getElementById('cameraInput').click()">
-        📷 拍 照 上 传
+        拍照上传
       </button>
       <button class="upload-btn album" onclick="document.getElementById('albumInput').click()">
-        📎 文 件 上 传
+        文件上传
       </button>
     </div>
     <input type="file" id="cameraInput" accept="image/*,video/*" capture="environment" style="display:none" multiple onchange="handleFiles(this.files)">
@@ -726,18 +765,18 @@
 
   // 文件图标工具
   function getStaffFileIcon(name) {
-    if (!name) return { icon: '📄', label: '文件' };
+    if (!name) return { icon: 'FILE', label: '文件' };
     const ext = name.toLowerCase().split('.').pop();
     const map = {
-      'pdf': { icon: '📕', label: 'PDF' },
-      'doc': { icon: '📘', label: 'Word' }, 'docx': { icon: '📘', label: 'Word' },
-      'ppt': { icon: '📙', label: 'PPT' }, 'pptx': { icon: '📙', label: 'PPT' },
-      'xls': { icon: '📗', label: 'Excel' }, 'xlsx': { icon: '📗', label: 'Excel' },
-      'dwg': { icon: '📐', label: 'CAD' }, 'dxf': { icon: '📐', label: 'CAD' },
-      'zip': { icon: '🗜️', label: 'ZIP' }, 'rar': { icon: '🗜️', label: 'RAR' },
-      'mp4': { icon: '🎥', label: '视频' }, 'mov': { icon: '🎥', label: '视频' },
+      'pdf': { icon: 'PDF', label: 'PDF' },
+      'doc': { icon: 'DOC', label: 'Word' }, 'docx': { icon: 'DOC', label: 'Word' },
+      'ppt': { icon: 'PPT', label: 'PPT' }, 'pptx': { icon: 'PPT', label: 'PPT' },
+      'xls': { icon: 'XLS', label: 'Excel' }, 'xlsx': { icon: 'XLS', label: 'Excel' },
+      'dwg': { icon: 'CAD', label: 'CAD' }, 'dxf': { icon: 'CAD', label: 'CAD' },
+      'zip': { icon: 'ZIP', label: 'ZIP' }, 'rar': { icon: 'ZIP', label: 'RAR' },
+      'mp4': { icon: 'MP4', label: '视频' }, 'mov': { icon: 'MP4', label: '视频' },
     };
-    return map[ext] || { icon: '📄', label: '文件' };
+    return map[ext] || { icon: 'FILE', label: '文件' };
   }
 
   // 全局状态
@@ -1199,25 +1238,25 @@
     const name = file.name.toLowerCase();
     const ext = name.substring(name.lastIndexOf('.') + 1);
     const iconMap = {
-      'pdf': { icon: '📕', label: 'PDF' },
-      'doc': { icon: '📘', label: 'Word' },
-      'docx': { icon: '📘', label: 'Word' },
-      'ppt': { icon: '📙', label: 'PPT' },
-      'pptx': { icon: '📙', label: 'PPT' },
-      'xls': { icon: '📗', label: 'Excel' },
-      'xlsx': { icon: '📗', label: 'Excel' },
-      'dwg': { icon: '📐', label: 'CAD' },
-      'dxf': { icon: '📐', label: 'CAD' },
-      'zip': { icon: '🗜️', label: 'ZIP' },
-      'rar': { icon: '🗜️', label: 'RAR' },
-      '7z': { icon: '🗜️', label: '7Z' },
-      'txt': { icon: '📄', label: 'TXT' },
-      'csv': { icon: '📄', label: 'CSV' },
-      'mp4': { icon: '🎥', label: '视频' },
-      'mov': { icon: '🎥', label: '视频' },
-      'avi': { icon: '🎥', label: '视频' },
+      'pdf': { icon: 'PDF', label: 'PDF' },
+      'doc': { icon: 'DOC', label: 'Word' },
+      'docx': { icon: 'DOC', label: 'Word' },
+      'ppt': { icon: 'PPT', label: 'PPT' },
+      'pptx': { icon: 'PPT', label: 'PPT' },
+      'xls': { icon: 'XLS', label: 'Excel' },
+      'xlsx': { icon: 'XLS', label: 'Excel' },
+      'dwg': { icon: 'CAD', label: 'CAD' },
+      'dxf': { icon: 'CAD', label: 'CAD' },
+      'zip': { icon: 'ZIP', label: 'ZIP' },
+      'rar': { icon: 'ZIP', label: 'RAR' },
+      '7z': { icon: 'ZIP', label: '7Z' },
+      'txt': { icon: 'TXT', label: 'TXT' },
+      'csv': { icon: 'CSV', label: 'CSV' },
+      'mp4': { icon: 'MP4', label: '视频' },
+      'mov': { icon: 'MP4', label: '视频' },
+      'avi': { icon: 'MP4', label: '视频' },
     };
-    return iconMap[ext] || { icon: '📄', label: '文件' };
+    return iconMap[ext] || { icon: 'FILE', label: '文件' };
   }
 
   function renderFilePreview() {
@@ -1227,9 +1266,9 @@
       if (f.preview && f.preview.startsWith('data:')) {
         inner = `<img src="${f.preview}" alt="${f.file.name}">`;
       } else if (f.preview === 'video') {
-        inner = `<div class="file-thumb-file">🎥</div>`;
+        inner = `<div class="file-thumb-file">VIDEO<div style="font-size:9px;margin-top:2px;color:var(--text-light);">视频</div></div>`;
       } else {
-        const fi = f.fileIcon || { icon: '📄', label: '文件' };
+        const fi = f.fileIcon || { icon: 'FILE', label: '文件' };
         inner = `<div class="file-thumb-file">${fi.icon}<div style="font-size:9px;margin-top:2px;color:var(--text-light);">${fi.label}</div></div>`;
       }
       const fileSize = (f.file.size / 1024 / 1024).toFixed(1);

@@ -6,19 +6,22 @@
 <title>立和设计 · 管理总台</title>
 <style>
 :root {
-  --primary: #2C3E50;
-  --accent: #3498DB;
-  --success: #27AE60;
-  --warning: #F39C12;
-  --danger: #E74C3C;
-  --bg: #F5F7FA;
+  --primary: #2D5440;
+  --accent: #4A7C59;
+  --accent-light: #6FA07C;
+  --success: #4A7C59;
+  --warning: #D4945A;
+  --danger: #D95A5A;
+  --bg: #F5FAF6;
   --card: #FFFFFF;
-  --border: #E1E8ED;
-  --text-main: #2C3E50;
-  --text-light: #7F8C8D;
+  --border: #D4E4D8;
+  --text-main: #1E3829;
+  --text-light: #8BA897;
   --text-white: #FFFFFF;
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 4px 18px rgba(30, 80, 50, 0.08);
+  --shadow-soft: 0 2px 8px rgba(30, 80, 50, 0.06);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text-main); }
@@ -34,24 +37,26 @@ let state = { staffId: '', password: '', data: null, filter: { staff: '', stage:
 // ===== Login =====
 function renderLogin() {
   document.getElementById('app').innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2C3E50,#34495E);">
-      <div style="background:#fff;padding:40px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.2);width:360px;">
-        <div style="text-align:center;margin-bottom:30px;">
-          <div style="width:60px;height:60px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:#fff;font-weight:700;">立</div>
-          <h2 style="font-size:20px;color:var(--primary);">管理总台</h2>
-          <p style="font-size:13px;color:var(--text-light);margin-top:4px;">立和设计 · 全局管理视角</p>
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);padding:20px;">
+      <div style="background:#fff;padding:40px 36px;border-radius:24px;box-shadow:0 20px 60px rgba(30,80,50,0.2);width:100%;max-width:380px;">
+        <div style="text-align:center;margin-bottom:32px;">
+          <div style="width:90px;height:90px;background:rgba(74,124,89,0.12);border:1.5px solid rgba(74,124,89,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden;">
+            <img src="/images/logo.png" alt="立和设计" style="width:70%;height:70%;object-fit:contain;filter:brightness(0) saturate(100%) invert(34%) sepia(24%) saturate(911%) hue-rotate(95deg) brightness(95%) contrast(88%);">
+          </div>
+          <h2 style="font-size:22px;color:var(--primary);font-weight:700;">管理总台</h2>
+          <p style="font-size:13px;color:var(--text-light);margin-top:6px;">全局数据 · 项目 overview</p>
         </div>
-        <div style="margin-bottom:16px;">
-          <label style="display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;">管理员账号</label>
-          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;">
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">管理员账号</label>
+          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#F7FBF8;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(74,124,89,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
         <div style="margin-bottom:24px;">
-          <label style="display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;">密码</label>
-          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">密码</label>
+          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#F7FBF8;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(74,124,89,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
-        <button onclick="login()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">登 录</button>
-        <div id="loginError" style="display:none;text-align:center;padding:8px;margin-top:8px;color:var(--danger);font-size:13px;"></div>
-        <div style="text-align:center;margin-top:12px;">
+        <button onclick="login()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(74,124,89,0.25);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(74,124,89,0.32)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(74,124,89,0.25)';">登 录</button>
+        <div id="loginError" style="display:none;text-align:center;padding:10px;margin-top:12px;color:var(--danger);font-size:13px;background:#FDF2F2;border-radius:8px;"></div>
+        <div style="text-align:center;margin-top:14px;">
           <a href="/login.html" style="font-size:12px;color:var(--text-light);text-decoration:none;">返回统一登录</a>
         </div>
       </div>
@@ -112,51 +117,53 @@ function renderDashboard() {
   
   document.getElementById('app').innerHTML = `
     <!-- Nav -->
-    <div style="background:var(--primary);color:#fff;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+    <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(30,80,50,0.14);border-radius:0 0 16px 16px;">
       <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;">立</div>
+        <div style="width:36px;height:36px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="/images/logo.png" alt="立和设计" style="width:80%;height:80%;object-fit:contain;filter:brightness(0) invert(1);">
+        </div>
         <div>
-          <div style="font-size:15px;font-weight:600;">管理总台</div>
-          <div style="font-size:11px;opacity:0.7;">立和设计运营管理系统</div>
+          <div style="font-size:15px;font-weight:700;">管理总台</div>
+          <div style="font-size:11px;opacity:0.75;">全局数据 overview</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button onclick="refresh()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">🔄 刷新</button>
-        <button onclick="logout()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">退出</button>
-        <span style="font-size:13px;opacity:0.8;">管理员 ${state.staffId}</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="refresh()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;">刷新</button>
+        <button onclick="logout()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;">退出</button>
+        <span style="font-size:13px;opacity:0.85;">${state.staffId}</span>
       </div>
     </div>
 
-    <div style="max-width:1200px;margin:0 auto;padding:20px;">
+    <div style="max-width:1200px;margin:0 auto;padding:24px 20px;">
       <!-- Stats Cards -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:24px;">
-        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
-          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">在管项目</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-bottom:24px;">
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+          <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">在管项目</div>
           <div style="font-size:32px;font-weight:700;color:var(--primary);">${stats.totalProjects}</div>
-          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">活跃 ${stats.activeProjects} · 停工 ${stats.pausedProjects}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:6px;">活跃 ${stats.activeProjects} · 停工 ${stats.pausedProjects}</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
-          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">待客户确认</div>
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+          <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">待客户确认</div>
           <div style="font-size:32px;font-weight:700;color:var(--warning);">${stats.pendingConfirmations}</div>
-          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">本周新增 ${stats.recentNodes} 个节点</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:6px;">本周新增 ${stats.recentNodes} 个节点</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
-          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">合同总额</div>
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+          <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">合同总额</div>
           <div style="font-size:32px;font-weight:700;color:var(--accent);">¥${fmt(stats.totalBudget)}</div>
-          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">已收款 ¥${fmt(stats.totalPaid)}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:6px;">已收款 ¥${fmt(stats.totalPaid)}</div>
         </div>
-        <div style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
-          <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">设计阶段</div>
-          <div style="font-size:32px;font-weight:700;color:#9B59B6;">${stats.designCount}</div>
-          <div style="font-size:11px;color:var(--text-light);margin-top:4px;">施工 ${stats.constructionCount} · 软装 ${stats.softDecoCount} · 交付 ${stats.deliveredCount}</div>
+        <div style="background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(212,228,216,0.5);">
+          <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">设计阶段</div>
+          <div style="font-size:32px;font-weight:700;color:var(--accent);">${stats.designCount}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:6px;">施工 ${stats.constructionCount} · 软装 ${stats.softDecoCount} · 交付 ${stats.deliveredCount}</div>
         </div>
       </div>
 
       <!-- View Tabs -->
       <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);">
         ${['overview','projects','staff','pending'].map(v => `
-          <button onclick="switchView('${v}')" style="padding:10px 20px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:${state.activeView===v?'var(--accent)':'var(--text-light)'};border-bottom:2px solid ${state.activeView===v?'var(--accent)':'transparent'};margin-bottom:-2px;">
-            ${ {overview:'📊 概览',projects:'📁 项目列表',staff:'👥 员工管理',pending:'⏳ 待确认'}[v] }
+          <button onclick="switchView('${v}')" style="padding:10px 20px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:${state.activeView===v?'var(--accent)':'var(--text-light)'};border-bottom:2px solid ${state.activeView===v?'var(--accent)':'transparent'};margin-bottom:-2px;transition:all 0.2s;">
+            ${ {overview:'数据概览',projects:'项目列表',staff:'员工管理',pending:'待确认'}[v] }
           </button>
         `).join('')}
       </div>
@@ -189,9 +196,9 @@ function renderOverview() {
       <div style="background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
         <h3 style="font-size:15px;margin-bottom:16px;">项目进度分布</h3>
         ${[
-          {label:'设计阶段',count:stats.designCount,color:'#9B59B6'},
-          {label:'施工阶段',count:stats.constructionCount,color:'#E67E22'},
-          {label:'软装阶段',count:stats.softDecoCount,color:'#1ABC9C'},
+          {label:'设计阶段',count:stats.designCount,color:'var(--accent)'},
+          {label:'施工阶段',count:stats.constructionCount,color:'var(--warning)'},
+          {label:'软装阶段',count:stats.softDecoCount,color:'var(--accent-light)'},
           {label:'竣工交付',count:stats.deliveredCount,color:'var(--success)'},
         ].map(s => {
           const pct = stats.totalProjects > 0 ? (s.count/stats.totalProjects*100).toFixed(0) : 0;
@@ -430,7 +437,7 @@ function renderPending() {
       </div>
       <div style="padding:8px 0;">
         ${pendingNodes.length === 0
-          ? '<div style="padding:60px;text-align:center;color:var(--text-light);">🎉 所有节点已确认完毕</div>'
+          ? '<div style="padding:60px;text-align:center;color:var(--text-light);">所有节点已确认完毕</div>'
           : pendingNodes.map(n => {
               const proj = projects.find(p => p.recordId === n.projectId);
               const elapsed = n.uploadTime ? Math.floor((Date.now() - n.uploadTime) / 86400000) : 0;

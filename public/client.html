@@ -6,24 +6,24 @@
 <title>立和设计 · 我的项目</title>
 <style>
   :root {
-    --sage: #5A7D6B;
-    --sage-light: #7A9D8B;
-    --sage-dark: #3F5D50;
-    --sage-bg: #F0F4F2;
-    --sage-border: #C5D5CC;
-    --text-main: #2C3E35;
-    --text-secondary: #5A6B62;
-    --text-light: #8A9B92;
-    --bg: #FAFBF9;
+    --sage: #4A7C59;
+    --sage-light: #6FA07C;
+    --sage-dark: #2D5440;
+    --sage-bg: #EDF5EF;
+    --sage-border: #D4E4D8;
+    --text-main: #1E3829;
+    --text-secondary: #4F6B5A;
+    --text-light: #8BA897;
+    --bg: #F5FAF6;
     --white: #FFFFFF;
-    --accent: #D4A574;
-    --success: #5A7D6B;
+    --accent: #C89F6B;
+    --success: #4A7C59;
     --warning: #D4945A;
-    --danger: #C75450;
-    --radius: 10px;
-    --radius-lg: 14px;
-    --shadow: 0 2px 12px rgba(90, 125, 107, 0.08);
-    --shadow-hover: 0 4px 20px rgba(90, 125, 107, 0.15);
+    --danger: #D95A5A;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --shadow: 0 4px 18px rgba(30, 80, 50, 0.08);
+    --shadow-hover: 0 8px 28px rgba(30, 80, 50, 0.12);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -39,74 +39,97 @@
     min-height: 100vh;
   }
 
-  /* ===== 登录页 ===== */
-  .login-page { padding: 60px 24px; text-align: center; }
-  .login-logo {
-    width: 56px; height: 56px;
-    background: var(--sage);
-    border-radius: 14px;
-    margin: 0 auto 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; color: var(--white); font-weight: 700;
+  /* 顶部装饰条 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 500px; height: 160px;
+    background: linear-gradient(160deg, var(--sage-dark) 0%, var(--sage) 100%);
+    border-radius: 0 0 28px 28px;
+    z-index: -1;
   }
-  .login-title { font-size: 20px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
-  .login-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 32px; }
+
+  /* ===== 登录页 ===== */
+  .login-page { padding: 80px 28px 40px; text-align: center; }
+  .login-logo {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.28);
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .login-logo img { width: 70%; height: 70%; object-fit: contain; filter: brightness(0) invert(1); }
+  .login-title { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .login-subtitle { font-size: 13px; color: rgba(255,255,255,0.82); margin-bottom: 36px; }
   .login-input {
     width: 100%;
-    padding: 14px 16px;
+    padding: 15px 18px;
     border: 1.5px solid var(--sage-border);
     border-radius: var(--radius);
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     background: var(--white);
     -webkit-appearance: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
   }
-  .login-input:focus { outline: none; border-color: var(--sage); }
+  .login-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.08); }
   .login-btn {
     width: 100%;
-    padding: 14px;
-    background: var(--sage);
+    padding: 15px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
     color: var(--white);
     border: none;
     border-radius: var(--radius);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     margin-top: 8px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 18px rgba(74, 124, 89, 0.25);
   }
-  .login-btn:active { background: var(--sage-dark); }
-  .login-btn:disabled { opacity: 0.6; }
+  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74, 124, 89, 0.32); }
+  .login-btn:active { background: var(--sage-dark); transform: translateY(0); }
+  .login-btn:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 
   /* ===== 顶部导航 ===== */
   .nav-bar {
-    background: var(--white);
-    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--sage-border);
     position: sticky; top: 0; z-index: 100;
+    color: var(--white);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 16px rgba(30, 80, 50, 0.14);
   }
   .nav-brand { display: flex; align-items: center; gap: 8px; }
   .nav-logo {
     width: 28px; height: 28px;
-    background: var(--sage);
-    border-radius: 7px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--white); font-size: 14px; font-weight: 700;
+    color: var(--white); font-size: 12px; font-weight: 700;
+    overflow: hidden;
   }
-  .nav-title { font-size: 16px; font-weight: 600; color: var(--sage-dark); }
-  .nav-logout { font-size: 13px; color: var(--text-light); cursor: pointer; }
+  .nav-logo img { width: 80%; height: 80%; object-fit: contain; filter: brightness(0) invert(1); }
+  .nav-title { font-size: 16px; font-weight: 700; color: var(--white); }
+  .nav-logout { font-size: 13px; color: rgba(255,255,255,0.85); cursor: pointer; font-weight: 500; }
 
   /* ===== 项目卡片 ===== */
   .project-card {
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 16px;
+    padding: 18px;
     margin: 12px 16px;
     box-shadow: var(--shadow);
+    border: 1px solid rgba(212, 228, 216, 0.5);
   }
   .project-header {
     display: flex;
@@ -244,28 +267,33 @@
   .node-actions { display: flex; gap: 8px; margin-top: 10px; }
   .btn-confirm {
     flex: 1;
-    padding: 10px;
-    background: var(--sage);
+    padding: 11px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
     color: var(--white);
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.2);
+    transition: all 0.2s ease;
   }
-  .btn-confirm:active { background: var(--sage-dark); }
-  .btn-confirm:disabled { opacity: 0.5; }
+  .btn-confirm:hover { transform: translateY(-1px); }
+  .btn-confirm:active { background: var(--sage-dark); transform: translateY(0); }
+  .btn-confirm:disabled { opacity: 0.5; transform: none; box-shadow: none; }
   .btn-revise {
     flex: 1;
-    padding: 10px;
+    padding: 11px;
     background: var(--white);
     color: var(--sage-dark);
     border: 1.5px solid var(--sage-border);
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    transition: all 0.2s ease;
   }
+  .btn-revise:active { background: var(--sage-bg); }
 
   /* 修改意见输入 */
   .revise-box { display: none; margin-top: 10px; }
@@ -318,7 +346,15 @@
     padding: 60px 20px;
     color: var(--text-light);
   }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-icon {
+    width: 72px; height: 72px;
+    background: var(--sage-bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 13px; font-weight: 700; color: var(--sage);
+    letter-spacing: 0.5px;
+  }
 
   /* ===== Toast ===== */
   .toast {
@@ -368,9 +404,9 @@
 
 <!-- ===== 登录页 ===== -->
 <div id="loginPage" class="login-page">
-  <div class="login-logo">立</div>
-  <div class="login-title">立和设计</div>
-  <div class="login-subtitle">我的项目 · 查看进度与确认</div>
+  <div class="login-logo"><img src="/images/logo.png" alt="立和设计"></div>
+  <div class="login-title">我的项目</div>
+  <div class="login-subtitle">查看进度 · 确认节点</div>
   <input class="login-input" id="phoneInput" type="tel" placeholder="请输入您的手机号" maxlength="11">
   <button class="login-btn" id="loginBtn" onclick="doLogin()">查 看 我 的 项 目</button>
   <div style="margin-top:24px; font-size:12px; color:var(--text-light);">
@@ -383,7 +419,7 @@
   <!-- 导航栏 -->
   <div class="nav-bar">
     <div class="nav-brand">
-      <div class="nav-logo">立</div>
+      <div class="nav-logo"><img src="/images/logo.png" alt="立和设计"></div>
       <div class="nav-title">我的项目</div>
     </div>
     <div class="nav-logout" onclick="logout()">切换账号</div>
@@ -461,7 +497,7 @@
     if (projects.length === 0) {
       area.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📋</div>
+          <div class="empty-icon">暂无</div>
           <p>暂无关联项目</p>
           <p style="font-size:13px; margin-top:4px;">请联系您的专属顾问为您绑定项目</p>
         </div>
@@ -502,13 +538,13 @@
           <span>${p.progress}%</span>
         </div>
         <div class="project-meta">
-          ${p.spaceType ? `<div class="project-meta-item">🏠 ${p.spaceType}</div>` : ''}
-          ${p.area ? `<div class="project-meta-item">📐 ${p.area}㎡</div>` : ''}
-          ${p.address ? `<div class="project-meta-item">📍 ${p.address}</div>` : ''}
-          ${p.designerName ? `<div class="project-meta-item">✏️ 设计 ${p.designerName}</div>` : ''}
-          ${p.softDecoName ? `<div class="project-meta-item">🛋️ 软装 ${p.softDecoName}</div>` : ''}
-          ${p.drawingName ? `<div class="project-meta-item">📐 施工图 ${p.drawingName}</div>` : ''}
-          ${p.supervisorName ? `<div class="project-meta-item">👷 监理 ${p.supervisorName}</div>` : ''}
+          ${p.spaceType ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">空间</span> ${p.spaceType}</div>` : ''}
+          ${p.area ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">面积</span> ${p.area}㎡</div>` : ''}
+          ${p.address ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">地址</span> ${p.address}</div>` : ''}
+          ${p.designerName ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">设计</span> ${p.designerName}</div>` : ''}
+          ${p.softDecoName ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">软装</span> ${p.softDecoName}</div>` : ''}
+          ${p.drawingName ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">施工图</span> ${p.drawingName}</div>` : ''}
+          ${p.supervisorName ? `<div class="project-meta-item"><span style="color:var(--sage);font-weight:600;">监理</span> ${p.supervisorName}</div>` : ''}
         </div>
       </div>
       <div class="timeline" id="nodes-${p.recordId}">
@@ -610,13 +646,13 @@
         if (isImage && att.url) {
           attachHtml += `<div class="attachment-thumb" onclick="viewImage('${fullUrl}')"><img src="${fullUrl}" alt="${att.name}"></div>`;
         } else if (isVideo && att.url) {
-          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="font-size:24px;">🎥</div>`;
+          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="flex-direction:column;padding:4px;"><span style="font-size:11px;font-weight:700;color:var(--sage);">VIDEO</span><span style="font-size:9px;margin-top:2px;color:var(--text-light);">视频</span></div>`;
         } else {
           attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="flex-direction:column;padding:4px;">${fileIcon.icon}<span style="font-size:9px;margin-top:2px;color:var(--text-light);">${fileIcon.label}</span></div>`;
         }
       });
       if (node.attachments.length > 6) {
-        attachHtml += `<div class="attachment-thumb file" style="position:relative;">📎<span class="attachment-more">+${node.attachments.length - 6}</span></div>`;
+        attachHtml += `<div class="attachment-thumb file" style="position:relative;"><span style="font-size:11px;font-weight:700;color:var(--sage);">更多</span><span class="attachment-more">+${node.attachments.length - 6}</span></div>`;
       }
       attachHtml += '</div>';
     }
@@ -635,9 +671,9 @@
         </div>
       `;
     } else if (node.status === '已确认') {
-      actionHtml = `<div style="margin-top:8px; font-size:13px; color:var(--success);">✓ 您已确认此节点</div>`;
+      actionHtml = `<div style="margin-top:8px; font-size:13px; color:var(--success); font-weight:600;">已确认此节点</div>`;
     } else if (node.status === '有修改意见') {
-      actionHtml = `<div style="margin-top:8px; padding:8px 10px; background:#FFF3E0; border-radius:6px; font-size:13px; color:var(--warning);">📝 您的修改意见：${node.clientNotes || '已提交'}</div>`;
+      actionHtml = `<div style="margin-top:8px; padding:10px 12px; background:#FFF8EC; border-radius:8px; font-size:13px; color:var(--warning);"><span style="font-weight:600;">修改意见：</span>${node.clientNotes || '已提交'}</div>`;
     }
 
     return `
@@ -716,18 +752,18 @@
   }
 
   function getAttachmentIcon(name, type) {
-    if (!name) return { icon: '📄', label: '文件' };
+    if (!name) return { icon: 'FILE', label: '文件' };
     const ext = name.toLowerCase().split('.').pop();
     const map = {
-      'pdf': { icon: '📕', label: 'PDF' },
-      'doc': { icon: '📘', label: 'Word' }, 'docx': { icon: '📘', label: 'Word' },
-      'ppt': { icon: '📙', label: 'PPT' }, 'pptx': { icon: '📙', label: 'PPT' },
-      'xls': { icon: '📗', label: 'Excel' }, 'xlsx': { icon: '📗', label: 'Excel' },
-      'dwg': { icon: '📐', label: 'CAD' }, 'dxf': { icon: '📐', label: 'CAD' },
-      'zip': { icon: '🗜️', label: 'ZIP' }, 'rar': { icon: '🗜️', label: 'RAR' },
-      'mp4': { icon: '🎥', label: '视频' }, 'mov': { icon: '🎥', label: '视频' },
+      'pdf': { icon: 'PDF', label: 'PDF' },
+      'doc': { icon: 'DOC', label: 'Word' }, 'docx': { icon: 'DOC', label: 'Word' },
+      'ppt': { icon: 'PPT', label: 'PPT' }, 'pptx': { icon: 'PPT', label: 'PPT' },
+      'xls': { icon: 'XLS', label: 'Excel' }, 'xlsx': { icon: 'XLS', label: 'Excel' },
+      'dwg': { icon: 'CAD', label: 'CAD' }, 'dxf': { icon: 'CAD', label: 'CAD' },
+      'zip': { icon: 'ZIP', label: 'ZIP' }, 'rar': { icon: 'ZIP', label: 'RAR' },
+      'mp4': { icon: 'MP4', label: '视频' }, 'mov': { icon: 'MP4', label: '视频' },
     };
-    return map[ext] || { icon: '📄', label: '文件' };
+    return map[ext] || { icon: 'FILE', label: '文件' };
   }
 
   // ===== 工具函数 =====
