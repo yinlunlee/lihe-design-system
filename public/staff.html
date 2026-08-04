@@ -518,6 +518,7 @@
       <div class="nav-title">我的项目</div>
     </div>
     <div class="nav-user" id="navUser"></div>
+    <div class="nav-logout" onclick="logout()" style="font-size:13px;color:var(--text-light);cursor:pointer;margin-left:12px;">退出</div>
   </div>
 
   <div class="form-section">
@@ -1363,6 +1364,28 @@
   // ===== 回车登录 =====
   document.getElementById('passwordInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') doLogin();
+  });
+
+  // ===== 退出登录 =====
+  function logout() {
+    localStorage.removeItem('lihe_role');
+    localStorage.removeItem('lihe_staffId');
+    localStorage.removeItem('lihe_password');
+    localStorage.removeItem('lihe_staffName');
+    localStorage.removeItem('lihe_staffRole');
+    window.location.href = '/login.html';
+  }
+
+  // ===== 自动登录（从统一登录页跳转） =====
+  window.addEventListener('load', () => {
+    const savedRole = localStorage.getItem('lihe_role');
+    const savedStaffId = localStorage.getItem('lihe_staffId');
+    const savedPwd = localStorage.getItem('lihe_password');
+    if (savedRole === 'staff' && savedStaffId && savedPwd) {
+      document.getElementById('staffIdInput').value = savedStaffId;
+      document.getElementById('passwordInput').value = savedPwd;
+      doLogin();
+    }
   });
 </script>
 

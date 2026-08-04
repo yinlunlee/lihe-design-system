@@ -57,9 +57,9 @@ function renderLogin() {
   document.getElementById('bossPwd').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
 }
 
-async function login() {
-  const staffId = document.getElementById('bossId').value.trim();
-  const password = document.getElementById('bossPwd').value.trim();
+async function login(staffIdArg, passwordArg) {
+  const staffId = staffIdArg || document.getElementById('bossId').value.trim();
+  const password = passwordArg || document.getElementById('bossPwd').value.trim();
   if (!staffId || !password) return alert('请输入账号密码');
   try {
     const resp = await fetch(`${API_BASE}/api/boss?staffId=${encodeURIComponent(staffId)}&password=${encodeURIComponent(password)}`);
@@ -101,8 +101,9 @@ function renderDashboard() {
           <div style="font-size:11px;opacity:0.7;">立和设计运营管理系统</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:16px;">
+      <div style="display:flex;align-items:center;gap:12px;">
         <button onclick="refresh()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">🔄 刷新</button>
+        <button onclick="logout()" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;">退出</button>
         <span style="font-size:13px;opacity:0.8;">管理员 ${state.staffId}</span>
       </div>
     </div>
@@ -438,8 +439,25 @@ function renderPending() {
   `;
 }
 
-// Init
-renderLogin();
+// ===== Logout =====
+function logout() {
+  localStorage.removeItem('lihe_role');
+  localStorage.removeItem('lihe_staffId');
+  localStorage.removeItem('lihe_password');
+  window.location.href = '/login.html';
+}
+
+// ===== Init: auto-login if credentials saved =====
+const savedRole = localStorage.getItem('lihe_role');
+const savedStaffId = localStorage.getItem('lihe_staffId');
+const savedPwd = localStorage.getItem('lihe_password');
+if (savedRole === 'boss' && savedStaffId && savedPwd) {
+  state.staffId = savedStaffId;
+  state.password = savedPwd;
+  login(savedStaffId, savedPwd);
+} else {
+  renderLogin();
+}
 </script>
 </body>
 </html>

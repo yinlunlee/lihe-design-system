@@ -745,7 +745,8 @@
   }
   function logout() {
     localStorage.removeItem('lihe_phone');
-    location.reload();
+    localStorage.removeItem('lihe_role');
+    window.location.href = '/login.html';
   }
 
   // ===== 演示模式（API未部署时） =====
