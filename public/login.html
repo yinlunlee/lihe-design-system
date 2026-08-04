@@ -205,32 +205,26 @@
     <div id="staffForm" class="hidden">
       <div class="form-group">
         <label>工号</label>
-        <input class="form-input" id="staffIdInput" type="text" placeholder="S01~S06">
+        <input class="form-input" id="staffIdInput" type="text" placeholder="请输入工号">
       </div>
       <div class="form-group">
         <label>密码</label>
         <input class="form-input" id="staffPwdInput" type="password" placeholder="请输入密码">
       </div>
       <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
-      <div class="hint">
-        <b>员工账号：</b><br>
-        S01 庄涛(设计师) · S02 林协莎(设计师) · S03 颜大然(软装) · S04 王润鹏(施工图) · S05 谢佳润(监理) · S06 谢建彬(监理)<br>
-        默认密码：<b>lihe2026</b>
-      </div>
     </div>
 
     <!-- Boss Form -->
     <div id="bossForm" class="hidden">
       <div class="form-group">
         <label>管理员账号</label>
-        <input class="form-input" id="bossIdInput" type="text" placeholder="B01" value="B01">
+        <input class="form-input" id="bossIdInput" type="text" placeholder="请输入管理员账号">
       </div>
       <div class="form-group">
         <label>密码</label>
         <input class="form-input" id="bossPwdInput" type="password" placeholder="请输入密码">
       </div>
       <button class="login-btn" id="loginBtn" onclick="doLogin()">登 录</button>
-      <div class="hint"><b>管理员账号：B01</b> · 默认密码：<b>lihe2026</b></div>
     </div>
   </div>
 </div>
@@ -254,11 +248,6 @@
     document.getElementById('clientForm').classList.toggle('hidden', role !== 'client');
     document.getElementById('staffForm').classList.toggle('hidden', role !== 'staff');
     document.getElementById('bossForm').classList.toggle('hidden', role !== 'boss');
-
-    // Auto-fill for boss
-    if (role === 'boss') {
-      document.getElementById('bossIdInput').value = 'B01';
-    }
   }
 
   // ===== Login =====
