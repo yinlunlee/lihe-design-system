@@ -64,7 +64,7 @@
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   }
-  .login-logo img { width: 70%; height: 70%; object-fit: contain; filter: brightness(0) invert(1); }
+  .login-logo img { width: 70%; height: 70%; object-fit: contain; }
   .login-title { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 4px; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
   .login-subtitle { font-size: 13px; color: rgba(255,255,255,0.82); margin-bottom: 36px; }
   .login-input {
@@ -118,7 +118,7 @@
     color: var(--white); font-size: 12px; font-weight: 700;
     overflow: hidden;
   }
-  .nav-logo img { width: 80%; height: 80%; object-fit: contain; filter: brightness(0) invert(1); }
+  .nav-logo img { width: 80%; height: 80%; object-fit: contain; }
   .nav-title { font-size: 16px; font-weight: 700; color: var(--white); }
   .nav-user { font-size: 13px; color: rgba(255,255,255,0.8); }
   .nav-logout { font-size: 13px; color: rgba(255,255,255,0.85); cursor: pointer; font-weight: 500; }
@@ -543,7 +543,7 @@
 
 <!-- ===== 登录页 ===== -->
 <div id="loginPage" class="login-page">
-  <div class="login-logo"><img src="/images/logo.png" alt="立和设计"></div>
+  <div class="login-logo"><img src="/images/logo-light.png" alt="立和设计"></div>
   <div class="login-title">员工工作台</div>
   <div class="login-subtitle">项目协同 · 成果管理</div>
   <input class="login-input" id="staffIdInput" type="text" placeholder="工号（S01庄涛/S02林协莎/S03颜大然/S04王润鹏/S05谢佳润/S06谢建彬）">
@@ -560,11 +560,11 @@
   <!-- 导航栏 -->
   <div class="nav-bar">
     <div class="nav-brand">
-      <div class="nav-logo"><img src="/images/logo.png" alt="立和设计"></div>
+      <div class="nav-logo"><img src="/images/logo-light.png" alt="立和设计"></div>
       <div class="nav-title">我的项目</div>
     </div>
     <div class="nav-user" id="navUser"></div>
-    <div class="nav-logout" onclick="logout()" style="font-size:13px;color:var(--text-light);cursor:pointer;margin-left:12px;">退出</div>
+    <div class="nav-logout" onclick="logout()" style="font-size:13px;color:rgba(255,255,255,0.85);cursor:pointer;margin-left:12px;">退出</div>
   </div>
 
   <div class="form-section">
