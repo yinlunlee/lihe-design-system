@@ -777,8 +777,8 @@ async function syncNeedToProject(needRecordId) {
       '空间类型': parseFieldValue(f['空间类型']),
       '面积': typeof f['面积'] === 'number' ? f['面积'] : (f['面积'] ? parseFloat(parseFieldValue(f['面积'])) : null),
       '每平米预算': parseFieldValue(f['每平米预算']),
-      '当前阶段': '设计准备',
-      '阶段进度': 10,
+      '当前阶段': '平面布局方案',
+      '阶段进度': 5,
       '停工状态': '正常',
     }
   };
@@ -1060,11 +1060,47 @@ async function handleAssignNeedStaff(req, res) {
     return sendJSON(res, 500, { success: false, error: updateResult.msg });
   }
 
+  // 如果需求已签约（项目已存在），同步团队分配到项目表
+  let projectSynced = false;
+  try {
+    const needDetail = await feishuRequest('GET',
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/${needRecordId}`
+    );
+    if (needDetail.code === 0 && needDetail.data && needDetail.data.record) {
+      const nf = needDetail.data.record.fields;
+      const needStatus = parseFieldValue(nf['跟进状态']);
+      const clientPhone = parseFieldValue(nf['联系方式']);
+
+      if (needStatus === '已签约' && clientPhone) {
+        // 查找已存在的项目
+        const projResult = await feishuRequest('POST',
+          `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search`,
+          { filter: { conjunction: 'and', conditions: [{ field_name: '客户联系方式', operator: 'is', value: [clientPhone] }] } }
+        );
+
+        if (projResult.code === 0 && projResult.data.items && projResult.data.items.length > 0) {
+          const projectRecordId = projResult.data.items[0].record_id;
+          const projUpdateResult = await feishuRequest('PUT',
+            `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/${projectRecordId}`,
+            { fields: fieldsToUpdate }
+          );
+          if (projUpdateResult.code === 0) {
+            projectSynced = true;
+            console.log(`[assign-need] Team synced to project ${projectRecordId}`);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error('[assign-need] Project sync error:', e.message);
+  }
+
   return sendJSON(res, 200, {
     success: true,
     needRecordId,
     updatedRoles: Object.keys(assignments),
-    message: '需求团队分配已更新',
+    projectSynced,
+    message: projectSynced ? '团队分配已更新，并已同步到项目' : '需求团队分配已更新',
   });
 }
 
