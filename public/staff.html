@@ -802,7 +802,7 @@
     </div>
 
     <!-- 文件上传 -->
-    <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个，单个文件不超过20MB</span></div>
+    <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个，单个文件不超过100MB</span></div>
     <div class="upload-actions">
       <button class="upload-btn camera" onclick="document.getElementById('cameraInput').click()">
         拍照上传
@@ -1573,14 +1573,14 @@
 
           // 如果有部分文件失败，提示用户
           if (data.failedCount && data.failedCount > 0) {
-            showToast(`${data.uploadedCount}个成功，${data.failedCount}个失败（超过20MB的文件无法上传）`);
+            showToast(`${data.uploadedCount}个成功，${data.failedCount}个失败（超过100MB的文件无法上传）`);
           }
 
           setTimeout(() => {
             const successMsg = isInspection
               ? `巡检记录已上传：${state.selectedProject.name} - ${stage}`
               : data.failedCount > 0
-                ? `成功上传 ${data.uploadedCount} 个文件，${data.failedCount} 个文件失败（超过20MB）`
+                ? `成功上传 ${data.uploadedCount} 个文件，${data.failedCount} 个文件失败（超过100MB）`
                 : `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」，客户已收到通知`;
             document.getElementById('successMsg').textContent = successMsg;
             document.getElementById('uploadPage').style.display = 'none';

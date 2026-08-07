@@ -148,6 +148,92 @@ async function uploadToFeishu(file, appToken) {
   });
 }
 
+// 分片上传大文件到飞书（支持超过20MB的文件）
+async function uploadLargeToFeishu(file, appToken) {
+  const https = require('https');
+  const token = await getToken();
+
+  // Step 1: 准备上传
+  const prepareResult = await feishuRequest('POST', '/open-apis/drive/v1/medias/upload_prepare', {
+    file_name: file.originalname,
+    parent_type: 'bitable_file',
+    parent_node: appToken,
+    size: file.size,
+  });
+
+  if (prepareResult.code !== 0) {
+    console.error('[upload-large] Prepare failed:', prepareResult.msg);
+    return prepareResult;
+  }
+
+  const uploadId = prepareResult.data.upload_id;
+  const blockSize = prepareResult.data.block_size;
+  const blockNum = prepareResult.data.block_num;
+
+  console.log(`[upload-large] Prepared: ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB), ${blockNum} blocks, block_size=${blockSize}`);
+
+  // Step 2: 逐块上传
+  for (let seq = 0; seq < blockNum; seq++) {
+    const start = seq * blockSize;
+    const end = Math.min(start + blockSize, file.size);
+    const blockBuffer = file.buffer.slice(start, end);
+    const actualBlockSize = blockBuffer.length;
+
+    const boundary = '----FormBoundary' + Math.random().toString(36).substring(2);
+    const parts = [];
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="upload_id"\r\n\r\n${uploadId}\r\n`));
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="seq"\r\n\r\n${seq}\r\n`));
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="size"\r\n\r\n${actualBlockSize}\r\n`));
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="block_${seq}"\r\nContent-Type: application/octet-stream\r\n\r\n`));
+    parts.push(blockBuffer);
+    parts.push(Buffer.from(`\r\n--${boundary}--\r\n`));
+
+    const body = Buffer.concat(parts);
+
+    const partResult = await new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: 'open.feishu.cn',
+        path: '/open-apis/drive/v1/medias/upload_part',
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          'Content-Length': body.length,
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          try { resolve(JSON.parse(data)); }
+          catch (e) { resolve({ code: -1, msg: 'parse error', raw: data }); }
+        });
+      });
+      req.on('error', reject);
+      req.write(body);
+      req.end();
+    });
+
+    if (partResult.code !== 0) {
+      console.error(`[upload-large] Block ${seq + 1}/${blockNum} failed:`, partResult.msg);
+      return partResult;
+    }
+  }
+
+  console.log(`[upload-large] All ${blockNum} blocks uploaded, finishing...`);
+
+  // Step 3: 完成上传
+  const finishResult = await feishuRequest('POST', '/open-apis/drive/v1/medias/upload_finish', {
+    upload_id: uploadId,
+    block_num: blockNum,
+  });
+
+  if (finishResult.code === 0) {
+    console.log(`[upload-large] File uploaded: ${file.originalname} -> ${finishResult.data.file_token}`);
+  }
+
+  return finishResult;
+}
+
 // ===== API Handlers =====
 
 // Parse Feishu text field value (can be string, array of {text,type}, or number)
@@ -593,18 +679,25 @@ async function handleUpload(req, res) {
     projectName = parseFieldValue(projectResult.data.record.fields['项目名称']);
   }
 
-  // Upload files to Feishu (飞书 upload_all API 限制单文件 20MB)
-  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+  // Upload files to Feishu (≤20MB用upload_all，>20MB用分片上传)
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  const SMALL_FILE_LIMIT = 20 * 1024 * 1024; // 20MB
   const uploadedFiles = [];
   const failedFiles = [];
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE) {
-      console.warn(`[upload] File too large (>20MB): ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB)`);
-      failedFiles.push({ name: file.originalname, reason: '文件超过20MB限制' });
+      console.warn(`[upload] File too large (>100MB): ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB)`);
+      failedFiles.push({ name: file.originalname, reason: '文件超过100MB限制' });
       continue;
     }
 
-    const uploadResult = await uploadToFeishu(file, config.feishu.appToken);
+    let uploadResult;
+    if (file.size > SMALL_FILE_LIMIT) {
+      console.log(`[upload] Large file, using chunked upload: ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB)`);
+      uploadResult = await uploadLargeToFeishu(file, config.feishu.appToken);
+    } else {
+      uploadResult = await uploadToFeishu(file, config.feishu.appToken);
+    }
     if (uploadResult.code === 0) {
       uploadedFiles.push({
         name: file.originalname,
@@ -621,7 +714,7 @@ async function handleUpload(req, res) {
   // 如果所有文件都上传失败，不创建记录，直接返回错误
   if (uploadedFiles.length === 0) {
     const errMsg = failedFiles.length > 0
-      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过20MB。`
+      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过100MB。`
       : '文件上传失败，请重试';
     return sendJSON(res, 500, { success: false, error: errMsg, failedFiles });
   }
@@ -1242,16 +1335,23 @@ async function handleInspectionUpload(req, res) {
     projectName = parseFieldValue(projectResult.data.record.fields['项目名称']);
   }
 
-  // 上传文件到飞书 (飞书 upload_all API 限制单文件 20MB)
-  const MAX_FILE_SIZE = 20 * 1024 * 1024;
+  // 上传文件到飞书 (≤20MB用upload_all，>20MB用分片上传)
+  const MAX_FILE_SIZE = 100 * 1024 * 1024;
+  const SMALL_FILE_LIMIT = 20 * 1024 * 1024;
   const uploadedFiles = [];
   const failedFiles = [];
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE) {
-      failedFiles.push({ name: file.originalname, reason: '文件超过20MB限制' });
+      failedFiles.push({ name: file.originalname, reason: '文件超过100MB限制' });
       continue;
     }
-    const uploadResult = await uploadToFeishu(file, config.feishu.appToken);
+    let uploadResult;
+    if (file.size > SMALL_FILE_LIMIT) {
+      console.log(`[upload] Large file, using chunked upload: ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB)`);
+      uploadResult = await uploadLargeToFeishu(file, config.feishu.appToken);
+    } else {
+      uploadResult = await uploadToFeishu(file, config.feishu.appToken);
+    }
     if (uploadResult.code === 0) {
       uploadedFiles.push({
         name: file.originalname,
@@ -1265,7 +1365,7 @@ async function handleInspectionUpload(req, res) {
 
   if (uploadedFiles.length === 0) {
     const errMsg = failedFiles.length > 0
-      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过20MB。`
+      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过100MB。`
       : '文件上传失败，请重试';
     return sendJSON(res, 500, { success: false, error: errMsg, failedFiles });
   }
