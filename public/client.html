@@ -638,7 +638,7 @@
     const statusBadge = node.status === '已确认' ? 'confirmed' : (node.status === '有修改意见' ? 'revising' : 'wait');
     const isPending = node.status === '待确认' || !node.status;
 
-    // 附件预览
+    // 附件预览（仅在线浏览，不可下载）
     let attachHtml = '';
     if (node.attachments && node.attachments.length > 0) {
       attachHtml = '<div class="attachment-grid">';
@@ -650,9 +650,9 @@
         if (isImage && att.url) {
           attachHtml += `<div class="attachment-thumb" onclick="viewImage('${fullUrl}')"><img src="${fullUrl}" alt="${att.name}"></div>`;
         } else if (isVideo && att.url) {
-          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="flex-direction:column;padding:4px;"><span style="font-size:11px;font-weight:700;color:var(--sage);">VIDEO</span><span style="font-size:9px;margin-top:2px;color:var(--text-light);">视频</span></div>`;
+          attachHtml += `<div class="attachment-thumb file" onclick="previewFile('${fullUrl}')" style="flex-direction:column;padding:4px;"><span style="font-size:11px;font-weight:700;color:var(--sage);">VIDEO</span><span style="font-size:9px;margin-top:2px;color:var(--text-light);">视频</span></div>`;
         } else {
-          attachHtml += `<div class="attachment-thumb file" onclick="downloadFile('${fullUrl}','${att.name}')" style="flex-direction:column;padding:4px;">${fileIcon.icon}<span style="font-size:9px;margin-top:2px;color:var(--text-light);">${fileIcon.label}</span></div>`;
+          attachHtml += `<div class="attachment-thumb file" onclick="previewFile('${fullUrl}')" style="flex-direction:column;padding:4px;">${fileIcon.icon}<span style="font-size:9px;margin-top:2px;color:var(--text-light);">${fileIcon.label}</span></div>`;
         }
       });
       if (node.attachments.length > 6) {
@@ -750,7 +750,7 @@
   function closeViewer() {
     document.getElementById('imageViewer').classList.remove('show');
   }
-  function downloadFile(url, name) {
+  function previewFile(url) {
     if (url) window.open(url, '_blank');
     else showToast('文件链接已过期，请刷新页面');
   }

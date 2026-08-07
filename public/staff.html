@@ -802,7 +802,7 @@
     </div>
 
     <!-- 文件上传 -->
-    <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个</span></div>
+    <div class="field-label">上传文件 <span class="field-hint">支持图片/PDF/PPT/Word/CAD/视频等，单次最多10个，单个文件不超过20MB</span></div>
     <div class="upload-actions">
       <button class="upload-btn camera" onclick="document.getElementById('cameraInput').click()">
         拍照上传
@@ -1555,19 +1555,34 @@
       .then(r => r.json())
       .then(data => {
         if (data.success) {
+          // 标记成功和失败的文件
           state.files.forEach((f, i) => {
             const el = document.getElementById(`prog-${i}`);
             if (el) {
-              el.textContent = `✓ ${f.file.name} - 上传成功`;
-              el.classList.add('done');
+              // 如果有失败文件，检查当前文件是否在失败列表中
+              const failed = data.failedFiles && data.failedFiles.find(ff => ff.name === f.file.name);
+              if (failed) {
+                el.textContent = `✗ ${f.file.name} - 失败：${failed.reason}`;
+                el.style.color = 'var(--danger)';
+              } else {
+                el.textContent = `✓ ${f.file.name} - 上传成功`;
+                el.classList.add('done');
+              }
             }
           });
 
+          // 如果有部分文件失败，提示用户
+          if (data.failedCount && data.failedCount > 0) {
+            showToast(`${data.uploadedCount}个成功，${data.failedCount}个失败（超过20MB的文件无法上传）`);
+          }
+
           setTimeout(() => {
-            document.getElementById('successMsg').textContent =
-              isInspection
-                ? `巡检记录已上传：${state.selectedProject.name} - ${stage}`
+            const successMsg = isInspection
+              ? `巡检记录已上传：${state.selectedProject.name} - ${stage}`
+              : data.failedCount > 0
+                ? `成功上传 ${data.uploadedCount} 个文件，${data.failedCount} 个文件失败（超过20MB）`
                 : `成功上传 ${data.uploadedCount || state.files.length} 个文件到「${state.selectedProject.name}」，客户已收到通知`;
+            document.getElementById('successMsg').textContent = successMsg;
             document.getElementById('uploadPage').style.display = 'none';
             document.getElementById('successPage').style.display = 'block';
           }, 500);

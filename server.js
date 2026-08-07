@@ -485,6 +485,7 @@ async function handleFileProxy(req, res) {
       const ct = proxyRes.headers['content-type'] || 'application/octet-stream';
       res.writeHead(200, {
         'Content-Type': ct,
+        'Content-Disposition': 'inline',
         'Cache-Control': 'public, max-age=3600',
         'Access-Control-Allow-Origin': '*',
       });
@@ -592,11 +593,14 @@ async function handleUpload(req, res) {
     projectName = parseFieldValue(projectResult.data.record.fields['项目名称']);
   }
 
-  // Upload files to Feishu
+  // Upload files to Feishu (飞书 upload_all API 限制单文件 20MB)
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
   const uploadedFiles = [];
+  const failedFiles = [];
   for (const file of files) {
-    if (file.size > 50 * 1024 * 1024) {
-      console.warn(`[upload] File too large: ${file.originalname} (${file.size} bytes)`);
+    if (file.size > MAX_FILE_SIZE) {
+      console.warn(`[upload] File too large (>20MB): ${file.originalname} (${(file.size/1024/1024).toFixed(1)}MB)`);
+      failedFiles.push({ name: file.originalname, reason: '文件超过20MB限制' });
       continue;
     }
 
@@ -610,7 +614,16 @@ async function handleUpload(req, res) {
       console.log(`[upload] File uploaded: ${file.originalname} -> ${uploadResult.data.file_token}`);
     } else {
       console.error(`[upload] Upload failed for ${file.originalname}:`, uploadResult.msg);
+      failedFiles.push({ name: file.originalname, reason: uploadResult.msg || '飞书上传失败' });
     }
+  }
+
+  // 如果所有文件都上传失败，不创建记录，直接返回错误
+  if (uploadedFiles.length === 0) {
+    const errMsg = failedFiles.length > 0
+      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过20MB。`
+      : '文件上传失败，请重试';
+    return sendJSON(res, 500, { success: false, error: errMsg, failedFiles });
   }
 
   // Create confirm node record
@@ -630,9 +643,7 @@ async function handleUpload(req, res) {
   };
 
   // Add file tokens as attachment
-  if (uploadedFiles.length > 0) {
-    record.fields['成果附件'] = uploadedFiles.map(f => ({ file_token: f.token }));
-  }
+  record.fields['成果附件'] = uploadedFiles.map(f => ({ file_token: f.token }));
 
   const createResult = await feishuRequest('POST',
     `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.confirm}/records`,
@@ -645,6 +656,8 @@ async function handleUpload(req, res) {
       success: true,
       recordId: createResult.data.record.record_id,
       uploadedCount: uploadedFiles.length,
+      failedCount: failedFiles.length,
+      failedFiles: failedFiles,
     });
   } else {
     console.error('[upload] Create record failed:', createResult.msg);
@@ -1229,10 +1242,15 @@ async function handleInspectionUpload(req, res) {
     projectName = parseFieldValue(projectResult.data.record.fields['项目名称']);
   }
 
-  // 上传文件到飞书
+  // 上传文件到飞书 (飞书 upload_all API 限制单文件 20MB)
+  const MAX_FILE_SIZE = 20 * 1024 * 1024;
   const uploadedFiles = [];
+  const failedFiles = [];
   for (const file of files) {
-    if (file.size > 50 * 1024 * 1024) continue;
+    if (file.size > MAX_FILE_SIZE) {
+      failedFiles.push({ name: file.originalname, reason: '文件超过20MB限制' });
+      continue;
+    }
     const uploadResult = await uploadToFeishu(file, config.feishu.appToken);
     if (uploadResult.code === 0) {
       uploadedFiles.push({
@@ -1240,7 +1258,16 @@ async function handleInspectionUpload(req, res) {
         token: uploadResult.data.file_token,
         type: file.mimetype,
       });
+    } else {
+      failedFiles.push({ name: file.originalname, reason: uploadResult.msg || '飞书上传失败' });
     }
+  }
+
+  if (uploadedFiles.length === 0) {
+    const errMsg = failedFiles.length > 0
+      ? `文件上传失败：${failedFiles.map(f => `${f.name}(${f.reason})`).join('、')}。单个文件不能超过20MB。`
+      : '文件上传失败，请重试';
+    return sendJSON(res, 500, { success: false, error: errMsg, failedFiles });
   }
 
   // 创建巡检记录
@@ -1256,9 +1283,7 @@ async function handleInspectionUpload(req, res) {
     }
   };
 
-  if (uploadedFiles.length > 0) {
-    record.fields['巡检照片'] = uploadedFiles.map(f => ({ file_token: f.token }));
-  }
+  record.fields['巡检照片'] = uploadedFiles.map(f => ({ file_token: f.token }));
 
   const createResult = await feishuRequest('POST',
     `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.inspection}/records`,
