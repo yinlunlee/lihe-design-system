@@ -166,10 +166,10 @@ function renderDashboard() {
       </div>
 
       <!-- View Tabs -->
-      <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);">
-        ${['overview','projects','staff','pending'].map(v => `
+      <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--border);flex-wrap:wrap;">
+        ${['overview','projects','needs','staff','pending'].map(v => `
           <button onclick="switchView('${v}')" style="padding:10px 20px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:${state.activeView===v?'var(--accent)':'var(--text-light)'};border-bottom:2px solid ${state.activeView===v?'var(--accent)':'transparent'};margin-bottom:-2px;transition:all 0.2s;">
-            ${ {overview:'数据概览',projects:'项目列表',staff:'员工管理',pending:'待确认'}[v] }
+            ${ {overview:'数据概览',projects:'项目列表',needs:'需求管理',staff:'员工管理',pending:'待确认'}[v] }
           </button>
         `).join('')}
       </div>
@@ -186,6 +186,7 @@ function renderContent() {
   const area = document.getElementById('contentArea');
   if (state.activeView === 'overview') area.innerHTML = renderOverview();
   else if (state.activeView === 'projects') area.innerHTML = renderProjects();
+  else if (state.activeView === 'needs') { area.innerHTML = '<div id="needsContainer">加载中...</div>'; loadBossNeeds(); }
   else if (state.activeView === 'staff') area.innerHTML = renderStaff();
   else if (state.activeView === 'pending') area.innerHTML = renderPending();
 }
@@ -469,6 +470,184 @@ function renderPending() {
       </div>
     </div>
   `;
+}
+
+// ===== 需求管理 =====
+let bossNeeds = [];
+let bossNeedsLoaded = false;
+
+async function loadBossNeeds() {
+  const container = document.getElementById('needsContainer');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">加载需求中...</div>';
+  try {
+    const resp = await fetch(`${API_BASE}/api/needs-list?staffId=${state.staffId}&password=${encodeURIComponent(state.password)}`);
+    const data = await resp.json();
+    if (data.success) {
+      bossNeeds = data.items || [];
+      bossNeedsLoaded = true;
+      renderBossNeeds();
+    } else {
+      container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--danger);">${data.error || '加载失败'}</div>`;
+    }
+  } catch(e) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--danger);">网络错误: ${e.message}</div>`;
+  }
+}
+
+function renderBossNeeds() {
+  const container = document.getElementById('needsContainer');
+  if (!container) return;
+  if (bossNeeds.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">暂无客户需求</div>';
+    return;
+  }
+
+  const statusOptions = ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失'];
+  const statusColors = {
+    '待联系': 'background:var(--gold-pale);color:#6B4E2E;',
+    '已联系': 'background:#E3F2FD;color:#1565C0;',
+    '方案设计中': 'background:var(--sage-bg);color:var(--primary);',
+    '已签约': 'background:var(--accent);color:#fff;',
+    '已搁置': 'background:#F5F5F5;color:#999;',
+    '已流失': 'background:#FCE8E8;color:#8B3A3A;',
+  };
+
+  container.innerHTML = bossNeeds.map(item => {
+    const designers = [{id:'',name:'— 未分配 —'},{id:'S01',name:'S01 庄涛'},{id:'S02',name:'S02 林协莎'}];
+    const softDecos = [{id:'',name:'— 未分配 —'},{id:'S03',name:'S03 颜大然'}];
+    const drawings = [{id:'',name:'— 未分配 —'},{id:'S04',name:'S04 王润鹏'}];
+
+    function makeSelect(role, options, currentVal) {
+      return `<select class="need-assign-select" data-need="${item.recordId}" data-role="${role}" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;">
+        ${options.map(o => `<option value="${o.id}" ${currentVal===o.id?'selected':''}>${o.name}</option>`).join('')}
+      </select>`;
+    }
+
+    const assigned = [item.designerId, item.softDecoId, item.drawingId].filter(Boolean).length;
+
+    return `
+      <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;border:1px solid rgba(216,232,222,0.5);">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text-main);">${item.name || '未署名'}</div>
+              <div style="font-size:12px;color:var(--text-light);margin-top:4px;">
+                ${item.contact || '无联系方式'} · ${item.spaceType || '未指定'} ${item.area ? ' · ' + item.area + '㎡' : ''} ${item.budget ? ' · ' + item.budget : ''} ${item.address ? ' · ' + item.address : ''}
+              </div>
+              ${assigned > 0 ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                ${item.designerId ? `<span style="padding:2px 8px;background:var(--sage-bg);color:var(--primary);border-radius:4px;font-size:11px;font-weight:600;">设计师: ${item.designerName || item.designerId}</span>` : ''}
+                ${item.softDecoId ? `<span style="padding:2px 8px;background:var(--sage-bg);color:var(--primary);border-radius:4px;font-size:11px;font-weight:600;">软装: ${item.softDecoName || item.softDecoId}</span>` : ''}
+                ${item.drawingId ? `<span style="padding:2px 8px;background:var(--sage-bg);color:var(--primary);border-radius:4px;font-size:11px;font-weight:600;">施工图: ${item.drawingName || item.drawingId}</span>` : ''}
+              </div>` : '<div style="margin-top:6px;font-size:12px;color:var(--warning);font-weight:600;">⚠ 未分配团队</div>'}
+            </div>
+            <select onchange="updateNeedStatus('${item.recordId}', this.value, this)" style="${statusColors[item.status] || ''}padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;outline:none;-webkit-appearance:none;">
+              ${statusOptions.map(s => `<option value="${s}" ${item.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div style="padding:14px 20px;background:var(--bg);">
+          <div style="font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:10px;">团队分配 <span style="font-weight:400;font-size:11px;">（分配后对应员工可在员工端看到此需求）</span></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;color:var(--text-light);">设计师</span>
+              ${makeSelect('designer', designers, item.designerId)}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;color:var(--text-light);">软装</span>
+              ${makeSelect('softDeco', softDecos, item.softDecoId)}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;color:var(--text-light);">施工图</span>
+              ${makeSelect('drawing', drawings, item.drawingId)}
+            </div>
+            <button onclick="saveNeedAssign('${item.recordId}')" style="padding:7px 18px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(42,107,80,0.2);">保存分配</button>
+          </div>
+          ${item.status === '已签约' ? '<div style="margin-top:8px;font-size:12px;color:var(--success);font-weight:600;">✓ 已签约，项目已自动创建，团队分配已同步到项目</div>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveNeedAssign(needRecordId) {
+  const selects = document.querySelectorAll(`.need-assign-select[data-need="${needRecordId}"]`);
+  const assignments = {};
+  selects.forEach(sel => {
+    const role = sel.dataset.role;
+    const val = sel.value;
+    if (val) assignments[role] = val;
+  });
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/assign-need-staff`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staffId: state.staffId,
+        password: state.password,
+        needRecordId: needRecordId,
+        assignments: assignments,
+      })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      // 更新本地数据
+      const idx = bossNeeds.findIndex(n => n.recordId === needRecordId);
+      if (idx >= 0) {
+        if (assignments.designer) { bossNeeds[idx].designerId = assignments.designer; bossNeeds[idx].designerName = {S01:'庄涛',S02:'林协莎'}[assignments.designer] || ''; }
+        if (assignments.softDeco) { bossNeeds[idx].softDecoId = assignments.softDeco; bossNeeds[idx].softDecoName = {S03:'颜大然'}[assignments.softDeco] || ''; }
+        if (assignments.drawing) { bossNeeds[idx].drawingId = assignments.drawing; bossNeeds[idx].drawingName = {S04:'王润鹏'}[assignments.drawing] || ''; }
+      }
+      renderBossNeeds();
+      alert('团队分配已保存');
+    } else {
+      alert('分配失败: ' + (data.error || ''));
+    }
+  } catch(e) {
+    alert('网络错误: ' + e.message);
+  }
+}
+
+async function updateNeedStatus(recordId, newStatus, selectEl) {
+  const oldVal = selectEl.dataset.old || '';
+  selectEl.disabled = true;
+  try {
+    const resp = await fetch(`${API_BASE}/api/update-status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staffId: state.staffId,
+        password: state.password,
+        recordId: recordId,
+        status: newStatus,
+      })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      if (newStatus === '已签约' && data.syncResult) {
+        if (data.syncResult.success) {
+          alert('已签约！项目已自动创建，团队分配已同步到项目');
+        } else if (data.syncResult.skipped) {
+          alert('状态已更新，项目已存在');
+        } else {
+          alert('状态已更新，但项目同步失败: ' + (data.syncResult.error || ''));
+        }
+      }
+      // 更新本地数据
+      const idx = bossNeeds.findIndex(n => n.recordId === recordId);
+      if (idx >= 0) bossNeeds[idx].status = newStatus;
+      selectEl.dataset.old = newStatus;
+      renderBossNeeds();
+      // 刷新项目列表
+      refresh();
+    } else {
+      alert('更新失败: ' + (data.error || ''));
+    }
+  } catch(e) {
+    alert('网络错误: ' + e.message);
+  }
+  selectEl.disabled = false;
 }
 
 // ===== Logout =====

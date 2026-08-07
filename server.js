@@ -783,6 +783,17 @@ async function syncNeedToProject(needRecordId) {
     }
   };
 
+  // 同步团队分配字段（从需求表复制到项目表）
+  const designerId = parseFieldValue(f['设计师工号']);
+  const designerName = parseFieldValue(f['设计师姓名']);
+  const softDecoId = parseFieldValue(f['软装设计师工号']);
+  const softDecoName = parseFieldValue(f['软装设计师姓名']);
+  const drawingId = parseFieldValue(f['施工图设计师工号']);
+  const drawingName = parseFieldValue(f['施工图设计师姓名']);
+  if (designerId) { projectRecord.fields['设计师工号'] = designerId; projectRecord.fields['设计师姓名'] = designerName; }
+  if (softDecoId) { projectRecord.fields['软装设计师工号'] = softDecoId; projectRecord.fields['软装设计师姓名'] = softDecoName; }
+  if (drawingId) { projectRecord.fields['施工图设计师工号'] = drawingId; projectRecord.fields['施工图设计师姓名'] = drawingName; }
+
   // 移除空值
   Object.keys(projectRecord.fields).forEach(k => {
     if (projectRecord.fields[k] === null || projectRecord.fields[k] === '') delete projectRecord.fields[k];
@@ -808,7 +819,7 @@ async function syncNeedToProject(needRecordId) {
   }
 }
 
-// 获取客户需求列表（含跟进状态）
+// 获取客户需求列表（含跟进状态和团队分配）
 async function handleNeedsList(req, res) {
   const parsed = url.parse(req.url, true);
   const { staffId, password } = parsed.query;
@@ -825,7 +836,7 @@ async function handleNeedsList(req, res) {
     return sendJSON(res, 500, { success: false, error: result.msg });
   }
 
-  const items = (result.data.items || []).map(item => {
+  const allItems = (result.data.items || []).map(item => {
     const f = item.fields;
     return {
       recordId: item.record_id,
@@ -838,8 +849,27 @@ async function handleNeedsList(req, res) {
       timeline: parseFieldValue(f['工期期望']),
       status: parseFieldValue(f['跟进状态']) || '待联系',
       createdAt: item.created_time || '',
+      // 团队分配字段
+      designerId: parseFieldValue(f['设计师工号']) || '',
+      designerName: parseFieldValue(f['设计师姓名']) || '',
+      softDecoId: parseFieldValue(f['软装设计师工号']) || '',
+      softDecoName: parseFieldValue(f['软装设计师姓名']) || '',
+      drawingId: parseFieldValue(f['施工图设计师工号']) || '',
+      drawingName: parseFieldValue(f['施工图设计师姓名']) || '',
     };
   });
+
+  // B01 管理员看到所有需求；普通员工只看到分配给自己的需求
+  let items;
+  if (staffId === 'B01') {
+    items = allItems;
+  } else {
+    items = allItems.filter(item =>
+      item.designerId === staffId ||
+      item.softDecoId === staffId ||
+      item.drawingId === staffId
+    );
+  }
 
   return sendJSON(res, 200, { success: true, total: items.length, items });
 }
@@ -858,6 +888,23 @@ async function handleUpdateStatus(req, res) {
 
   if (!recordId || !status) {
     return sendJSON(res, 400, { success: false, error: '缺少 recordId 或 status' });
+  }
+
+  // B01管理员可以直接修改；普通员工需要被分配到该需求才能修改
+  if (staffId !== 'B01') {
+    const needResult = await feishuRequest('GET',
+      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/${recordId}`
+    );
+    if (needResult.code !== 0 || !needResult.data || !needResult.data.record) {
+      return sendJSON(res, 404, { success: false, error: '需求记录不存在' });
+    }
+    const f = needResult.data.record.fields;
+    const designerId = parseFieldValue(f['设计师工号']);
+    const softDecoId = parseFieldValue(f['软装设计师工号']);
+    const drawingId = parseFieldValue(f['施工图设计师工号']);
+    if (designerId !== staffId && softDecoId !== staffId && drawingId !== staffId) {
+      return sendJSON(res, 403, { success: false, error: '您未被分配到此需求，无法修改状态' });
+    }
   }
 
   const validStatuses = ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失'];
@@ -953,6 +1000,71 @@ async function handleAssignStaff(req, res) {
     projectRecordId,
     updatedRoles: Object.keys(assignments),
     message: '团队分配已更新',
+  });
+}
+
+// ===== 在需求表上分配团队成员（管理后台专用） =====
+async function handleAssignNeedStaff(req, res) {
+  const body = await getBody(req);
+  let data;
+  try { data = JSON.parse(body.toString()); } catch { return sendJSON(res, 400, { success: false, error: 'Invalid JSON' }); }
+
+  const { staffId, password, needRecordId, assignments } = data;
+
+  // 验证身份：只有B01管理员可以在需求表分配团队
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+  if (staffId !== 'B01') {
+    return sendJSON(res, 403, { success: false, error: '仅管理员可分配团队' });
+  }
+  if (!needRecordId || !assignments || typeof assignments !== 'object') {
+    return sendJSON(res, 400, { success: false, error: '缺少 needRecordId 或 assignments' });
+  }
+
+  // 角色字段映射（需求表）
+  const roleFieldMap = {
+    designer:    { idField: '设计师工号',       nameField: '设计师姓名' },
+    softDeco:    { idField: '软装设计师工号',   nameField: '软装设计师姓名' },
+    drawing:     { idField: '施工图设计师工号', nameField: '施工图设计师姓名' },
+  };
+
+  const fieldsToUpdate = {};
+  for (const [role, assignStaffId] of Object.entries(assignments)) {
+    const mapping = roleFieldMap[role];
+    if (!mapping) continue;
+
+    if (assignStaffId === '' || assignStaffId === null) {
+      fieldsToUpdate[mapping.idField] = '';
+      fieldsToUpdate[mapping.nameField] = '';
+    } else {
+      const staffInfo = config.staffRoles[assignStaffId];
+      if (!staffInfo) {
+        return sendJSON(res, 400, { success: false, error: `无效的工号: ${assignStaffId}` });
+      }
+      fieldsToUpdate[mapping.idField] = assignStaffId;
+      fieldsToUpdate[mapping.nameField] = staffInfo.name;
+    }
+  }
+
+  if (Object.keys(fieldsToUpdate).length === 0) {
+    return sendJSON(res, 400, { success: false, error: '没有需要更新的分配' });
+  }
+
+  const updateResult = await feishuRequest('PUT',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.needs}/records/${needRecordId}`,
+    { fields: fieldsToUpdate }
+  );
+
+  if (updateResult.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: updateResult.msg });
+  }
+
+  return sendJSON(res, 200, {
+    success: true,
+    needRecordId,
+    updatedRoles: Object.keys(assignments),
+    message: '需求团队分配已更新',
   });
 }
 
@@ -1250,6 +1362,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/assign-staff' && req.method === 'POST') {
       return await handleAssignStaff(req, res);
+    }
+    if (pathname === '/api/assign-need-staff' && req.method === 'POST') {
+      return await handleAssignNeedStaff(req, res);
     }
     if (pathname.startsWith('/api/file/') && req.method === 'GET') {
       return await handleFileProxy(req, res);

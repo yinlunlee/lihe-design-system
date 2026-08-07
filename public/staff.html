@@ -676,12 +676,6 @@
       <div id="detailTeamInfo"></div>
     </div>
 
-    <!-- 团队分配卡片（仅B01管理员可见） -->
-    <div class="detail-card" id="assignCard" style="display:none;">
-      <div class="detail-card-title">团队分配 <span class="field-hint">设计师/软装/施工图先分配，监理等施工阶段再分配</span></div>
-      <div id="assignArea"></div>
-    </div>
-
     <!-- 进度卡片 -->
     <div class="detail-card">
       <div class="detail-card-title">当前进度</div>
@@ -1054,7 +1048,7 @@
               ${statusOptions.map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''}>${s}</option>`).join('')}
             </select>
           </div>
-          ${item.status === '已签约' ? '<div style="margin-top:6px;font-size:12px;color:var(--sage);font-weight:600;">✓ 项目已自动创建，可在「我的项目」中查看并分配团队</div>' : ''}
+          ${item.status === '已签约' ? '<div style="margin-top:6px;font-size:12px;color:var(--sage);font-weight:600;">✓ 项目已自动创建，可在「我的项目」中查看</div>' : ''}
         </div>
       `;
     }).join('');
@@ -1079,7 +1073,7 @@
       if (data.success) {
         if (newStatus === '已签约' && data.syncResult) {
           if (data.syncResult.success) {
-            showToast('已签约！项目已自动创建，请到「我的项目」分配团队');
+            showToast('已签约！项目已自动创建，请到「我的项目」查看');
           } else if (data.syncResult.skipped) {
             showToast('状态已更新，项目已存在');
           } else {
@@ -1185,16 +1179,6 @@
       <div class="info-row"><span class="info-label">施工监理</span><span class="info-value">${p.supervisorName || p.supervisorId || '未分配'}</span></div>
     `;
 
-    // 团队分配卡片（仅B01管理员可见）
-    const isBoss = state.staffId === 'B01';
-    const assignCard = document.getElementById('assignCard');
-    if (isBoss) {
-      assignCard.style.display = 'block';
-      renderAssignArea(p);
-    } else {
-      assignCard.style.display = 'none';
-    }
-
     // 进度
     document.getElementById('detailProgress').innerHTML = `
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
@@ -1255,132 +1239,6 @@
       html += '</div>';
     }
     document.getElementById('detailTimeline').innerHTML = html;
-  }
-
-  // 员工角色映射（用于分配后本地更新）
-  const config_staffRoles = {
-    'S01': { name: '庄涛' },
-    'S02': { name: '林协莎' },
-    'S03': { name: '颜大然' },
-    'S04': { name: '王润鹏' },
-    'S05': { name: '谢佳润' },
-    'S06': { name: '谢建彬' },
-    'B01': { name: '管理员' },
-  };
-
-  // 施工阶段列表（用于判断监理是否可分配）
-  const CONSTRUCTION_STAGES = ['开工前期准备','拆除改造','水电隐蔽工程','防水工程','泥瓦工程','木工吊顶','油漆墙面','安装阶段','开荒保洁竣工验收','竣工交付'];
-
-  // ===== 团队分配渲染 =====
-  function renderAssignArea(p) {
-    const isConstruction = CONSTRUCTION_STAGES.includes(p.stage);
-    const designers = [
-      { id: '', name: '— 未分配 —' },
-      { id: 'S01', name: 'S01 庄涛（设计师）' },
-      { id: 'S02', name: 'S02 林协莎（设计师）' },
-    ];
-    const softDecos = [
-      { id: '', name: '— 未分配 —' },
-      { id: 'S03', name: 'S03 颜大然（软装设计师）' },
-    ];
-    const drawings = [
-      { id: '', name: '— 未分配 —' },
-      { id: 'S04', name: 'S04 王润鹏（施工图设计师）' },
-    ];
-    const supervisors = [
-      { id: '', name: '— 未分配 —' },
-      { id: 'S05', name: 'S05 谢佳润（施工监理）' },
-      { id: 'S06', name: 'S06 谢建彬（施工监理）' },
-    ];
-
-    function makeSelect(role, options, currentVal, disabled) {
-      return `<select class="assign-select" data-role="${role}" ${disabled ? 'disabled' : ''}>
-        ${options.map(o => `<option value="${o.id}" ${currentVal === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
-      </select>`;
-    }
-
-    const html = `
-      <div class="assign-row">
-        <div><div class="assign-label">设计师</div></div>
-        ${makeSelect('designer', designers, p.designerId, false)}
-      </div>
-      <div class="assign-row">
-        <div><div class="assign-label">软装设计师</div></div>
-        ${makeSelect('softDeco', softDecos, p.softDecoId, false)}
-      </div>
-      <div class="assign-row">
-        <div><div class="assign-label">施工图设计师</div></div>
-        ${makeSelect('drawing', drawings, p.drawingId, false)}
-      </div>
-      <div class="assign-row">
-        <div>
-          <div class="assign-label">施工监理</div>
-          <div class="assign-hint">${isConstruction ? '已进入施工阶段，可分配' : '进入施工阶段后可分配'}</div>
-        </div>
-        ${makeSelect('supervisor', supervisors, p.supervisorId, !isConstruction)}
-      </div>
-      <button class="assign-btn" onclick="submitAssign()">保 存 分 配</button>
-    `;
-    document.getElementById('assignArea').innerHTML = html;
-  }
-
-  // ===== 提交团队分配 =====
-  function submitAssign() {
-    const selects = document.querySelectorAll('#assignArea .assign-select');
-    const assignments = {};
-    selects.forEach(sel => {
-      const role = sel.dataset.role;
-      const val = sel.value;
-      if (val) assignments[role] = val;
-    });
-
-    if (Object.keys(assignments).length === 0) {
-      showToast('请至少分配一个角色');
-      return;
-    }
-
-    const btn = document.querySelector('.assign-btn');
-    btn.disabled = true;
-    btn.textContent = '保存中...';
-
-    fetch(`${API_BASE}/api/assign-staff`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        staffId: state.staffId,
-        password: state.password,
-        projectRecordId: state.selectedProject.recordId,
-        assignments: assignments,
-      })
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        showToast('团队分配已保存');
-        // 更新本地项目数据
-        if (assignments.designer) { state.selectedProject.designerId = assignments.designer; state.selectedProject.designerName = config_staffRoles[assignments.designer]?.name || ''; }
-        if (assignments.softDeco) { state.selectedProject.softDecoId = assignments.softDeco; state.selectedProject.softDecoName = config_staffRoles[assignments.softDeco]?.name || ''; }
-        if (assignments.drawing) { state.selectedProject.drawingId = assignments.drawing; state.selectedProject.drawingName = config_staffRoles[assignments.drawing]?.name || ''; }
-        if (assignments.supervisor) { state.selectedProject.supervisorId = assignments.supervisor; state.selectedProject.supervisorName = config_staffRoles[assignments.supervisor]?.name || ''; }
-        // 刷新团队信息显示
-        document.getElementById('detailTeamInfo').innerHTML = `
-          <div class="info-row"><span class="info-label">设计师</span><span class="info-value">${state.selectedProject.designerName || state.selectedProject.designerId || '未分配'}</span></div>
-          <div class="info-row"><span class="info-label">软装设计师</span><span class="info-value">${state.selectedProject.softDecoName || state.selectedProject.softDecoId || '未分配'}</span></div>
-          <div class="info-row"><span class="info-label">施工图设计师</span><span class="info-value">${state.selectedProject.drawingName || state.selectedProject.drawingId || '未分配'}</span></div>
-          <div class="info-row"><span class="info-label">施工监理</span><span class="info-value">${state.selectedProject.supervisorName || state.selectedProject.supervisorId || '未分配'}</span></div>
-        `;
-        renderAssignArea(state.selectedProject);
-      } else {
-        showToast('分配失败: ' + (data.error || ''));
-      }
-    })
-    .catch(err => {
-      showToast('网络错误: ' + err.message);
-    })
-    .finally(() => {
-      btn.disabled = false;
-      btn.textContent = '保 存 分 配';
-    });
   }
 
   // ===== 详情页 Tab 切换 =====
