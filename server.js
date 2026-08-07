@@ -265,17 +265,17 @@ async function handleNeeds(req, res) {
       '联系方式': data.contact || '',
       '项目地址': data.address || '',
       '空间类型': data.spaceType || '',
+      '空间大类': data.spaceCategory || '',
       '面积': data.area ? parseFloat(data.area) : null,
       '每平米预算': data.budget || '',
       '预算弹性': data.budgetFlex || '',
+      '风格偏好': data.stylePreference || '',
       '喜欢的色系': data.colorSystem || '',
       '圈选色系': data.colorPick || '',
       '喜欢的明暗度': data.brightness || '',
       '不接受的色调': data.reject || '',
-      '常住人口': data.residents || '',
       '核心功能区': data.rooms || '',
       '特殊需求': data.special || '',
-      '收纳需求': data.storage || '',
       '材质偏好': data.material || '',
       '风水考量': data.fengshui || '',
       '工期期望': data.timeline || '',
@@ -284,6 +284,20 @@ async function handleNeeds(req, res) {
       '提交时间': Date.now(),
     }
   };
+
+  // 商业空间特有字段
+  if (data.spaceCategory === '商业空间') {
+    record.fields['商业类型'] = data.bizType || '';
+    record.fields['经营内容'] = data.bizDetail || '';
+    record.fields['特殊行业功能'] = data.specialBiz || '';
+  }
+
+  // 住宅空间特有字段
+  if (data.spaceCategory === '住宅空间') {
+    record.fields['常住人口'] = data.residents || '';
+    record.fields['电器喜好'] = (data.appliances ? data.appliances + (data.applianceOther ? '、' + data.applianceOther : '') : data.applianceOther || '');
+    record.fields['收纳需求'] = data.storage || '';
+  }
 
   // Remove null/empty values
   Object.keys(record.fields).forEach(k => {
@@ -296,7 +310,7 @@ async function handleNeeds(req, res) {
   );
 
   if (result.code === 0) {
-    console.log(`[needs] New client needs submitted: ${data.name} - ${data.contact}`);
+    console.log(`[needs] New client needs submitted: ${data.name} - ${data.contact} (${data.spaceCategory || '未分类'})`);
     sendJSON(res, 200, { success: true, recordId: result.data.record.record_id });
   } else {
     console.error('[needs] Error:', result.msg);
@@ -981,9 +995,12 @@ async function handleNeedsList(req, res) {
       name: parseFieldValue(f['客户姓名']),
       contact: parseFieldValue(f['联系方式']),
       address: parseFieldValue(f['项目地址']),
+      spaceCategory: parseFieldValue(f['空间大类']) || '',
       spaceType: parseFieldValue(f['空间类型']),
       area: parseFieldValue(f['面积']),
       budget: parseFieldValue(f['每平米预算']),
+      stylePreference: parseFieldValue(f['风格偏好']) || '',
+      bizType: parseFieldValue(f['商业类型']) || '',
       timeline: parseFieldValue(f['工期期望']),
       status: parseFieldValue(f['跟进状态']) || '待联系',
       createdAt: item.created_time || '',

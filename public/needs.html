@@ -58,8 +58,56 @@
   .cover .subtitle { font-size: 12px; opacity: 0.8; margin-bottom: 6px; }
   .cover .philosophy { font-size: 11px; opacity: 0.6; font-style: italic; }
 
+  /* ===== 入口选择页 ===== */
+  .select-page { padding: 30px 16px; }
+  .select-intro { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; line-height: 1.8; }
+  .select-cards { display: flex; flex-direction: column; gap: 16px; }
+  .select-card {
+    background: var(--white);
+    border: 2px solid var(--sage-border);
+    border-radius: var(--radius-lg);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .select-card:active { transform: scale(0.97); border-color: var(--sage); }
+  .select-card-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 26px;
+  }
+  .select-card-icon.commercial { background: linear-gradient(135deg, #E8C9A0, #D4A574); color: #fff; }
+  .select-card-icon.residential { background: linear-gradient(135deg, #7A9D8B, #5A7D6B); color: #fff; }
+  .select-card h3 { font-size: 18px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
+  .select-card p { font-size: 13px; color: var(--text-light); }
+  .select-card .arrow {
+    position: absolute;
+    right: 16px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--sage-light);
+    font-size: 20px;
+  }
+
   /* ===== 表单主体 ===== */
-  .form-body { padding: 20px 16px 40px; }
+  .form-body { padding: 20px 16px 40px; display: none; }
+
+  /* 返回按钮 */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--sage);
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
 
   /* 章节标题 */
   .section-title {
@@ -117,7 +165,7 @@
   .input-text:focus { outline: none; border-color: var(--sage); }
   textarea.input-text { resize: none; min-height: 60px; line-height: 1.6; }
 
-  /* 复选框标签组 */
+  /* 单选标签组 */
   .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .tag-item {
     padding: 6px 14px;
@@ -136,6 +184,19 @@
     border-color: var(--sage);
   }
   .tag-item:active { transform: scale(0.95); }
+
+  /* 立和独创风格特殊标签 */
+  .tag-item.signature {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #FFF8EE, #F5E6D3);
+    color: #8B6914;
+    font-weight: 600;
+  }
+  .tag-item.signature.active {
+    background: linear-gradient(135deg, var(--accent), #C9954E);
+    color: var(--white);
+    border-color: var(--accent);
+  }
 
   /* 复选框组 */
   .check-group { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
@@ -164,7 +225,7 @@
     border-color: var(--sage);
   }
   .check-item.checked .check-box::after {
-    content: '✓';
+    content: '\2713';
     color: var(--white);
     font-size: 12px;
     font-weight: 700;
@@ -252,8 +313,31 @@
   <div class="philosophy">「 为时间而设计  ·  Design for Time 」</div>
 </div>
 
-<!-- ===== 表单主体 ===== -->
-<div class="form-body" id="formBody">
+<!-- ===== 入口选择页 ===== -->
+<div class="select-page" id="selectPage">
+  <div class="select-intro">
+    请选择您的空间类型<br>我们将为您匹配对应的需求表单
+  </div>
+  <div class="select-cards">
+    <div class="select-card" onclick="selectType('commercial')">
+      <div class="select-card-icon commercial">🏬</div>
+      <h3>商业空间</h3>
+      <p>商铺 · 餐饮 · 办公 · 展厅 · 会所</p>
+      <span class="arrow">›</span>
+    </div>
+    <div class="select-card" onclick="selectType('residential')">
+      <div class="select-card-icon residential">🏡</div>
+      <h3>住宅空间</h3>
+      <p>住宅 · 公寓 · 别墅</p>
+      <span class="arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 商业空间表单 ===== -->
+<div class="form-body" id="commercialForm">
+
+  <div class="back-btn" onclick="backToSelect()">‹ 返回重新选择</div>
 
   <!-- 01 基本信息 -->
   <div class="section-title">
@@ -261,51 +345,85 @@
   </div>
 
   <div class="field-label">客户姓名</div>
-  <input class="input-text" id="f_name" type="text" placeholder="请输入姓名">
+  <input class="input-text" id="c_name" type="text" placeholder="请输入姓名">
 
   <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span></div>
-  <input class="input-text" id="f_contact" type="text" placeholder="手机号或微信号">
+  <input class="input-text" id="c_contact" type="text" placeholder="手机号或微信号">
 
   <div class="field-label">项目地址</div>
-  <input class="input-text" id="f_address" type="text" placeholder="如：汕头市龙湖区xxx">
-
-  <div class="field-label">空间类型</div>
-  <div class="check-group" id="f_spaceType">
-    <div class="check-item" data-val="住宅"><div class="check-box"></div>住宅</div>
-    <div class="check-item" data-val="公寓"><div class="check-box"></div>公寓</div>
-    <div class="check-item" data-val="别墅"><div class="check-box"></div>别墅</div>
-    <div class="check-item" data-val="商铺"><div class="check-box"></div>商铺</div>
-    <div class="check-item" data-val="办公"><div class="check-box"></div>办公</div>
-    <div class="check-item" data-val="餐饮"><div class="check-box"></div>餐饮</div>
-    <div class="check-item" data-val="其他"><div class="check-box"></div>其他</div>
-  </div>
+  <input class="input-text" id="c_address" type="text" placeholder="如：汕头市龙湖区xxx">
 
   <div class="field-label">面积 <span class="field-hint">㎡</span></div>
-  <input class="input-text" id="f_area" type="number" placeholder="如：180">
+  <input class="input-text" id="c_area" type="number" placeholder="如：180">
 
-  <!-- 02 预算 -->
+  <!-- 02 商业品类 -->
   <div class="section-title">
-    <span class="section-num">2</span> 预算范围
+    <span class="section-num">2</span> 商业品类
+  </div>
+
+  <div class="field-label">商业类型 <span class="field-hint">请选择您的商业品类</span></div>
+  <div class="tag-group" id="c_bizType">
+    <div class="tag-item" data-val="餐饮">餐饮</div>
+    <div class="tag-item" data-val="零售商铺">零售商铺</div>
+    <div class="tag-item" data-val="办公室">办公室</div>
+    <div class="tag-item" data-val="展厅/ showroom">展厅/ showroom</div>
+    <div class="tag-item" data-val="美容/美发">美容/美发</div>
+    <div class="tag-item" data-val="健身/瑜伽">健身/瑜伽</div>
+    <div class="tag-item" data-val="教育培训">教育培训</div>
+    <div class="tag-item" data-val="酒店/民宿">酒店/民宿</div>
+    <div class="tag-item" data-val="会所/club">会所/club</div>
+    <div class="tag-item" data-val="诊所/药房">诊所/药房</div>
+    <div class="tag-item" data-val="其他">其他</div>
+  </div>
+
+  <div class="field-label">具体经营内容 <span class="field-hint">请描述您的具体业务</span></div>
+  <textarea class="input-text" id="c_bizDetail" rows="2" placeholder="如：精品咖啡店、高端女装店、设计工作室..."></textarea>
+
+  <div class="field-label">特殊行业特殊功能 <span class="field-hint">如有特殊要求请详细描述</span></div>
+  <textarea class="input-text" id="c_specialBiz" rows="3" placeholder="如：餐饮需排烟排水/生鲜冷藏、诊所需无菌分区/独立通道、美容需上下水/通风等..."></textarea>
+
+  <!-- 03 预算 -->
+  <div class="section-title">
+    <span class="section-num">3</span> 预算范围
   </div>
 
   <div class="field-label">每平米预算 <span class="field-hint">元/㎡</span></div>
-  <div class="tag-group" id="f_budget">
+  <div class="tag-group" id="c_budget">
+    <div class="tag-item" data-val="1000-2000">1000-2000</div>
+    <div class="tag-item" data-val="2000-3000">2000-3000</div>
     <div class="tag-item" data-val="3000-4000">3000-4000</div>
-    <div class="tag-item" data-val="4000-5000">4000-5000</div>
-    <div class="tag-item" data-val="5000-6000">5000-6000</div>
-    <div class="tag-item" data-val="7000+">7000+</div>
+    <div class="tag-item" data-val="4000+">4000+</div>
   </div>
 
   <div class="field-label">预算弹性 <span class="field-hint">可上下浮动范围</span></div>
-  <input class="input-text" id="f_budgetFlex" type="text" placeholder="如：可浮动10%">
+  <input class="input-text" id="c_budgetFlex" type="text" placeholder="如：可浮动10%">
 
-  <!-- 03 色调感觉 -->
+  <!-- 04 风格偏好 -->
   <div class="section-title">
-    <span class="section-num">3</span> 色调感觉
+    <span class="section-num">4</span> 风格偏好
+  </div>
+
+  <div class="field-label">喜欢的风格 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="c_style">
+    <div class="tag-item signature" data-val="立和独创风格">✦ 立和独创风格</div>
+    <div class="tag-item" data-val="现代简约">现代简约</div>
+    <div class="tag-item" data-val="侘寂风">侘寂风</div>
+    <div class="tag-item" data-val="轻奢">轻奢</div>
+    <div class="tag-item" data-val="新中式">新中式</div>
+    <div class="tag-item" data-val="工业风">工业风</div>
+    <div class="tag-item" data-val="复古风">复古风</div>
+    <div class="tag-item" data-val="自然风">自然风</div>
+    <div class="tag-item" data-val="极简">极简</div>
+    <div class="tag-item" data-val="其他">其他</div>
+  </div>
+
+  <!-- 05 色调感觉 -->
+  <div class="section-title">
+    <span class="section-num">5</span> 色调感觉
   </div>
 
   <div class="field-label">喜欢的色系 <span class="field-hint">可多选</span></div>
-  <div class="tag-group" id="f_colorSystem">
+  <div class="tag-group" id="c_colorSystem">
     <div class="tag-item" data-val="暖白">暖白</div>
     <div class="tag-item" data-val="原木色">原木色</div>
     <div class="tag-item" data-val="灰色系">灰色系</div>
@@ -318,62 +436,237 @@
   </div>
 
   <div class="field-label">请圈选您有感觉的色系</div>
-  <div class="color-grid" id="f_colorPick">
-    <div class="color-card" data-val="暖米" style="border:2px solid transparent;">
+  <div class="color-grid" id="c_colorPick">
+    <div class="color-card" data-val="暖米">
       <div class="color-block" style="background:#F0E6D2;"></div>
       <div class="color-name">暖米</div>
     </div>
-    <div class="color-card" data-val="暖沙" style="border:2px solid transparent;">
+    <div class="color-card" data-val="暖沙">
       <div class="color-block" style="background:#D4A574;"></div>
       <div class="color-name">暖沙</div>
     </div>
-    <div class="color-card" data-val="静绿" style="border:2px solid transparent;">
+    <div class="color-card" data-val="静绿">
       <div class="color-block" style="background:#5A7D6B;"></div>
       <div class="color-name">静绿</div>
     </div>
-    <div class="color-card" data-val="雾蓝" style="border:2px solid transparent;">
+    <div class="color-card" data-val="雾蓝">
       <div class="color-block" style="background:#8B9DAB;"></div>
       <div class="color-name">雾蓝</div>
     </div>
-    <div class="color-card" data-val="大地" style="border:2px solid transparent;">
+    <div class="color-card" data-val="大地">
       <div class="color-block" style="background:#6B5B4F;"></div>
       <div class="color-name">大地</div>
     </div>
-    <div class="color-card" data-val="墨黑" style="border:2px solid transparent;">
+    <div class="color-card" data-val="墨黑">
       <div class="color-block" style="background:#3A3A3A;"></div>
       <div class="color-name">墨黑</div>
     </div>
-    <div class="color-card" data-val="灰调" style="border:2px solid transparent;">
+    <div class="color-card" data-val="灰调">
       <div class="color-block" style="background:#C4C4C4;"></div>
       <div class="color-name">灰调</div>
     </div>
-    <div class="color-card" data-val="奶咖" style="border:2px solid transparent;">
+    <div class="color-card" data-val="奶咖">
       <div class="color-block" style="background:#E8D5C4;"></div>
       <div class="color-name">奶咖</div>
     </div>
   </div>
 
   <div class="field-label">喜欢的明暗度 <span class="field-hint">可多选</span></div>
-  <div class="tag-group" id="f_brightness">
+  <div class="tag-group" id="c_brightness">
     <div class="tag-item" data-val="明亮通透">明亮通透</div>
     <div class="tag-item" data-val="柔和均匀">柔和均匀</div>
     <div class="tag-item" data-val="层次光影">层次光影</div>
     <div class="tag-item" data-val="暗调氛围">暗调氛围</div>
   </div>
 
-  <div class="field-label">不接受的感觉或色调 <span class="field-hint">请描述您不想要的色彩/氛围</span></div>
-  <textarea class="input-text" id="f_reject" rows="3" placeholder="如：不要大面积红色，不喜欢冷冰冰的工业感..."></textarea>
+  <div class="field-label">不接受的感觉或色调</div>
+  <textarea class="input-text" id="c_reject" rows="3" placeholder="如：不要大面积红色，不喜欢冷冰冰的工业感..."></textarea>
 
-  <!-- 04 功能需求 -->
+  <!-- 06 功能需求 -->
   <div class="section-title">
-    <span class="section-num">4</span> 功能需求
+    <span class="section-num">6</span> 功能需求
+  </div>
+
+  <div class="field-label">核心功能区 <span class="field-hint">请勾选需要的空间</span></div>
+  <div class="check-group" id="c_rooms">
+    <div class="check-item" data-val="前台接待"><div class="check-box"></div>前台接待</div>
+    <div class="check-item" data-val="展示区"><div class="check-box"></div>展示区</div>
+    <div class="check-item" data-val="洽谈区"><div class="check-box"></div>洽谈区</div>
+    <div class="check-item" data-val="办公区"><div class="check-box"></div>办公区</div>
+    <div class="check-item" data-val="会议区"><div class="check-box"></div>会议区</div>
+    <div class="check-item" data-val="操作间/厨房"><div class="check-box"></div>操作间/厨房</div>
+    <div class="check-item" data-val="仓储区"><div class="check-box"></div>仓储区</div>
+    <div class="check-item" data-val="卫生间"><div class="check-box"></div>卫生间</div>
+    <div class="check-item" data-val="休息室"><div class="check-box"></div>休息室</div>
+    <div class="check-item" data-val="储物间"><div class="check-box"></div>储物间</div>
+    <div class="check-item" data-val="其他"><div class="check-box"></div>其他</div>
+  </div>
+
+  <div class="field-label">其他功能需求 <span class="field-hint">如有特殊需求请描述</span></div>
+  <textarea class="input-text" id="c_special" rows="2" placeholder="如：需要直播间/展示橱窗/特殊设备摆放区..."></textarea>
+
+  <!-- 07 其他补充 -->
+  <div class="section-title">
+    <span class="section-num">7</span> 其他补充
+  </div>
+
+  <div class="field-label">对材质的偏好</div>
+  <textarea class="input-text" id="c_material" rows="2" placeholder="如：木材/石材/金属/布艺/皮革等"></textarea>
+
+  <div class="field-label">是否有风水方面的考量？</div>
+  <input class="input-text" id="c_fengshui" type="text" placeholder="如有请简要描述">
+
+  <div class="field-label">工期期望 <span class="field-hint">希望什么时候开始 / 开业</span></div>
+  <input class="input-text" id="c_timeline" type="text" placeholder="如：希望9月开工，年底开业">
+
+  <div class="field-label">其他想说的话</div>
+  <textarea class="input-text" id="c_other" rows="3" placeholder="任何想补充的都可以写在这里"></textarea>
+
+  <button class="submit-btn" id="c_submitBtn" onclick="submitForm('commercial')">提 交 需 求</button>
+</div>
+
+<!-- ===== 住宅空间表单 ===== -->
+<div class="form-body" id="residentialForm">
+
+  <div class="back-btn" onclick="backToSelect()">‹ 返回重新选择</div>
+
+  <!-- 01 基本信息 -->
+  <div class="section-title">
+    <span class="section-num">1</span> 基本信息
+  </div>
+
+  <div class="field-label">客户姓名</div>
+  <input class="input-text" id="r_name" type="text" placeholder="请输入姓名">
+
+  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span></div>
+  <input class="input-text" id="r_contact" type="text" placeholder="手机号或微信号">
+
+  <div class="field-label">项目地址</div>
+  <input class="input-text" id="r_address" type="text" placeholder="如：汕头市龙湖区xxx">
+
+  <div class="field-label">空间类型</div>
+  <div class="check-group" id="r_spaceType">
+    <div class="check-item" data-val="住宅"><div class="check-box"></div>住宅</div>
+    <div class="check-item" data-val="公寓"><div class="check-box"></div>公寓</div>
+    <div class="check-item" data-val="别墅"><div class="check-box"></div>别墅</div>
+  </div>
+
+  <div class="field-label">面积 <span class="field-hint">㎡</span></div>
+  <input class="input-text" id="r_area" type="number" placeholder="如：180">
+
+  <!-- 02 预算 -->
+  <div class="section-title">
+    <span class="section-num">2</span> 预算范围
+  </div>
+
+  <div class="field-label">每平米预算 <span class="field-hint">元/㎡</span></div>
+  <div class="tag-group" id="r_budget">
+    <div class="tag-item" data-val="3000-4000">3000-4000</div>
+    <div class="tag-item" data-val="4000-5000">4000-5000</div>
+    <div class="tag-item" data-val="5000-6000">5000-6000</div>
+    <div class="tag-item" data-val="7000+">7000+</div>
+  </div>
+
+  <div class="field-label">预算弹性 <span class="field-hint">可上下浮动范围</span></div>
+  <input class="input-text" id="r_budgetFlex" type="text" placeholder="如：可浮动10%">
+
+  <!-- 03 风格偏好 -->
+  <div class="section-title">
+    <span class="section-num">3</span> 风格偏好
+  </div>
+
+  <div class="field-label">喜欢的风格 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="r_style">
+    <div class="tag-item signature" data-val="立和独创风格">✦ 立和独创风格</div>
+    <div class="tag-item" data-val="现代简约">现代简约</div>
+    <div class="tag-item" data-val="侘寂风">侘寂风</div>
+    <div class="tag-item" data-val="轻奢">轻奢</div>
+    <div class="tag-item" data-val="新中式">新中式</div>
+    <div class="tag-item" data-val="日式">日式</div>
+    <div class="tag-item" data-val="北欧">北欧</div>
+    <div class="tag-item" data-val="法式">法式</div>
+    <div class="tag-item" data-val="工业风">工业风</div>
+    <div class="tag-item" data-val="复古风">复古风</div>
+    <div class="tag-item" data-val="自然风">自然风</div>
+    <div class="tag-item" data-val="极简">极简</div>
+    <div class="tag-item" data-val="其他">其他</div>
+  </div>
+
+  <!-- 04 色调感觉 -->
+  <div class="section-title">
+    <span class="section-num">4</span> 色调感觉
+  </div>
+
+  <div class="field-label">喜欢的色系 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="r_colorSystem">
+    <div class="tag-item" data-val="暖白">暖白</div>
+    <div class="tag-item" data-val="原木色">原木色</div>
+    <div class="tag-item" data-val="灰色系">灰色系</div>
+    <div class="tag-item" data-val="绿色系">绿色系</div>
+    <div class="tag-item" data-val="蓝色系">蓝色系</div>
+    <div class="tag-item" data-val="大地色">大地色</div>
+    <div class="tag-item" data-val="黑色系">黑色系</div>
+    <div class="tag-item" data-val="跳色点缀">跳色点缀</div>
+    <div class="tag-item" data-val="低饱和">低饱和</div>
+  </div>
+
+  <div class="field-label">请圈选您有感觉的色系</div>
+  <div class="color-grid" id="r_colorPick">
+    <div class="color-card" data-val="暖米">
+      <div class="color-block" style="background:#F0E6D2;"></div>
+      <div class="color-name">暖米</div>
+    </div>
+    <div class="color-card" data-val="暖沙">
+      <div class="color-block" style="background:#D4A574;"></div>
+      <div class="color-name">暖沙</div>
+    </div>
+    <div class="color-card" data-val="静绿">
+      <div class="color-block" style="background:#5A7D6B;"></div>
+      <div class="color-name">静绿</div>
+    </div>
+    <div class="color-card" data-val="雾蓝">
+      <div class="color-block" style="background:#8B9DAB;"></div>
+      <div class="color-name">雾蓝</div>
+    </div>
+    <div class="color-card" data-val="大地">
+      <div class="color-block" style="background:#6B5B4F;"></div>
+      <div class="color-name">大地</div>
+    </div>
+    <div class="color-card" data-val="墨黑">
+      <div class="color-block" style="background:#3A3A3A;"></div>
+      <div class="color-name">墨黑</div>
+    </div>
+    <div class="color-card" data-val="灰调">
+      <div class="color-block" style="background:#C4C4C4;"></div>
+      <div class="color-name">灰调</div>
+    </div>
+    <div class="color-card" data-val="奶咖">
+      <div class="color-block" style="background:#E8D5C4;"></div>
+      <div class="color-name">奶咖</div>
+    </div>
+  </div>
+
+  <div class="field-label">喜欢的明暗度 <span class="field-hint">可多选</span></div>
+  <div class="tag-group" id="r_brightness">
+    <div class="tag-item" data-val="明亮通透">明亮通透</div>
+    <div class="tag-item" data-val="柔和均匀">柔和均匀</div>
+    <div class="tag-item" data-val="层次光影">层次光影</div>
+    <div class="tag-item" data-val="暗调氛围">暗调氛围</div>
+  </div>
+
+  <div class="field-label">不接受的感觉或色调</div>
+  <textarea class="input-text" id="r_reject" rows="3" placeholder="如：不要大面积红色，不喜欢冷冰冰的工业感..."></textarea>
+
+  <!-- 05 功能需求 -->
+  <div class="section-title">
+    <span class="section-num">5</span> 功能需求
   </div>
 
   <div class="field-label">常住人口 <span class="field-hint">人数 / 年龄段 / 是否有老人小孩宠物</span></div>
-  <textarea class="input-text" id="f_residents" rows="2" placeholder="如：3人（夫妻+1小孩6岁），有1只猫"></textarea>
+  <textarea class="input-text" id="r_residents" rows="2" placeholder="如：3人（夫妻+1小孩6岁），有1只猫"></textarea>
 
   <div class="field-label">核心功能区 <span class="field-hint">请勾选需要的空间</span></div>
-  <div class="check-group" id="f_rooms">
+  <div class="check-group" id="r_rooms">
     <div class="check-item" data-val="客厅"><div class="check-box"></div>客厅</div>
     <div class="check-item" data-val="餐厅"><div class="check-box"></div>餐厅</div>
     <div class="check-item" data-val="主卧"><div class="check-box"></div>主卧</div>
@@ -390,37 +683,53 @@
     <div class="check-item" data-val="健身房"><div class="check-box"></div>健身房</div>
   </div>
 
+  <div class="field-label">电器喜好 <span class="field-hint">请勾选或描述您偏好或已有的电器</span></div>
+  <div class="check-group" id="r_appliances">
+    <div class="check-item" data-val="中央空调"><div class="check-box"></div>中央空调</div>
+    <div class="check-item" data-val="分体空调"><div class="check-box"></div>分体空调</div>
+    <div class="check-item" data-val="地暖"><div class="check-box"></div>地暖</div>
+    <div class="check-item" data-val="新风系统"><div class="check-box"></div>新风系统</div>
+    <div class="check-item" data-val="全屋净水"><div class="check-box"></div>全屋净水</div>
+    <div class="check-item" data-val="洗碗机"><div class="check-box"></div>洗碗机</div>
+    <div class="check-item" data-val="烘干机"><div class="check-box"></div>烘干机</div>
+    <div class="check-item" data-val="蒸烤箱"><div class="check-box"></div>蒸烤箱</div>
+    <div class="check-item" data-val="垃圾处理器"><div class="check-box"></div>垃圾处理器</div>
+    <div class="check-item" data-val="智能马桶"><div class="check-box"></div>智能马桶</div>
+    <div class="check-item" data-val="智能家居系统"><div class="check-box"></div>智能家居系统</div>
+    <div class="check-item" data-val="投影仪"><div class="check-box"></div>投影仪</div>
+    <div class="check-item" data-val="其他"><div class="check-box"></div>其他</div>
+  </div>
+  <input class="input-text" id="r_applianceOther" type="text" placeholder="其他电器请补充说明" style="margin-top:8px;">
+
   <div class="field-label">特殊功能需求 <span class="field-hint">如：居家办公/乐器练习/收藏展示等</span></div>
-  <textarea class="input-text" id="f_special" rows="2" placeholder="如有特殊需求请描述"></textarea>
+  <textarea class="input-text" id="r_special" rows="2" placeholder="如有特殊需求请描述"></textarea>
 
   <div class="field-label">对收纳的需求程度</div>
-  <div class="check-group" id="f_storage">
+  <div class="check-group" id="r_storage">
     <div class="check-item" data-val="极少收纳"><div class="check-box"></div>极少收纳</div>
     <div class="check-item" data-val="适中"><div class="check-box"></div>适中</div>
     <div class="check-item" data-val="大量收纳"><div class="check-box"></div>大量收纳</div>
     <div class="check-item" data-val="需要隐藏式收纳"><div class="check-box"></div>需要隐藏式收纳</div>
   </div>
 
-  <!-- 05 其他补充 -->
+  <!-- 06 其他补充 -->
   <div class="section-title">
-    <span class="section-num">5</span> 其他补充
+    <span class="section-num">6</span> 其他补充
   </div>
 
-  <div class="field-label">对材质的偏好 <span class="field-hint">如：木材/石材/金属/布艺/皮革等</span></div>
-  <textarea class="input-text" id="f_material" rows="2" placeholder="请描述您喜欢的材质"></textarea>
+  <div class="field-label">对材质的偏好</div>
+  <textarea class="input-text" id="r_material" rows="2" placeholder="如：木材/石材/金属/布艺/皮革等"></textarea>
 
   <div class="field-label">是否有风水方面的考量？</div>
-  <input class="input-text" id="f_fengshui" type="text" placeholder="如有请简要描述">
+  <input class="input-text" id="r_fengshui" type="text" placeholder="如有请简要描述">
 
   <div class="field-label">工期期望 <span class="field-hint">希望什么时候开始 / 入住</span></div>
-  <input class="input-text" id="f_timeline" type="text" placeholder="如：希望9月开工，年底入住">
+  <input class="input-text" id="r_timeline" type="text" placeholder="如：希望9月开工，年底入住">
 
   <div class="field-label">其他想说的话</div>
-  <textarea class="input-text" id="f_other" rows="3" placeholder="任何想补充的都可以写在这里"></textarea>
+  <textarea class="input-text" id="r_other" rows="3" placeholder="任何想补充的都可以写在这里"></textarea>
 
-  <!-- 提交 -->
-  <button class="submit-btn" id="submitBtn" onclick="submitForm()">提 交 需 求</button>
-
+  <button class="submit-btn" id="r_submitBtn" onclick="submitForm('residential')">提 交 需 求</button>
 </div>
 
 <!-- ===== 成功页 ===== -->
@@ -438,18 +747,40 @@
 </div>
 
 <script>
-  // ===== 交互逻辑 =====
+  var currentType = '';
 
-  // 单选标签组
-  document.querySelectorAll('.tag-group').forEach(group => {
-    group.querySelectorAll('.tag-item').forEach(item => {
-      item.addEventListener('click', () => {
-        // 色系和明暗度允许多选，预算单选
-        const groupId = group.id;
-        if (groupId === 'f_budget') {
-          group.querySelectorAll('.tag-item').forEach(i => i.classList.remove('active'));
+  // ===== 入口选择 =====
+  function selectType(type) {
+    currentType = type;
+    document.getElementById('selectPage').style.display = 'none';
+    if (type === 'commercial') {
+      document.getElementById('commercialForm').style.display = 'block';
+    } else {
+      document.getElementById('residentialForm').style.display = 'block';
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function backToSelect() {
+    document.getElementById('commercialForm').style.display = 'none';
+    document.getElementById('residentialForm').style.display = 'none';
+    document.getElementById('selectPage').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  // ===== 通用交互逻辑 =====
+
+  // 单选标签组（预算单选，其他多选）
+  document.querySelectorAll('.tag-group').forEach(function(group) {
+    group.querySelectorAll('.tag-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        var groupId = group.id;
+        if (groupId.indexOf('budget') > -1) {
+          // 预算单选
+          group.querySelectorAll('.tag-item').forEach(function(i) { i.classList.remove('active'); });
           item.classList.add('active');
         } else {
+          // 风格、色系、明暗度等多选
           item.classList.toggle('active');
         }
       });
@@ -457,14 +788,14 @@
   });
 
   // 复选框组
-  document.querySelectorAll('.check-group').forEach(group => {
-    // 空间类型和收纳是单选，功能区是多选
-    const groupId = group.id;
-    const isSingle = (groupId === 'f_spaceType' || groupId === 'f_storage');
-    group.querySelectorAll('.check-item').forEach(item => {
-      item.addEventListener('click', () => {
+  document.querySelectorAll('.check-group').forEach(function(group) {
+    var groupId = group.id;
+    // 空间类型和收纳是单选，其余多选
+    var isSingle = (groupId.indexOf('spaceType') > -1 || groupId.indexOf('storage') > -1);
+    group.querySelectorAll('.check-item').forEach(function(item) {
+      item.addEventListener('click', function() {
         if (isSingle) {
-          group.querySelectorAll('.check-item').forEach(i => i.classList.remove('checked'));
+          group.querySelectorAll('.check-item').forEach(function(i) { i.classList.remove('checked'); });
           item.classList.add('checked');
         } else {
           item.classList.toggle('checked');
@@ -474,51 +805,75 @@
   });
 
   // 色块选择（多选）
-  document.querySelectorAll('#f_colorPick .color-card').forEach(card => {
-    card.addEventListener('click', () => {
+  document.querySelectorAll('.color-grid .color-card').forEach(function(card) {
+    card.addEventListener('click', function() {
       card.classList.toggle('active');
     });
   });
 
-  // 获取选中的值
-  function getSelectedValues(containerId, isCheckbox = false) {
-    const container = document.getElementById(containerId);
-    const selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
-    const elements = container.querySelectorAll(selector);
-    return Array.from(elements).map(el => el.dataset.val);
+  // ===== 获取选中值 =====
+  function getSelectedValues(containerId, isCheckbox) {
+    var container = document.getElementById(containerId);
+    if (!container) return [];
+    var selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
+    var elements = container.querySelectorAll(selector);
+    return Array.from(elements).map(function(el) { return el.dataset.val; });
   }
 
-  // 获取单选值
-  function getSingleValue(containerId, isCheckbox = false) {
-    const container = document.getElementById(containerId);
-    const selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
-    const el = container.querySelector(selector);
+  function getSingleValue(containerId, isCheckbox) {
+    var container = document.getElementById(containerId);
+    if (!container) return '';
+    var selector = isCheckbox ? '.check-item.checked' : '.tag-item.active';
+    var el = container.querySelector(selector);
     return el ? el.dataset.val : '';
   }
 
-  // 提交表单
-  function submitForm() {
-    const data = {
-      name: document.getElementById('f_name').value.trim(),
-      contact: document.getElementById('f_contact').value.trim(),
-      address: document.getElementById('f_address').value.trim(),
-      spaceType: getSingleValue('f_spaceType', true),
-      area: document.getElementById('f_area').value.trim(),
-      budget: getSingleValue('f_budget'),
-      budgetFlex: document.getElementById('f_budgetFlex').value.trim(),
-      colorSystem: getSelectedValues('f_colorSystem').join('、'),
-      colorPick: getSelectedValues('f_colorPick').join('、'),
-      brightness: getSelectedValues('f_brightness').join('、'),
-      reject: document.getElementById('f_reject').value.trim(),
-      residents: document.getElementById('f_residents').value.trim(),
-      rooms: getSelectedValues('f_rooms', true).join('、'),
-      special: document.getElementById('f_special').value.trim(),
-      storage: getSingleValue('f_storage', true),
-      material: document.getElementById('f_material').value.trim(),
-      fengshui: document.getElementById('f_fengshui').value.trim(),
-      timeline: document.getElementById('f_timeline').value.trim(),
-      other: document.getElementById('f_other').value.trim(),
-    };
+  function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  // ===== 提交表单 =====
+  function submitForm(type) {
+    var data = { spaceCategory: type === 'commercial' ? '商业空间' : '住宅空间' };
+    var prefix = type === 'commercial' ? 'c_' : 'r_';
+
+    // 通用字段
+    data.name = val(prefix + 'name');
+    data.contact = val(prefix + 'contact');
+    data.address = val(prefix + 'address');
+    data.area = val(prefix + 'area');
+    data.budgetFlex = val(prefix + 'budgetFlex');
+    data.colorSystem = getSelectedValues(prefix + 'colorSystem').join('、');
+    data.colorPick = getSelectedValues(prefix + 'colorPick').join('、');
+    data.brightness = getSelectedValues(prefix + 'brightness').join('、');
+    data.reject = val(prefix + 'reject');
+    data.material = val(prefix + 'material');
+    data.fengshui = val(prefix + 'fengshui');
+    data.timeline = val(prefix + 'timeline');
+    data.other = val(prefix + 'other');
+    data.stylePreference = getSelectedValues(prefix + 'style').join('、');
+
+    if (type === 'commercial') {
+      // 商业空间特有字段
+      data.budget = getSingleValue('c_budget');
+      data.bizType = getSingleValue('c_bizType');
+      data.bizDetail = val('c_bizDetail');
+      data.specialBiz = val('c_specialBiz');
+      data.rooms = getSelectedValues('c_rooms', true).join('、');
+      data.special = val('c_special');
+      data.spaceType = '商业空间';
+    } else {
+      // 住宅空间特有字段
+      data.spaceType = getSingleValue('r_spaceType', true);
+      data.budget = getSingleValue('r_budget');
+      data.residents = val('r_residents');
+      data.rooms = getSelectedValues('r_rooms', true).join('、');
+      data.appliances = getSelectedValues('r_appliances', true).join('、');
+      data.applianceOther = val('r_applianceOther');
+      data.special = val('r_special');
+      data.storage = getSingleValue('r_storage', true);
+    }
 
     // 简单校验
     if (!data.name || !data.contact) {
@@ -526,58 +881,57 @@
       return;
     }
 
-    // ===== 提交到后端API → 飞书多维表格 =====
-    const API_BASE = new URLSearchParams(window.location.search).get('api')
+    // ===== 提交到后端API =====
+    var API_BASE = new URLSearchParams(window.location.search).get('api')
       || localStorage.getItem('lihe_api_base')
-      || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+      || (window.location.origin.indexOf('localhost') > -1 || window.location.origin.indexOf('127.0.0.1') > -1
         ? 'http://localhost:3000'
         : window.location.origin);
 
-    const btn = document.getElementById('submitBtn');
+    var btn = document.getElementById(prefix + 'submitBtn');
     btn.disabled = true;
     btn.textContent = '提交中...';
 
-    fetch(`${API_BASE}/api/needs`, {
+    fetch(API_BASE + '/api/needs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-      .then(r => r.json())
-      .then(result => {
+      .then(function(r) { return r.json(); })
+      .then(function(result) {
         if (result.success) {
           showSuccess();
         } else {
           throw new Error(result.error || '提交失败');
         }
       })
-      .catch(err => {
-        // API未连接时使用演示模式
+      .catch(function(err) {
         console.warn('API未连接，使用演示模式:', err);
         localStorage.setItem('lihe_last_submission', JSON.stringify(data));
         showToast('演示模式：需求已模拟提交（未实际写入飞书）');
-        setTimeout(() => {
-          showSuccess();
-        }, 800);
+        setTimeout(function() { showSuccess(); }, 800);
       })
-      .finally(() => {
+      .finally(function() {
         btn.disabled = false;
         btn.textContent = '提 交 需 求';
       });
   }
 
   function showSuccess() {
-    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('selectPage').style.display = 'none';
+    document.getElementById('commercialForm').style.display = 'none';
+    document.getElementById('residentialForm').style.display = 'none';
     document.getElementById('successPage').style.display = 'block';
     window.scrollTo(0, 0);
   }
 
   function showToast(msg) {
-    let t = document.createElement('div');
+    var t = document.createElement('div');
     t.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:rgba(63,93,80,0.95);color:#fff;padding:10px 24px;border-radius:24px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;';
     t.textContent = msg;
     document.body.appendChild(t);
-    requestAnimationFrame(() => t.style.opacity = '1');
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+    requestAnimationFrame(function() { t.style.opacity = '1'; });
+    setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 2500);
   }
 </script>
 
