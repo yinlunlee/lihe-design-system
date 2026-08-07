@@ -197,6 +197,11 @@
     color: var(--text-secondary);
     margin: 14px 0 6px;
   }
+  .field-label .required {
+    color: var(--danger);
+    margin-left: 2px;
+    font-weight: 700;
+  }
   .field-hint {
     font-size: 12px;
     color: var(--text-light);
@@ -213,11 +218,21 @@
     font-size: 14px;
     color: var(--text-main);
     background: var(--white);
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     -webkit-appearance: none;
   }
   .input-text:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74, 107, 90, 0.06); }
+  .input-text.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(199, 84, 80, 0.08); }
   textarea.input-text { resize: none; min-height: 60px; line-height: 1.6; }
+
+  /* 必填字段提示文字 */
+  .field-error-msg {
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 4px;
+    display: none;
+  }
+  .field-error-msg.show { display: block; }
 
   /* 单选标签组 */
   .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
@@ -519,11 +534,13 @@
     <span class="section-num">1</span> 基本信息
   </div>
 
-  <div class="field-label">客户姓名</div>
+  <div class="field-label">客户姓名<span class="required">*</span></div>
   <input class="input-text" id="c_name" type="text" placeholder="请输入姓名">
+  <div class="field-error-msg" id="c_name_err">请填写客户姓名</div>
 
-  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span></div>
+  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span><span class="required">*</span></div>
   <input class="input-text" id="c_contact" type="text" placeholder="手机号或微信号">
+  <div class="field-error-msg" id="c_contact_err">请填写联系方式</div>
 
   <div class="field-label">项目地址</div>
   <input class="input-text" id="c_address" type="text" placeholder="如：汕头市龙湖区xxx">
@@ -710,11 +727,13 @@
     <span class="section-num">1</span> 基本信息
   </div>
 
-  <div class="field-label">客户姓名</div>
+  <div class="field-label">客户姓名<span class="required">*</span></div>
   <input class="input-text" id="r_name" type="text" placeholder="请输入姓名">
+  <div class="field-error-msg" id="r_name_err">请填写客户姓名</div>
 
-  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span></div>
+  <div class="field-label">联系方式 <span class="field-hint">手机 / 微信</span><span class="required">*</span></div>
   <input class="input-text" id="r_contact" type="text" placeholder="手机号或微信号">
+  <div class="field-error-msg" id="r_contact_err">请填写联系方式</div>
 
   <div class="field-label">项目地址</div>
   <input class="input-text" id="r_address" type="text" placeholder="如：汕头市龙湖区xxx">
@@ -1014,6 +1033,18 @@
     });
   });
 
+  // 必填字段输入时清除错误状态
+  ['c_name', 'r_name', 'c_contact', 'r_contact'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        el.classList.remove('error');
+        var errEl = document.getElementById(id + '_err');
+        if (errEl) errEl.classList.remove('show');
+      });
+    }
+  });
+
   // ===== 获取选中值 =====
   function getSelectedValues(containerId, isCheckbox) {
     var container = document.getElementById(containerId);
@@ -1078,9 +1109,33 @@
       data.storage = getSingleValue('r_storage', true);
     }
 
-    // 简单校验
-    if (!data.name || !data.contact) {
-      alert('请至少填写客户姓名和联系方式');
+    // 必填校验：姓名 + 联系方式
+    var missingFields = [];
+    var nameInput = document.getElementById(prefix + 'name');
+    var contactInput = document.getElementById(prefix + 'contact');
+    var nameErr = document.getElementById(prefix + 'name_err');
+    var contactErr = document.getElementById(prefix + 'contact_err');
+
+    // 先清除之前的错误状态
+    nameInput.classList.remove('error');
+    contactInput.classList.remove('error');
+    nameErr.classList.remove('show');
+    contactErr.classList.remove('show');
+
+    if (!data.name) {
+      nameInput.classList.add('error');
+      nameErr.classList.add('show');
+      missingFields.push(nameInput);
+    }
+    if (!data.contact) {
+      contactInput.classList.add('error');
+      contactErr.classList.add('show');
+      missingFields.push(contactInput);
+    }
+    if (missingFields.length > 0) {
+      // 滚动到第一个缺失的字段
+      missingFields[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      missingFields[0].focus();
       return;
     }
 
