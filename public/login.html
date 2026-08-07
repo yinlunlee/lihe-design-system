@@ -6,50 +6,42 @@
 <title>立和设计 · 项目协同平台</title>
 <style>
   :root {
-    /* Premium Green Palette */
-    --forest-900: #0A241B;
-    --forest-800: #0F2E22;
-    --forest-700: #153D2C;
-    --forest-600: #1E523D;
-    --forest-500: #2A6B50;
-    --forest-400: #3A8A68;
-    --forest-300: #5DAA88;
-    --forest-200: #8CC8AC;
-    --forest-100: #BCE3CD;
-    --forest-50: #E6F4EC;
-    --mint: #F0F7F2;
-    --cream: #FAFCFA;
+    /* v3 Warm Premium Palette */
+    --warm-bg: #F2EFE9;
+    --warm-header: #EDE9E0;
+    --warm-deco: #E3DDD0;
     --white: #FFFFFF;
-    /* Luxury Accent */
-    --gold: #B8956B;
-    --gold-light: #D4BA94;
-    --gold-pale: #F0E6D6;
-    /* Functional */
-    --text-primary: #0A241B;
-    --text-secondary: #3D5A4D;
-    --text-tertiary: #6E8B7D;
-    --text-inverse: #FFFFFF;
-    --border: #D8E8DE;
-    --border-light: #E8F0EB;
+    --sage: #4A6B5A;
+    --sage-dark: #3A5648;
+    --sage-light: #6A8B7A;
+    --sage-bg: #E8EDE9;
+    --gold: #A8884F;
+    --gold-light: #C4A87A;
+    --gold-bg: #F5F0E6;
+    --text-main: #2A3A30;
+    --text-secondary: #5A6B62;
+    --text-light: #8A9B92;
+    --text-placeholder: #B0ABA0;
+    --border: #D8D5CD;
+    --border-light: #E8E5DF;
     --danger: #C75B5B;
-    /* Elevation */
-    --shadow-sm: 0 2px 8px rgba(10, 36, 27, 0.04);
-    --shadow-md: 0 4px 16px rgba(10, 36, 27, 0.08);
-    --shadow-lg: 0 12px 32px rgba(10, 36, 27, 0.12);
-    --shadow-xl: 0 24px 56px rgba(10, 36, 27, 0.18);
-    /* Radius */
-    --radius-sm: 10px;
+    --radius-sm: 8px;
     --radius-md: 14px;
     --radius-lg: 20px;
     --radius-xl: 28px;
     --radius-full: 9999px;
+    --shadow-sm: 0 2px 8px rgba(42, 58, 48, 0.04);
+    --shadow-md: 0 4px 16px rgba(42, 58, 48, 0.08);
+    --shadow-lg: 0 12px 32px rgba(42, 58, 48, 0.12);
+    --shadow-xl: 0 24px 56px rgba(42, 58, 48, 0.16);
+    --serif: Georgia, 'Times New Roman', serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
-    background: linear-gradient(145deg, var(--forest-800) 0%, var(--forest-600) 50%, var(--forest-500) 100%);
+    background: var(--warm-bg);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -59,26 +51,26 @@
     overflow-x: hidden;
   }
 
-  /* Organic background shapes */
+  /* Subtle warm decorative shapes */
   body::before,
   body::after {
     content: '';
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.22;
+    filter: blur(60px);
+    opacity: 0.5;
     z-index: 0;
     pointer-events: none;
   }
   body::before {
-    width: 420px; height: 420px;
-    background: var(--forest-300);
-    top: -120px; right: -120px;
+    width: 300px; height: 300px;
+    background: var(--warm-deco);
+    top: -80px; right: -80px;
   }
   body::after {
-    width: 360px; height: 360px;
-    background: var(--gold);
-    bottom: -100px; left: -100px;
+    width: 260px; height: 260px;
+    background: var(--warm-deco);
+    bottom: -60px; left: -60px;
   }
 
   .login-wrapper {
@@ -93,6 +85,7 @@
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     overflow: hidden;
+    border: 0.5px solid var(--border);
     animation: cardEnter 0.6s ease-out;
   }
 
@@ -101,118 +94,162 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Header */
+  /* ===== Header - Warm grey with decorative ellipses + wave bottom ===== */
   .login-header {
-    background: linear-gradient(135deg, var(--forest-700) 0%, var(--forest-500) 100%);
-    padding: 48px 32px 44px;
+    background: var(--warm-header);
+    padding: 44px 32px 48px;
     text-align: center;
-    color: var(--white);
+    color: var(--text-main);
     position: relative;
     overflow: hidden;
   }
 
+  /* Decorative ellipses */
   .login-header::before {
     content: '';
     position: absolute;
-    top: -60px; right: -60px;
-    width: 160px; height: 160px;
-    background: rgba(255,255,255,0.06);
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: var(--warm-deco);
     border-radius: 50%;
+    opacity: 0.6;
   }
-
   .login-header::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 64px; height: 3px;
-    background: var(--gold);
-    border-radius: 2px;
+    top: 20px; left: -30px;
+    width: 100px; height: 100px;
+    background: var(--warm-deco);
+    border-radius: 50%;
+    opacity: 0.4;
   }
 
+  /* Wave bottom */
+  .wave-bottom {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    line-height: 0;
+    pointer-events: none;
+  }
+  .wave-bottom svg {
+    width: 100%; height: 20px;
+    display: block;
+  }
+
+  /* Gold double-ring logo */
   .logo-ring {
-    width: 112px; height: 112px;
-    margin: 0 auto 20px;
-    padding: 6px;
-    border: 1.5px solid rgba(255,255,255,0.3);
+    width: 104px; height: 104px;
+    margin: 0 auto 18px;
+    padding: 5px;
+    border: 1.5px solid var(--gold);
     border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    background: var(--white);
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 16px rgba(168, 136, 79, 0.15);
+  }
+  .logo-ring::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid var(--gold-light);
+    border-radius: 50%;
+    opacity: 0.5;
   }
 
   .logo-box {
     width: 100%; height: 100%;
-    background: rgba(255,255,255,0.12);
+    background: var(--warm-header);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
   }
 
   .logo-box img {
-    width: 68%; height: 68%;
+    width: 64%; height: 64%;
     object-fit: contain;
   }
 
   .login-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    margin-bottom: 8px;
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-main);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
     position: relative;
+    z-index: 1;
   }
 
-  .login-header p {
-    font-size: 13px;
-    color: rgba(255,255,255,0.78);
-    letter-spacing: 0.3px;
+  .login-header .slogan {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
     position: relative;
+    z-index: 1;
   }
 
-  /* Role Selection */
+  /* Gold short divider */
+  .gold-divider {
+    width: 36px; height: 1.5px;
+    background: var(--gold);
+    margin: 0 auto;
+    border-radius: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== Role Selection ===== */
   .role-section {
     padding: 28px 32px 18px;
   }
 
   .role-section .label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--text-tertiary);
-    margin-bottom: 16px;
+    color: var(--text-light);
+    margin-bottom: 14px;
     text-align: center;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
   }
 
   .role-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 
   .role-card {
-    border: 1.5px solid var(--border);
+    border: 0.5px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 18px 8px;
+    padding: 16px 8px;
     text-align: center;
     cursor: pointer;
     transition: all 0.25s ease;
-    background: var(--cream);
+    background: var(--white);
     position: relative;
   }
 
   .role-card:hover {
-    border-color: var(--forest-300);
+    border-color: var(--sage-light);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
   }
 
   .role-card:active { transform: scale(0.96); }
 
   .role-card .role-icon {
-    width: 36px; height: 36px;
-    margin: 0 auto 10px;
+    width: 34px; height: 34px;
+    margin: 0 auto 8px;
     border-radius: 50%;
-    background: var(--forest-50);
-    color: var(--forest-500);
+    background: var(--sage-bg);
+    color: var(--sage);
     display: flex; align-items: center; justify-content: center;
     font-size: 13px;
     font-weight: 700;
@@ -220,88 +257,89 @@
   }
 
   .role-card .name {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 2px;
   }
 
   .role-card .desc {
     font-size: 11px;
-    color: var(--text-tertiary);
-    font-weight: 500;
+    color: var(--text-light);
+    font-weight: 400;
   }
 
   .role-card.active {
-    border-color: var(--forest-500);
-    background: linear-gradient(180deg, var(--forest-50) 0%, var(--white) 100%);
-    box-shadow: var(--shadow-md);
+    border-color: var(--sage);
+    background: var(--sage-bg);
+    box-shadow: var(--shadow-sm);
   }
 
   .role-card.active .role-icon {
-    background: var(--forest-500);
+    background: var(--sage);
     color: var(--white);
   }
 
-  .role-card.active .name { color: var(--forest-700); }
+  .role-card.active .name { color: var(--sage-dark); }
 
-  /* Form */
-  .form-section { padding: 10px 32px 36px; }
+  /* ===== Form ===== */
+  .form-section { padding: 8px 32px 32px; }
 
-  .form-group { margin-bottom: 18px; }
+  .form-group { margin-bottom: 16px; }
 
   .form-group label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
   }
 
   .form-input {
     width: 100%;
-    padding: 15px 18px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
     font-size: 15px;
-    color: var(--text-primary);
-    background: var(--cream);
+    color: var(--text-main);
+    background: var(--white);
     transition: all 0.2s ease;
+    -webkit-appearance: none;
   }
 
-  .form-input::placeholder { color: var(--text-tertiary); opacity: 0.7; }
+  .form-input::placeholder { color: var(--text-placeholder); }
 
   .form-input:focus {
     outline: none;
-    border-color: var(--forest-400);
-    background: var(--white);
-    box-shadow: 0 0 0 4px rgba(45, 107, 80, 0.08);
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(74, 107, 90, 0.08);
   }
 
   .login-btn {
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--forest-600) 0%, var(--forest-400) 100%);
+    padding: 15px;
+    background: var(--sage);
     color: var(--white);
     border: none;
-    border-radius: var(--radius-md);
-    font-size: 16px;
-    font-weight: 700;
+    border-radius: var(--radius-full);
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.25s ease;
-    margin-top: 6px;
-    box-shadow: 0 6px 20px rgba(21, 61, 44, 0.25);
-    letter-spacing: 0.5px;
+    margin-top: 4px;
+    box-shadow: 0 4px 14px rgba(74, 107, 90, 0.2);
+    letter-spacing: 1px;
   }
 
   .login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 26px rgba(21, 61, 44, 0.32);
+    background: var(--sage-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(74, 107, 90, 0.28);
   }
 
   .login-btn:active {
     transform: translateY(0);
-    background: var(--forest-700);
   }
 
   .login-btn:disabled {
@@ -313,26 +351,37 @@
 
   /* Hint */
   .hint {
-    margin-top: 18px;
-    padding: 14px 16px;
-    background: var(--forest-50);
-    border-radius: var(--radius-md);
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--warm-bg);
+    border-radius: var(--radius-sm);
     font-size: 12px;
     color: var(--text-secondary);
     line-height: 1.7;
     text-align: center;
-    border: 1px solid var(--border-light);
+    border: 0.5px solid var(--border-light);
   }
 
-  .hint b { color: var(--forest-700); font-weight: 700; }
+  .hint b { color: var(--sage-dark); font-weight: 600; }
 
   /* Footer brand */
   .login-footer {
     text-align: center;
-    margin-top: 22px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.5px;
+    margin-top: 20px;
+    padding-bottom: 8px;
+  }
+  .login-footer .brand-tag {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  .login-footer .brand-sub {
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    margin-top: 4px;
   }
 
   /* Toast */
@@ -340,17 +389,17 @@
     position: fixed;
     top: 28px; left: 50%;
     transform: translateX(-50%);
-    background: rgba(10, 36, 27, 0.94);
+    background: rgba(42, 58, 48, 0.92);
     color: var(--white);
     padding: 12px 28px;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-full);
     font-size: 14px;
     font-weight: 500;
     z-index: 9999;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    box-shadow: var(--shadow-lg);
   }
 
   .toast.show { opacity: 1; }
@@ -359,11 +408,12 @@
 
   @media (max-width: 420px) {
     .login-card { border-radius: var(--radius-lg); }
-    .login-header { padding: 40px 24px 38px; }
+    .login-header { padding: 36px 24px 40px; }
     .role-section, .form-section { padding-left: 22px; padding-right: 22px; }
     .role-cards { gap: 8px; }
-    .role-card { padding: 16px 6px; }
-    .role-card .name { font-size: 14px; }
+    .role-card { padding: 14px 6px; }
+    .role-card .name { font-size: 13px; }
+    .login-header h1 { font-size: 24px; }
   }
 </style>
 </head>
@@ -379,7 +429,14 @@
         </div>
       </div>
       <h1>立和设计</h1>
-      <p>室内设计 · 项目协同平台</p>
+      <div class="slogan">Design for Time</div>
+      <div class="gold-divider"></div>
+      <!-- Wave bottom -->
+      <div class="wave-bottom">
+        <svg viewBox="0 0 440 20" preserveAspectRatio="none">
+          <path d="M0,10 Q110,2 220,10 T440,10 L440,20 L0,20 Z" fill="#FFFFFF"/>
+        </svg>
+      </div>
     </div>
 
     <!-- Role Selection -->
@@ -444,7 +501,10 @@
     </div>
   </div>
 
-  <div class="login-footer">LIHE DESIGN · 立和室内设计</div>
+  <div class="login-footer">
+    <div class="brand-tag">为时间而设计</div>
+    <div class="brand-sub">LIHE DESIGN · 立和室内设计</div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>

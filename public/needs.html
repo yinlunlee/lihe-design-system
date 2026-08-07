@@ -6,21 +6,28 @@
 <title>立和设计 · 客户设计需求表</title>
 <style>
   :root {
-    --sage: #5A7D6B;
-    --sage-light: #7A9D8B;
-    --sage-dark: #3F5D50;
-    --sage-bg: #F0F4F2;
-    --sage-border: #C5D5CC;
-    --text-main: #2C3E35;
+    /* v3 Warm Premium Palette */
+    --warm-bg: #F2EFE9;
+    --warm-header: #EDE9E0;
+    --warm-deco: #E3DDD0;
+    --white: #FFFFFF;
+    --sage: #4A6B5A;
+    --sage-light: #6A8B7A;
+    --sage-dark: #3A5648;
+    --sage-bg: #E8EDE9;
+    --sage-border: #D8D5CD;
+    --gold: #A8884F;
+    --gold-light: #C4A87A;
+    --gold-bg: #F5F0E6;
+    --text-main: #2A3A30;
     --text-secondary: #5A6B62;
     --text-light: #8A9B92;
-    --bg: #FAFBF9;
-    --white: #FFFFFF;
-    --accent: #D4A574;
-    --accent-light: #E8C9A0;
+    --text-placeholder: #B0ABA0;
+    --bg: #F2EFE9;
     --danger: #C75450;
     --radius: 10px;
     --radius-lg: 14px;
+    --serif: Georgia, 'Times New Roman', serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,63 +43,99 @@
     min-height: 100vh;
   }
 
-  /* ===== 顶部封面 ===== */
+  /* ===== 顶部封面 - 暖灰底 + 装饰椭圆 + 波浪底 ===== */
   .cover {
-    background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 100%);
-    color: var(--white);
-    padding: 32px 20px 24px;
+    background: var(--warm-header);
+    color: var(--text-main);
+    padding: 36px 20px 44px;
     text-align: center;
-    border-radius: 0 0 20px 20px;
     position: relative;
     overflow: hidden;
   }
   .cover::before {
     content: '';
     position: absolute;
-    top: -30px; right: -30px;
-    width: 120px; height: 120px;
-    background: rgba(255,255,255,0.04);
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: var(--warm-deco);
     border-radius: 50%;
+    opacity: 0.6;
   }
-  .cover h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: 1px; }
-  .cover .subtitle { font-size: 12px; opacity: 0.8; margin-bottom: 6px; }
-  .cover .philosophy { font-size: 11px; opacity: 0.6; font-style: italic; }
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: 10px; left: -30px;
+    width: 90px; height: 90px;
+    background: var(--warm-deco);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+  .cover-inner { position: relative; z-index: 1; }
+  .cover h1 {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+  }
+  .cover .subtitle { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .cover .philosophy {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  .cover .gold-line {
+    width: 32px; height: 1.5px;
+    background: var(--gold);
+    margin: 10px auto 0;
+    border-radius: 1px;
+  }
+  .wave-bottom {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    line-height: 0;
+    pointer-events: none;
+  }
+  .wave-bottom svg { width: 100%; height: 16px; display: block; }
 
   /* ===== 入口选择页 ===== */
-  .select-page { padding: 30px 16px; }
-  .select-intro { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; line-height: 1.8; }
-  .select-cards { display: flex; flex-direction: column; gap: 16px; }
+  .select-page { padding: 28px 16px; }
+  .select-intro { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.8; }
+  .select-cards { display: flex; flex-direction: column; gap: 14px; }
   .select-card {
     background: var(--white);
-    border: 2px solid var(--sage-border);
+    border: 0.5px solid var(--sage-border);
     border-radius: var(--radius-lg);
-    padding: 28px 20px;
+    padding: 26px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
   }
-  .select-card:active { transform: scale(0.97); border-color: var(--sage); }
+  .select-card:active { transform: scale(0.97); border-color: var(--sage); box-shadow: 0 4px 16px rgba(74, 107, 90, 0.1); }
   .select-card-icon {
-    width: 56px; height: 56px;
+    width: 52px; height: 52px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 26px;
+    margin: 0 auto 10px;
+    font-size: 24px;
   }
-  .select-card-icon.commercial { background: linear-gradient(135deg, #E8C9A0, #D4A574); color: #fff; }
-  .select-card-icon.residential { background: linear-gradient(135deg, #7A9D8B, #5A7D6B); color: #fff; }
-  .select-card h3 { font-size: 18px; font-weight: 700; color: var(--sage-dark); margin-bottom: 4px; }
+  .select-card-icon.commercial { background: var(--sage-bg); color: var(--sage); }
+  .select-card-icon.residential { background: var(--gold-bg); color: var(--gold); }
+  .select-card h3 { font-family: var(--serif); font-size: 17px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; letter-spacing: 1px; }
   .select-card p { font-size: 13px; color: var(--text-light); }
   .select-card .arrow {
     position: absolute;
     right: 16px; top: 50%;
     transform: translateY(-50%);
-    color: var(--sage-light);
-    font-size: 20px;
+    color: var(--gold);
+    font-size: 18px;
   }
 
   /* ===== 表单主体 ===== */
@@ -104,24 +147,35 @@
     align-items: center;
     gap: 4px;
     font-size: 13px;
-    color: var(--sage);
+    color: var(--gold);
     margin-bottom: 16px;
     cursor: pointer;
   }
 
-  /* 章节标题 */
+  /* 章节标题 - 衬线 + 金色下划线 */
   .section-title {
-    background: var(--sage-bg);
-    border-left: 4px solid var(--sage);
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin: 20px 0 12px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--sage-dark);
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin: 24px 0 4px;
+    letter-spacing: 1px;
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--sage-border);
+  }
+  .section-title .gold-underline {
+    width: 20px; height: 1.5px;
+    background: var(--gold);
+    border-radius: 1px;
+    display: block;
+    margin-bottom: 8px;
   }
   .section-num {
     background: var(--sage);
@@ -132,16 +186,16 @@
     align-items: center;
     justify-content: center;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     flex-shrink: 0;
   }
 
   /* 字段标签 */
   .field-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--sage-dark);
-    margin: 12px 0 6px;
+    color: var(--text-secondary);
+    margin: 14px 0 6px;
   }
   .field-hint {
     font-size: 12px;
@@ -154,7 +208,7 @@
   .input-text {
     width: 100%;
     padding: 10px 12px;
-    border: 1.5px solid var(--sage-border);
+    border: 0.5px solid var(--sage-border);
     border-radius: 8px;
     font-size: 14px;
     color: var(--text-main);
@@ -162,14 +216,14 @@
     transition: border-color 0.2s;
     -webkit-appearance: none;
   }
-  .input-text:focus { outline: none; border-color: var(--sage); }
+  .input-text:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74, 107, 90, 0.06); }
   textarea.input-text { resize: none; min-height: 60px; line-height: 1.6; }
 
   /* 单选标签组 */
   .tag-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .tag-item {
     padding: 6px 14px;
-    border: 1.5px solid var(--sage-border);
+    border: 0.5px solid var(--sage-border);
     border-radius: 20px;
     font-size: 13px;
     color: var(--text-secondary);
@@ -185,17 +239,17 @@
   }
   .tag-item:active { transform: scale(0.95); }
 
-  /* 立和独创风格特殊标签 */
+  /* 立和独创风格特殊标签 - 金色 */
   .tag-item.signature {
-    border-color: var(--accent);
-    background: linear-gradient(135deg, #FFF8EE, #F5E6D3);
-    color: #8B6914;
+    border-color: var(--gold);
+    background: var(--gold-bg);
+    color: var(--gold);
     font-weight: 600;
   }
   .tag-item.signature.active {
-    background: linear-gradient(135deg, var(--accent), #C9954E);
+    background: var(--gold);
     color: var(--white);
-    border-color: var(--accent);
+    border-color: var(--gold);
   }
 
   /* 复选框组 */
@@ -212,7 +266,7 @@
   }
   .check-box {
     width: 18px; height: 18px;
-    border: 2px solid var(--sage-border);
+    border: 1.5px solid var(--sage-border);
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -251,42 +305,155 @@
     background: var(--white);
   }
 
-  /* 提交按钮 */
+  /* 提交按钮 - 胶囊形 */
   .submit-btn {
     width: 100%;
     padding: 14px;
     background: var(--sage);
     color: var(--white);
     border: none;
-    border-radius: var(--radius);
-    font-size: 16px;
+    border-radius: 9999px;
+    font-size: 15px;
     font-weight: 600;
-    margin-top: 24px;
+    margin-top: 28px;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(74, 107, 90, 0.2);
+    letter-spacing: 1px;
   }
-  .submit-btn:active { background: var(--sage-dark); }
+  .submit-btn:active { background: var(--sage-dark); transform: scale(0.98); }
   .submit-btn:disabled { opacity: 0.6; }
 
-  /* 成功页 */
+  /* 成功页 - v3 温润设计 */
   .success-page {
     text-align: center;
-    padding: 60px 20px;
+    padding: 0;
     display: none;
+    min-height: 100vh;
+    background: var(--warm-bg);
+  }
+  .success-header {
+    background: var(--warm-header);
+    padding: 60px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .success-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: var(--warm-deco);
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+  .success-header::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -30px;
+    width: 90px; height: 90px;
+    background: var(--warm-deco);
+    border-radius: 50%;
+    opacity: 0.4;
   }
   .success-icon {
-    width: 64px; height: 64px;
-    background: var(--sage);
+    width: 72px; height: 72px;
+    margin: 0 auto 16px;
+    padding: 5px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 16px rgba(168, 136, 79, 0.15);
+  }
+  .success-icon::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid var(--gold-light);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+  .success-icon-inner {
+    width: 100%; height: 100%;
+    background: var(--gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 32px;
+    font-size: 30px;
     color: var(--white);
   }
-  .success-page h2 { color: var(--sage-dark); font-size: 18px; margin-bottom: 8px; }
-  .success-page p { color: var(--text-secondary); font-size: 14px; }
+  .success-header h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
+  .success-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    position: relative;
+    z-index: 1;
+  }
+  .success-body {
+    padding: 28px 20px 40px;
+  }
+  .success-next {
+    background: var(--white);
+    border: 0.5px solid var(--sage-border);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .success-next h3 {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+  .success-next .gold-line {
+    width: 20px; height: 1.5px;
+    background: var(--gold);
+    border-radius: 1px;
+    margin-bottom: 14px;
+  }
+  .success-next-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .success-next-item:last-child { margin-bottom: 0; }
+  .success-next-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+  .success-brand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold);
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
 
   /* 底部 */
   .footer {
@@ -296,8 +463,8 @@
     font-size: 12px;
   }
   .footer-divider {
-    width: 40px; height: 2px;
-    background: var(--sage);
+    width: 32px; height: 1.5px;
+    background: var(--gold);
     margin: 0 auto 10px;
     border-radius: 1px;
   }
@@ -308,9 +475,17 @@
 
 <!-- ===== 封面 ===== -->
 <div class="cover">
-  <h1>立和设计</h1>
-  <div class="subtitle">客户设计需求表 · Client Design Brief</div>
-  <div class="philosophy">「 为时间而设计  ·  Design for Time 」</div>
+  <div class="cover-inner">
+    <h1>立和设计</h1>
+    <div class="subtitle">客户设计需求表 · Client Design Brief</div>
+    <div class="philosophy">为时间而设计 · Design for Time</div>
+    <div class="gold-line"></div>
+  </div>
+  <div class="wave-bottom">
+    <svg viewBox="0 0 500 16" preserveAspectRatio="none">
+      <path d="M0,8 Q125,2 250,8 T500,8 L500,16 L0,16 Z" fill="#F2EFE9"/>
+    </svg>
+  </div>
 </div>
 
 <!-- ===== 入口选择页 ===== -->
@@ -734,16 +909,44 @@
 
 <!-- ===== 成功页 ===== -->
 <div class="success-page" id="successPage">
-  <div class="success-icon">✓</div>
-  <h2>需求已提交</h2>
-  <p>感谢您的信任，我们会在24小时内与您联系。<br>「 为时间而设计  ·  Design for Time 」</p>
+  <div class="success-header">
+    <div class="success-icon">
+      <div class="success-icon-inner">✓</div>
+    </div>
+    <h2>需求已提交</h2>
+    <p>感谢您的信任，我们会在24小时内与您联系</p>
+    <div class="wave-bottom">
+      <svg viewBox="0 0 500 16" preserveAspectRatio="none">
+        <path d="M0,8 Q125,2 250,8 T500,8 L500,16 L0,16 Z" fill="#F2EFE9"/>
+      </svg>
+    </div>
+  </div>
+  <div class="success-body">
+    <div class="success-next">
+      <h3>接下来</h3>
+      <div class="gold-line"></div>
+      <div class="success-next-item">
+        <div class="success-next-dot"></div>
+        <div>我们的设计师将仔细阅读您的需求，初步评估项目方向</div>
+      </div>
+      <div class="success-next-item">
+        <div class="success-next-dot"></div>
+        <div>24小时内会有专属顾问与您电话联系，沟通细节</div>
+      </div>
+      <div class="success-next-item">
+        <div class="success-next-dot"></div>
+        <div>确认合作意向后，安排现场勘测与方案设计</div>
+      </div>
+    </div>
+    <div class="success-brand">为时间而设计 · Design for Time</div>
+  </div>
 </div>
 
 <!-- ===== 底部 ===== -->
 <div class="footer">
   <div class="footer-divider"></div>
   <p>立和质作  |  广东汕头龙湖区  |  为时间而设计</p>
-  <p style="margin-top:4px; font-size:11px;">本表仅用于前期沟通了解，正式设计需求将在勘测后确认</p>
+  <p style="margin-top:4px; font-size:11px; color: var(--text-placeholder);">本表仅用于前期沟通了解，正式设计需求将在勘测后确认</p>
 </div>
 
 <script>

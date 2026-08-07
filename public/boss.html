@@ -6,26 +6,30 @@
 <title>立和设计 · 管理总台</title>
 <style>
 :root {
-  /* Premium Green Palette */
-  --primary: #153D2C;
-  --accent: #2A6B50;
-  --accent-light: #3A8A68;
-  --success: #2A6B50;
+  /* v3 Warm Premium Palette */
+  --primary: #3A5648;
+  --accent: #4A6B5A;
+  --accent-light: #6A8B7A;
+  --success: #4A6B5A;
   --warning: #C98B4F;
   --danger: #C75B5B;
-    --bg: #FAFCFA;
-    --sage-bg: #F0F7F2;
-    --card: #FFFFFF;
-    --border: #D8E8DE;
-  --text-main: #0A241B;
-  --text-light: #6E8B7D;
+  --bg: #F2EFE9;
+  --sage-bg: #E8EDE9;
+  --card: #FFFFFF;
+  --border: #D8D5CD;
+  --text-main: #2A3A30;
+  --text-light: #8A9B92;
   --text-white: #FFFFFF;
-  --gold-pale: #F0E6D6;
+  --gold: #A8884F;
+  --gold-pale: #F5F0E6;
+  --warm-header: #EDE9E0;
+  --warm-deco: #E3DDD0;
   --radius: 12px;
   --radius-lg: 16px;
-  --shadow: 0 4px 18px rgba(10, 36, 27, 0.07);
-  --shadow-soft: 0 2px 8px rgba(10, 36, 27, 0.05);
-  --shadow-glow: 0 0 0 4px rgba(42, 107, 80, 0.08);
+  --shadow: 0 4px 18px rgba(42, 58, 48, 0.06);
+  --shadow-soft: 0 2px 8px rgba(42, 58, 48, 0.04);
+  --shadow-glow: 0 0 0 4px rgba(74, 107, 90, 0.08);
+  --serif: Georgia, 'Times New Roman', serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-main); }
@@ -41,30 +45,35 @@ let state = { staffId: '', password: '', data: null, filter: { staff: '', stage:
 // ===== Login =====
 function renderLogin() {
   document.getElementById('app').innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);padding:20px;">
-      <div style="background:#fff;padding:40px 36px;border-radius:24px;box-shadow:0 20px 60px rgba(10,36,27,0.18);width:100%;max-width:380px;">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;position:relative;overflow:hidden;">
+      <div style="position:fixed;top:-80px;right:-80px;width:300px;height:300px;background:var(--warm-deco);border-radius:50%;filter:blur(60px);opacity:0.5;z-index:0;"></div>
+      <div style="position:fixed;bottom:-60px;left:-60px;width:260px;height:260px;background:var(--warm-deco);border-radius:50%;filter:blur(60px);opacity:0.5;z-index:0;"></div>
+      <div style="position:relative;z-index:1;background:#fff;padding:40px 36px;border-radius:28px;box-shadow:0 24px 56px rgba(42,58,48,0.16);width:100%;max-width:380px;border:0.5px solid var(--border);">
         <div style="text-align:center;margin-bottom:32px;">
-          <div style="width:96px;height:96px;margin:0 auto 18px;padding:5px;border:1.5px solid rgba(255,255,255,0.28);border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);box-shadow:0 8px 28px rgba(0,0,0,0.12);">
-            <div style="width:100%;height:100%;background:rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-              <img src="/images/logo-light.png" alt="立和设计" style="width:68%;height:68%;object-fit:contain;">
+          <div style="width:96px;height:96px;margin:0 auto 18px;padding:5px;border:1.5px solid var(--gold);border-radius:50%;background:#fff;box-shadow:0 4px 16px rgba(168,136,79,0.15);position:relative;">
+            <div style="position:absolute;inset:3px;border:1px solid rgba(168,136,79,0.3);border-radius:50%;"></div>
+            <div style="width:100%;height:100%;background:var(--warm-header);border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;z-index:1;">
+              <img src="/images/logo-light.png" alt="立和设计" style="width:66%;height:66%;object-fit:contain;">
             </div>
           </div>
-          <h2 style="font-size:22px;color:var(--primary);font-weight:700;">管理总台</h2>
-          <p style="font-size:13px;color:var(--text-light);margin-top:6px;">全局数据 · 项目 overview</p>
+          <h2 style="font-family:var(--serif);font-size:22px;color:var(--text-main);font-weight:500;letter-spacing:2px;">管理总台</h2>
+          <p style="font-size:12px;color:var(--text-light);margin-top:6px;letter-spacing:0.5px;">全局数据 · 项目 overview</p>
+          <div style="width:32px;height:1.5px;background:var(--gold);margin:10px auto 0;border-radius:1px;"></div>
         </div>
         <div style="margin-bottom:18px;">
-          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">管理员账号</label>
-          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#FAFCFA;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(42,107,80,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:6px;letter-spacing:0.3px;">管理员账号</label>
+          <input id="bossId" type="text" placeholder="请输入管理员账号" style="width:100%;padding:14px 16px;border:0.5px solid var(--border);border-radius:8px;font-size:15px;background:#fff;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(74,107,90,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
         <div style="margin-bottom:24px;">
-          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:8px;">密码</label>
-          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;background:#FAFCFA;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 4px rgba(42,107,80,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:6px;letter-spacing:0.3px;">密码</label>
+          <input id="bossPwd" type="password" placeholder="请输入密码" style="width:100%;padding:14px 16px;border:0.5px solid var(--border);border-radius:8px;font-size:15px;background:#fff;transition:all 0.2s;" onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px rgba(74,107,90,0.08)';" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none';">
         </div>
-        <button onclick="login()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(21,61,44,0.22);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(21,61,44,0.28)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(21,61,44,0.22)';">登 录</button>
+        <button onclick="login()" style="width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:9999px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(74,107,90,0.2);transition:all 0.2s;letter-spacing:1px;" onmouseover="this.style.background='var(--primary)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='var(--accent)';this.style.transform='none';">登 录</button>
         <div id="loginError" style="display:none;text-align:center;padding:10px;margin-top:12px;color:var(--danger);font-size:13px;background:#FCE8E8;border-radius:8px;"></div>
         <div style="text-align:center;margin-top:14px;">
           <a href="/login.html" style="font-size:12px;color:var(--text-light);text-decoration:none;">返回统一登录</a>
         </div>
+        <div style="text-align:center;margin-top:16px;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--gold);letter-spacing:1px;">为时间而设计</div>
       </div>
     </div>
   `;
@@ -123,7 +132,7 @@ function renderDashboard() {
   
   document.getElementById('app').innerHTML = `
     <!-- Nav -->
-    <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 6px 20px rgba(10,36,27,0.14);border-radius:0 0 20px 20px;">
+    <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 55%,var(--accent-light) 100%);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 6px 20px rgba(42,58,48,0.1);border-radius:0 0 20px 20px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="width:36px;height:36px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
           <img src="/images/logo-light.png" alt="立和设计" style="width:80%;height:80%;object-fit:contain;">
