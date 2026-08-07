@@ -18,6 +18,8 @@
     --bg: #FAFCFA;
     --white: #FFFFFF;
     --accent: #B8956B;
+    --gold-pale: #F0E6D6;
+    --forest-50: #E6F4EC;
     --danger: #C75B5B;
     --radius: 12px;
     --radius-lg: 20px;
@@ -537,6 +539,68 @@
   }
   .fab-upload:hover { transform: translateX(250px) scale(1.05); }
   .fab-upload:active { transform: translateX(250px) scale(0.95); }
+
+  /* ===== 需求管理列表 ===== */
+  .need-item {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(212, 228, 216, 0.5);
+  }
+  .need-item-head {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 8px;
+  }
+  .need-item-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+  .need-item-meta { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .need-status-select {
+    background: var(--sage-bg); color: var(--sage-dark);
+    border: 1.5px solid var(--sage-border);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; outline: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  .need-status-select:focus { border-color: var(--sage); }
+
+  /* ===== 团队分配 ===== */
+  .assign-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--sage-bg);
+  }
+  .assign-row:last-of-type { border-bottom: none; }
+  .assign-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+  .assign-hint { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+  .assign-select {
+    background: var(--white); color: var(--text-main);
+    border: 1.5px solid var(--sage-border);
+    border-radius: var(--radius); padding: 8px 12px;
+    font-size: 13px; min-width: 130px;
+    -webkit-appearance: none; appearance: none;
+    cursor: pointer; outline: none;
+  }
+  .assign-select:focus { border-color: var(--sage); box-shadow: var(--shadow-glow); }
+  .assign-select:disabled { background: var(--sage-bg); color: var(--text-light); cursor: not-allowed; }
+  .assign-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%);
+    color: var(--white); border: none;
+    border-radius: var(--radius);
+    font-size: 15px; font-weight: 700;
+    margin-top: 14px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(21, 61, 44, 0.2);
+    transition: all 0.2s;
+  }
+  .assign-btn:active { background: var(--sage-dark); transform: scale(0.98); }
+  .assign-btn:disabled { opacity: 0.5; }
+  .assigned-tag {
+    display: inline-block;
+    padding: 4px 10px; border-radius: 10px;
+    font-size: 12px; font-weight: 600;
+    background: var(--sage-bg); color: var(--sage-dark);
+  }
 </style>
 </head>
 <body>
@@ -555,22 +619,37 @@
   </div>
 </div>
 
-<!-- ===== 主页面（项目列表） ===== -->
+<!-- ===== 主页面 ===== -->
 <div id="mainPage" style="display:none;">
   <!-- 导航栏 -->
   <div class="nav-bar">
     <div class="nav-brand">
       <div class="nav-logo"><img src="/images/logo-light.png" alt="立和设计"></div>
-      <div class="nav-title">我的项目</div>
+      <div class="nav-title">工作台</div>
     </div>
     <div class="nav-user" id="navUser"></div>
     <div class="nav-logout" onclick="logout()" style="font-size:13px;color:rgba(255,255,255,0.85);cursor:pointer;margin-left:12px;">退出</div>
   </div>
 
-  <div class="form-section">
+  <!-- 主页Tab -->
+  <div class="main-tabs" style="display:flex;margin:12px 16px 0;border-bottom:2px solid var(--sage-border);">
+    <div class="main-tab active" data-tab="projects" onclick="switchMainTab('projects')" style="flex:1;text-align:center;padding:12px 8px;font-size:14px;font-weight:600;color:var(--sage-dark);cursor:pointer;border-bottom:3px solid var(--sage);margin-bottom:-2px;transition:all 0.2s;">我的项目</div>
+    <div class="main-tab" data-tab="needs" onclick="switchMainTab('needs')" style="flex:1;text-align:center;padding:12px 8px;font-size:14px;font-weight:600;color:var(--text-light);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;">需求管理</div>
+  </div>
+
+  <!-- 项目列表区 -->
+  <div class="form-section" id="projectsSection">
     <div class="field-label">我的项目 <span class="field-hint" id="projectCount"></span></div>
     <div id="projectListArea">
       <div class="loading"><div class="spinner"></div>加载项目中...</div>
+    </div>
+  </div>
+
+  <!-- 需求管理区 -->
+  <div class="form-section" id="needsSection" style="display:none;">
+    <div class="field-label">客户需求 <span class="field-hint" id="needsCount"></span></div>
+    <div id="needsListArea">
+      <div class="loading"><div class="spinner"></div>加载需求中...</div>
     </div>
   </div>
 </div>
@@ -595,6 +674,12 @@
     <div class="detail-card">
       <div class="detail-card-title">服务团队</div>
       <div id="detailTeamInfo"></div>
+    </div>
+
+    <!-- 团队分配卡片（仅B01管理员可见） -->
+    <div class="detail-card" id="assignCard" style="display:none;">
+      <div class="detail-card-title">团队分配 <span class="field-hint">设计师/软装/施工图先分配，监理等施工阶段再分配</span></div>
+      <div id="assignArea"></div>
     </div>
 
     <!-- 进度卡片 -->
@@ -787,6 +872,7 @@
     staffId: '',
     password: '',
     projects: [],
+    needs: [],
     selectedProject: null,
     selectedStage: null,
     selectedInspectionStage: null,
@@ -903,6 +989,134 @@
     initStageSelector();
   }
 
+  // ===== 主页Tab切换 =====
+  function switchMainTab(tab) {
+    document.querySelectorAll('.main-tab').forEach(t => {
+      const isActive = t.dataset.tab === tab;
+      t.classList.toggle('active', isActive);
+      t.style.color = isActive ? 'var(--sage-dark)' : 'var(--text-light)';
+      t.style.borderBottom = isActive ? '3px solid var(--sage)' : '3px solid transparent';
+    });
+    document.getElementById('projectsSection').style.display = tab === 'projects' ? 'block' : 'none';
+    document.getElementById('needsSection').style.display = tab === 'needs' ? 'block' : 'none';
+    if (tab === 'needs' && state.needs.length === 0) {
+      loadNeeds();
+    }
+  }
+
+  // ===== 加载需求列表 =====
+  function loadNeeds() {
+    document.getElementById('needsListArea').innerHTML = '<div class="loading"><div class="spinner"></div>加载需求中...</div>';
+    fetch(`${API_BASE}/api/needs-list?staffId=${state.staffId}&password=${encodeURIComponent(state.password)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          state.needs = data.items || [];
+          document.getElementById('needsCount').textContent = `共 ${state.needs.length} 条`;
+          renderNeeds();
+        } else {
+          document.getElementById('needsListArea').innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">加载失败: ${data.error || ''}</div>`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('needsListArea').innerHTML = `<div style="text-align:center;padding:20px;color:var(--danger);font-size:13px;">网络错误: ${err.message}</div>`;
+      });
+  }
+
+  // ===== 渲染需求列表 =====
+  function renderNeeds() {
+    const area = document.getElementById('needsListArea');
+    if (state.needs.length === 0) {
+      area.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">暂无客户需求</div>';
+      return;
+    }
+    const statusOptions = ['待联系', '已联系', '方案设计中', '已签约', '已搁置', '已流失'];
+    area.innerHTML = state.needs.map(item => {
+      const statusColor = {
+        '待联系': 'background:var(--gold-pale);color:#6B4E2E;',
+        '已联系': 'background:#E3F2FD;color:#1565C0;',
+        '方案设计中': 'background:var(--sage-bg);color:var(--sage-dark);',
+        '已签约': 'background:var(--sage);color:var(--white);',
+        '已搁置': 'background:#F5F5F5;color:#999;',
+        '已流失': 'background:#FCE8E8;color:#8B3A3A;',
+      };
+      return `
+        <div class="need-item">
+          <div class="need-item-head">
+            <div>
+              <div class="need-item-name">${item.name || '未署名'}</div>
+              <div class="need-item-meta">
+                ${item.contact || '无联系方式'} · ${item.spaceType || '未指定'} ${item.area ? ' · ' + item.area + '㎡' : ''}
+                ${item.budget ? ' · ' + item.budget : ''} ${item.address ? ' · ' + item.address : ''}
+              </div>
+            </div>
+            <select class="need-status-select" onchange="updateNeedStatus('${item.recordId}', this.value, this)" style="${statusColor[item.status] || ''}">
+              ${statusOptions.map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          ${item.status === '已签约' ? '<div style="margin-top:6px;font-size:12px;color:var(--sage);font-weight:600;">✓ 项目已自动创建，可在「我的项目」中查看并分配团队</div>' : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===== 更新需求状态 =====
+  function updateNeedStatus(recordId, newStatus, selectEl) {
+    const oldVal = selectEl.dataset.old || '';
+    selectEl.disabled = true;
+    fetch(`${API_BASE}/api/update-status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staffId: state.staffId,
+        password: state.password,
+        recordId: recordId,
+        status: newStatus,
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        if (newStatus === '已签约' && data.syncResult) {
+          if (data.syncResult.success) {
+            showToast('已签约！项目已自动创建，请到「我的项目」分配团队');
+          } else if (data.syncResult.skipped) {
+            showToast('状态已更新，项目已存在');
+          } else {
+            showToast('状态已更新，但项目同步失败: ' + (data.syncResult.error || ''));
+          }
+          // 刷新项目列表
+          loadProjects(state.staffId, state.password);
+        } else {
+          showToast('状态已更新为「' + newStatus + '」');
+        }
+        // 更新select颜色
+        const statusColor = {
+          '待联系': 'background:var(--gold-pale);color:#6B4E2E;',
+          '已联系': 'background:#E3F2FD;color:#1565C0;',
+          '方案设计中': 'background:var(--sage-bg);color:var(--sage-dark);',
+          '已签约': 'background:var(--sage);color:var(--white);',
+          '已搁置': 'background:#F5F5F5;color:#999;',
+          '已流失': 'background:#FCE8E8;color:#8B3A3A;',
+        };
+        selectEl.style.cssText = statusColor[newStatus] || '';
+        selectEl.dataset.old = newStatus;
+        // 更新state中的needs
+        const needIdx = state.needs.findIndex(n => n.recordId === recordId);
+        if (needIdx >= 0) state.needs[needIdx].status = newStatus;
+        renderNeeds();
+      } else {
+        showToast('更新失败: ' + (data.error || ''));
+        selectEl.value = oldVal;
+      }
+    })
+    .catch(err => {
+      showToast('网络错误: ' + err.message);
+      selectEl.value = oldVal;
+    })
+    .finally(() => { selectEl.disabled = false; });
+  }
+
   // ===== 渲染项目列表 =====
   function renderProjectList() {
     const area = document.getElementById('projectListArea');
@@ -971,6 +1185,16 @@
       <div class="info-row"><span class="info-label">施工监理</span><span class="info-value">${p.supervisorName || p.supervisorId || '未分配'}</span></div>
     `;
 
+    // 团队分配卡片（仅B01管理员可见）
+    const isBoss = state.staffId === 'B01';
+    const assignCard = document.getElementById('assignCard');
+    if (isBoss) {
+      assignCard.style.display = 'block';
+      renderAssignArea(p);
+    } else {
+      assignCard.style.display = 'none';
+    }
+
     // 进度
     document.getElementById('detailProgress').innerHTML = `
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
@@ -1031,6 +1255,132 @@
       html += '</div>';
     }
     document.getElementById('detailTimeline').innerHTML = html;
+  }
+
+  // 员工角色映射（用于分配后本地更新）
+  const config_staffRoles = {
+    'S01': { name: '庄涛' },
+    'S02': { name: '林协莎' },
+    'S03': { name: '颜大然' },
+    'S04': { name: '王润鹏' },
+    'S05': { name: '谢佳润' },
+    'S06': { name: '谢建彬' },
+    'B01': { name: '管理员' },
+  };
+
+  // 施工阶段列表（用于判断监理是否可分配）
+  const CONSTRUCTION_STAGES = ['开工前期准备','拆除改造','水电隐蔽工程','防水工程','泥瓦工程','木工吊顶','油漆墙面','安装阶段','开荒保洁竣工验收','竣工交付'];
+
+  // ===== 团队分配渲染 =====
+  function renderAssignArea(p) {
+    const isConstruction = CONSTRUCTION_STAGES.includes(p.stage);
+    const designers = [
+      { id: '', name: '— 未分配 —' },
+      { id: 'S01', name: 'S01 庄涛（设计师）' },
+      { id: 'S02', name: 'S02 林协莎（设计师）' },
+    ];
+    const softDecos = [
+      { id: '', name: '— 未分配 —' },
+      { id: 'S03', name: 'S03 颜大然（软装设计师）' },
+    ];
+    const drawings = [
+      { id: '', name: '— 未分配 —' },
+      { id: 'S04', name: 'S04 王润鹏（施工图设计师）' },
+    ];
+    const supervisors = [
+      { id: '', name: '— 未分配 —' },
+      { id: 'S05', name: 'S05 谢佳润（施工监理）' },
+      { id: 'S06', name: 'S06 谢建彬（施工监理）' },
+    ];
+
+    function makeSelect(role, options, currentVal, disabled) {
+      return `<select class="assign-select" data-role="${role}" ${disabled ? 'disabled' : ''}>
+        ${options.map(o => `<option value="${o.id}" ${currentVal === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
+      </select>`;
+    }
+
+    const html = `
+      <div class="assign-row">
+        <div><div class="assign-label">设计师</div></div>
+        ${makeSelect('designer', designers, p.designerId, false)}
+      </div>
+      <div class="assign-row">
+        <div><div class="assign-label">软装设计师</div></div>
+        ${makeSelect('softDeco', softDecos, p.softDecoId, false)}
+      </div>
+      <div class="assign-row">
+        <div><div class="assign-label">施工图设计师</div></div>
+        ${makeSelect('drawing', drawings, p.drawingId, false)}
+      </div>
+      <div class="assign-row">
+        <div>
+          <div class="assign-label">施工监理</div>
+          <div class="assign-hint">${isConstruction ? '已进入施工阶段，可分配' : '进入施工阶段后可分配'}</div>
+        </div>
+        ${makeSelect('supervisor', supervisors, p.supervisorId, !isConstruction)}
+      </div>
+      <button class="assign-btn" onclick="submitAssign()">保 存 分 配</button>
+    `;
+    document.getElementById('assignArea').innerHTML = html;
+  }
+
+  // ===== 提交团队分配 =====
+  function submitAssign() {
+    const selects = document.querySelectorAll('#assignArea .assign-select');
+    const assignments = {};
+    selects.forEach(sel => {
+      const role = sel.dataset.role;
+      const val = sel.value;
+      if (val) assignments[role] = val;
+    });
+
+    if (Object.keys(assignments).length === 0) {
+      showToast('请至少分配一个角色');
+      return;
+    }
+
+    const btn = document.querySelector('.assign-btn');
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
+    fetch(`${API_BASE}/api/assign-staff`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staffId: state.staffId,
+        password: state.password,
+        projectRecordId: state.selectedProject.recordId,
+        assignments: assignments,
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast('团队分配已保存');
+        // 更新本地项目数据
+        if (assignments.designer) { state.selectedProject.designerId = assignments.designer; state.selectedProject.designerName = config_staffRoles[assignments.designer]?.name || ''; }
+        if (assignments.softDeco) { state.selectedProject.softDecoId = assignments.softDeco; state.selectedProject.softDecoName = config_staffRoles[assignments.softDeco]?.name || ''; }
+        if (assignments.drawing) { state.selectedProject.drawingId = assignments.drawing; state.selectedProject.drawingName = config_staffRoles[assignments.drawing]?.name || ''; }
+        if (assignments.supervisor) { state.selectedProject.supervisorId = assignments.supervisor; state.selectedProject.supervisorName = config_staffRoles[assignments.supervisor]?.name || ''; }
+        // 刷新团队信息显示
+        document.getElementById('detailTeamInfo').innerHTML = `
+          <div class="info-row"><span class="info-label">设计师</span><span class="info-value">${state.selectedProject.designerName || state.selectedProject.designerId || '未分配'}</span></div>
+          <div class="info-row"><span class="info-label">软装设计师</span><span class="info-value">${state.selectedProject.softDecoName || state.selectedProject.softDecoId || '未分配'}</span></div>
+          <div class="info-row"><span class="info-label">施工图设计师</span><span class="info-value">${state.selectedProject.drawingName || state.selectedProject.drawingId || '未分配'}</span></div>
+          <div class="info-row"><span class="info-label">施工监理</span><span class="info-value">${state.selectedProject.supervisorName || state.selectedProject.supervisorId || '未分配'}</span></div>
+        `;
+        renderAssignArea(state.selectedProject);
+      } else {
+        showToast('分配失败: ' + (data.error || ''));
+      }
+    })
+    .catch(err => {
+      showToast('网络错误: ' + err.message);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '保 存 分 配';
+    });
   }
 
   // ===== 详情页 Tab 切换 =====

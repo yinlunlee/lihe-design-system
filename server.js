@@ -356,26 +356,36 @@ async function handleProject(req, res) {
       return sendJSON(res, 401, { success: false, error: 'Auth failed' });
     }
 
-    // Search projects where ANY of the 4 role fields = staffId (OR conjunction)
-    const searchResult = await feishuRequest('POST',
-      `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search?page_size=500`,
-      {
-        filter: {
-          conjunction: 'or',
-          conditions: [
-            { field_name: '设计师工号', operator: 'is', value: [staffId] },
-            { field_name: '软装设计师工号', operator: 'is', value: [staffId] },
-            { field_name: '施工图设计师工号', operator: 'is', value: [staffId] },
-            { field_name: '施工监理工号', operator: 'is', value: [staffId] },
-            { field_name: '负责人工号', operator: 'is', value: [staffId] },
-          ]
-        }
-      }
-    );
-
     let projects = [];
-    if (searchResult.code === 0 && searchResult.data.items) {
-      projects = searchResult.data.items.map(item => mapProjectFields(item));
+
+    if (staffId === 'B01') {
+      // B01管理员：加载所有项目
+      const allResult = await feishuRequest('GET',
+        `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records?page_size=500`
+      );
+      if (allResult.code === 0 && allResult.data.items) {
+        projects = allResult.data.items.map(item => mapProjectFields(item));
+      }
+    } else {
+      // 普通员工：搜索分配给自己的项目（OR条件，4个角色字段任一匹配）
+      const searchResult = await feishuRequest('POST',
+        `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/search?page_size=500`,
+        {
+          filter: {
+            conjunction: 'or',
+            conditions: [
+              { field_name: '设计师工号', operator: 'is', value: [staffId] },
+              { field_name: '软装设计师工号', operator: 'is', value: [staffId] },
+              { field_name: '施工图设计师工号', operator: 'is', value: [staffId] },
+              { field_name: '施工监理工号', operator: 'is', value: [staffId] },
+              { field_name: '负责人工号', operator: 'is', value: [staffId] },
+            ]
+          }
+        }
+      );
+      if (searchResult.code === 0 && searchResult.data.items) {
+        projects = searchResult.data.items.map(item => mapProjectFields(item));
+      }
     }
 
     return sendJSON(res, 200, {
@@ -881,6 +891,71 @@ async function handleUpdateStatus(req, res) {
   });
 }
 
+// ===== 分配团队成员到项目 =====
+async function handleAssignStaff(req, res) {
+  const body = await getBody(req);
+  let data;
+  try { data = JSON.parse(body.toString()); } catch { return sendJSON(res, 400, { success: false, error: 'Invalid JSON' }); }
+
+  const { staffId, password, projectRecordId, assignments } = data;
+
+  // 验证员工身份
+  if (!staffId || !config.staffAccounts[staffId] || config.staffAccounts[staffId] !== password) {
+    return sendJSON(res, 401, { success: false, error: '需要员工登录' });
+  }
+  if (!projectRecordId || !assignments || typeof assignments !== 'object') {
+    return sendJSON(res, 400, { success: false, error: '缺少 projectRecordId 或 assignments' });
+  }
+
+  // 角色字段映射
+  const roleFieldMap = {
+    designer:    { idField: '设计师工号',       nameField: '设计师姓名' },
+    softDeco:    { idField: '软装设计师工号',   nameField: '软装设计师姓名' },
+    drawing:     { idField: '施工图设计师工号', nameField: '施工图设计师姓名' },
+    supervisor:  { idField: '施工监理工号',     nameField: '施工监理姓名' },
+  };
+
+  const fieldsToUpdate = {};
+  for (const [role, assignStaffId] of Object.entries(assignments)) {
+    const mapping = roleFieldMap[role];
+    if (!mapping) continue;
+
+    if (assignStaffId === '' || assignStaffId === null) {
+      // 清空分配
+      fieldsToUpdate[mapping.idField] = '';
+      fieldsToUpdate[mapping.nameField] = '';
+    } else {
+      // 验证被分配的员工存在
+      const staffInfo = config.staffRoles[assignStaffId];
+      if (!staffInfo) {
+        return sendJSON(res, 400, { success: false, error: `无效的工号: ${assignStaffId}` });
+      }
+      fieldsToUpdate[mapping.idField] = assignStaffId;
+      fieldsToUpdate[mapping.nameField] = staffInfo.name;
+    }
+  }
+
+  if (Object.keys(fieldsToUpdate).length === 0) {
+    return sendJSON(res, 400, { success: false, error: '没有需要更新的分配' });
+  }
+
+  const updateResult = await feishuRequest('PUT',
+    `/open-apis/bitable/v1/apps/${config.feishu.appToken}/tables/${config.tables.project}/records/${projectRecordId}`,
+    { fields: fieldsToUpdate }
+  );
+
+  if (updateResult.code !== 0) {
+    return sendJSON(res, 500, { success: false, error: updateResult.msg });
+  }
+
+  return sendJSON(res, 200, {
+    success: true,
+    projectRecordId,
+    updatedRoles: Object.keys(assignments),
+    message: '团队分配已更新',
+  });
+}
+
 // 手动触发同步所有"已签约"需求
 async function handleSyncSigned(req, res) {
   const parsed = url.parse(req.url, true);
@@ -1172,6 +1247,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === '/api/update-status' && req.method === 'POST') {
       return await handleUpdateStatus(req, res);
+    }
+    if (pathname === '/api/assign-staff' && req.method === 'POST') {
+      return await handleAssignStaff(req, res);
     }
     if (pathname.startsWith('/api/file/') && req.method === 'GET') {
       return await handleFileProxy(req, res);
