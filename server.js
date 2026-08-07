@@ -559,26 +559,58 @@ async function handleFileProxy(req, res) {
     const token = await getToken();
     const https = require('https');
 
-    https.get({
+    // 转发 Range 请求头，支持分块加载（PDF按页加载、视频拖拽进度条）
+    const reqHeaders = { 'Authorization': `Bearer ${token}` };
+    if (req.headers.range) {
+      reqHeaders['Range'] = req.headers.range;
+    }
+
+    const proxyReq = https.request({
       hostname: 'open.feishu.cn',
       path: `/open-apis/drive/v1/medias/${fileToken}/download`,
       method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: reqHeaders,
+      timeout: 30000,
     }, (proxyRes) => {
-      if (proxyRes.statusCode !== 200) {
+      if (proxyRes.statusCode !== 200 && proxyRes.statusCode !== 206) {
         return sendJSON(res, proxyRes.statusCode, { error: `Feishu returned ${proxyRes.statusCode}` });
       }
-      const ct = proxyRes.headers['content-type'] || 'application/octet-stream';
-      res.writeHead(200, {
-        'Content-Type': ct,
+
+      const respHeaders = {
+        'Content-Type': proxyRes.headers['content-type'] || 'application/octet-stream',
         'Content-Disposition': 'inline',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'public, max-age=604800, immutable',
         'Access-Control-Allow-Origin': '*',
-      });
+        'Accept-Ranges': 'bytes',
+      };
+
+      // 转发 Content-Length（让浏览器显示进度条、合理分配内存）
+      if (proxyRes.headers['content-length']) {
+        respHeaders['Content-Length'] = proxyRes.headers['content-length'];
+      }
+      // 转发 Content-Range（支持 206 Partial Content）
+      if (proxyRes.headers['content-range']) {
+        respHeaders['Content-Range'] = proxyRes.headers['content-range'];
+      }
+
+      res.writeHead(proxyRes.statusCode, respHeaders);
       proxyRes.pipe(res);
-    }).on('error', (err) => {
-      sendJSON(res, 500, { error: err.message });
     });
+
+    proxyReq.on('timeout', () => {
+      proxyReq.destroy();
+      if (!res.headersSent) {
+        sendJSON(res, 504, { error: '文件下载超时，请重试' });
+      }
+    });
+
+    proxyReq.on('error', (err) => {
+      if (!res.headersSent) {
+        sendJSON(res, 500, { error: err.message });
+      }
+    });
+
+    proxyReq.end();
   } catch (err) {
     sendJSON(res, 500, { error: err.message });
   }
